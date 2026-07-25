@@ -1,0 +1,7 @@
+# 系统 / 编辑器垃圾文件
+Thumbs.db
+.DS_Store
+*.log
+
+# 本项目敏感/本地文件（不要上传）
+.workbuddy/

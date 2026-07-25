@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>点击勇者 · Tap Hero（放置点击游戏）</title>
+<!--
+  ============================================================================
+  这是一个「0基础也能玩、能改」的点击放置游戏，灵感来自 Tap Titans。
+  运行方式：直接用浏览器（Chrome / Edge / Safari）打开本文件即可，无需安装任何东西。
+
+  代码分三块：
+    1) <style>  画面样式（颜色、布局）
+    2) <body>   HTML 骨架（按钮、文字框）
+    3) <script> 游戏逻辑（这里最重要，带中文注释）
+  想改数值，只看 CONFIG 和 HEROES 两个地方就够了。
+  ============================================================================
+-->
+<style>
+  :root{
+    --bg:#1b1033;
+    --panel:#2a1a4a;
+    --panel2:#37235e;
+    --gold:#ffcb3d;
+    --red:#ff5b6e;
+    --green:#48e0a0;
+    --text:#f3ecff;
+    --muted:#b9a9e0;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    background:radial-gradient(120% 80% at 50% 0%, #3a1f63 0%, var(--bg) 60%);
+    color:var(--text);
+    min-height:100vh;
+    display:flex; justify-content:center;
+    user-select:none;
+  }
+  .app{
+    width:100%; max-width:440px;
+    display:flex; flex-direction:column;
+    min-height:100vh; padding:12px 14px 16px;
+  }
+  /* 顶部状态栏 */
+  .hud{
+    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;
+  }
+  .hud .box{
+    flex:1; min-width:62px; background:var(--panel); border-radius:14px;
+    padding:8px 10px; text-align:center;
+  }
+  .hud .box .k{font-size:11px; color:var(--muted);}
+  .hud .box .v{font-size:17px; font-weight:700; margin-top:2px; line-height:1.1;}
+  .gold .v{color:var(--gold);}
+  .essence .v{color:#b58cff;}
+
+  /* 战斗区 */
+  .stage{
+    background:var(--panel); border-radius:18px;
+    padding:10px; margin-bottom:10px; text-align:center;
+  }
+  .enemy-name{font-size:14px; color:var(--muted); margin-bottom:6px;}
+  .enemy-name b{color:var(--text);}
+  .tap-zone{
+    position:relative;
+    height:200px; display:flex; align-items:center; justify-content:center;
+    cursor:pointer; overflow:hidden;
+  }
+  .enemy{
+    font-size:96px; line-height:1;
+    transition:transform .05s ease;
+    filter:drop-shadow(0 8px 14px rgba(0,0,0,.45));
+  }
+  .tap-zone:active .enemy{transform:scale(.92);}
+  .hpbar{
+    height:16px; background:#160c2b; border-radius:10px; overflow:hidden;
+    margin-top:6px; border:1px solid #00000033;
+  }
+  .hpfill{
+    height:100%; width:100%;
+    background:linear-gradient(90deg,#ff5b6e,#ff9a3d);
+    transition:width .08s linear;
+  }
+  .hptext{font-size:12px; color:var(--muted); margin-top:4px;}
+
+  /* 难度自适应提示（右上角短暂出现） */
+  #diffToast{position:fixed; top:12px; right:12px; z-index:50;
+    background:rgba(20,12,35,.9); color:#fff; padding:8px 14px; border-radius:10px;
+    font-size:13px; box-shadow:0 4px 14px rgba(0,0,0,.35);
+    opacity:0; transform:translateY(-8px); transition:opacity .25s, transform .25s;
+    pointer-events:none;}
+  #diffToast.show{opacity:1; transform:translateY(0);}
+
+  /* 离线收益弹窗 */
+  .modal-mask{position:fixed; inset:0; z-index:50; display:none; align-items:center; justify-content:center;
+    background:rgba(8,4,16,.72); backdrop-filter:blur(2px);}
+  .modal{background:var(--panel2); border:1px solid #ffffff1a; border-radius:18px; padding:22px 26px;
+    text-align:center; width:min(300px,86vw); box-shadow:0 12px 32px rgba(0,0,0,.5);}
+  .modal h3{margin:0 0 10px; font-size:20px;}
+  .modal p{margin:6px 0; color:var(--text);}
+  .modal p.sub{font-size:12px; color:var(--muted);}
+  .modal .offline-gold{font-size:26px; font-weight:800; color:var(--gold); margin:12px 0 16px;}
+  .modal .buy{width:100%;}
+
+  /* Boss 限时进度条（仅 Boss 关显示） */
+  .boss-timer{position:relative; height:22px; margin-top:8px; background:#3a1530;
+    border-radius:11px; overflow:hidden; border:1px solid #ff5d8f;}
+  .boss-timer-fill{position:absolute; left:0; top:0; bottom:0; width:100%;
+    background:linear-gradient(90deg,#ff5d8f,#ff2d55); transition:width .1s linear;}
+  .boss-timer-text{position:relative; z-index:1; display:block; text-align:center;
+    line-height:22px; font-size:13px; font-weight:700; color:#fff;}
+  .boss-timer.danger .boss-timer-fill{background:linear-gradient(90deg,#ff2d55,#c20000);}
+
+  /* Boss 循环中的“继续挑战”按钮：准备充分后手动进入 Boss 关 */
+  .boss-continue{
+    display:block; width:100%; margin-top:10px; padding:12px;
+    border:none; border-radius:12px; cursor:pointer;
+    font-size:15px; font-weight:800; color:#1b1033;
+    background:linear-gradient(90deg,var(--gold),#ffb24d);
+    box-shadow:0 4px 12px rgba(255,176,77,.35);
+    animation:pulse 1.4s ease-in-out infinite;
+  }
+  .boss-continue:active{transform:scale(.97);}
+  @keyframes pulse{0%,100%{filter:brightness(1);}50%{filter:brightness(1.12);}}
+
+  /* 顶部固定区：吸顶，滚动升级时怪物仍可见可点 */
+  .topbar{
+    position: sticky; top:0; z-index:20;
+    background:#241046;                 /* 不透明，避免下方内容透出 */
+    margin:-12px -14px 0;               /* 抵消 .app 的留白，让背景铺满到屏幕顶端与两侧 */
+    padding:18px 14px 8px;
+    box-shadow:0 6px 14px rgba(0,0,0,.35);
+  }
+  /* 小怪进度点 */
+  .pips{ display:flex; gap:4px; justify-content:center; margin:4px 0; min-height:10px; }
+  .pips .pip{ width:9px; height:9px; border-radius:50%; background:#4a3a6e; }
+  .pips .pip.killed{ background:var(--gold); }
+
+  /* 伤害飘字 */
+  .dmg{
+    position:absolute; font-weight:800; font-size:22px;
+    color:#fff; pointer-events:none; text-shadow:0 2px 4px #000;
+    animation:floatUp .7s ease-out forwards;
+  }
+  .dmg.crit{color:var(--gold); font-size:30px;}
+  @keyframes floatUp{
+    0%{opacity:1; transform:translate(-50%,0) scale(.8);}
+    100%{opacity:0; transform:translate(-50%,-70px) scale(1.2);}
+  }
+
+  /* 区块标题 */
+  .title{display:flex; justify-content:space-between; align-items:center; margin:10px 2px 6px;}
+  .title h2{font-size:15px; margin:0;}
+  .title .hint{font-size:11px; color:var(--muted);}
+
+  /* 卡片列表（英雄商店 / 升级面板通用） */
+  .list{display:flex; flex-direction:column; gap:8px;}
+  .card{
+    background:var(--panel2); border-radius:14px; padding:10px 12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .card .emoji{font-size:30px; width:34px; text-align:center;}
+  .card .info{flex:1; min-width:0;}
+  .card .info .name{font-size:14px; font-weight:700;}
+  .card .info .sub{font-size:11px; color:var(--muted); margin-top:2px;}
+  .buy{
+    border:none; border-radius:12px; padding:10px 12px;
+    font-size:13px; font-weight:700; color:#1b1033;
+    background:var(--gold); cursor:pointer; min-width:88px;
+    transition:transform .05s, filter .1s;
+  }
+  .buy:active{transform:scale(.95);}
+  .buy:disabled{background:#4a3a6e; color:#8d7db5; cursor:not-allowed;}
+  .buy .c{display:block; font-size:11px; opacity:.8;}
+  /* 英雄卡片右侧操作区：升级 + 觉醒 两个按钮竖排 */
+  .card .actions{display:flex; flex-direction:column; gap:6px; min-width:84px;}
+  .buy.awaken{background:linear-gradient(135deg,#7c5cff,#b06bff); color:#fff;}
+  .buy.awaken:disabled{background:#4a3a6e; color:#8d7db5; cursor:not-allowed;}
+  /* 英雄列表：已拥有的英雄全部显示 + 末尾露出一张“即将可购买”的下一个单位；整体更紧凑，给两个按钮留出空间 */
+  #heroList .card{ padding:8px 10px; }
+  #heroList .card .emoji{ font-size:26px; width:30px; }
+  #heroList .card .info .name{ font-size:13px; }
+  #heroList .card .info .sub{ font-size:10px; margin-top:1px; }
+  #heroList .card .power{ font-size:11px; color:var(--green); font-weight:800; margin-top:3px; }
+  #heroList .card .actions{ min-width:80px; gap:5px; }
+  #heroList .card .buy{ padding:8px 10px; font-size:12px; }
+  #heroList .card .buy .c{ font-size:10px; }
+  /* 通用战力提升行（英雄卡与点击强化卡共用）：绿色高亮，明确显示本次可提升的战力 */
+  .card .power{ font-size:11px; color:var(--green); font-weight:800; margin-top:3px; }
+
+  /* 主动技能面板（能量+冷却） */
+  .skills{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
+  .skill{ display:flex; align-items:center; gap:10px; background:var(--panel); border-radius:12px; padding:8px 10px; }
+  .skill.locked{ opacity:.5; }
+  .skill .sk-icon{ font-size:22px; width:26px; text-align:center; }
+  .skill .sk-info{ flex:1; min-width:0; }
+  .skill .sk-name{ font-size:13px; font-weight:700; }
+  .skill .sk-state{ font-size:10px; color:var(--green); font-weight:700; margin-left:4px; }
+  .skill .sk-sub{ font-size:10px; color:var(--muted); margin-top:1px; }
+  .skill .sk-desc{ font-size:10px; color:var(--muted); margin-top:2px; line-height:1.35; }
+  .skill.active{ box-shadow:0 0 0 2px var(--green) inset; } /* buff 生效中高亮 */
+  /* 技能精通（后期用精华永久减冷却） */
+  .skill-mastery{ display:block; width:100%; margin-top:6px; padding:9px; border:none; border-radius:10px;
+    background:linear-gradient(135deg,#5a3fb0,#8a5cff); color:#fff; font-size:12px; font-weight:700; }
+  .skill-mastery:disabled{ background:#4a3a6e; color:#8d7db5; cursor:not-allowed; }
+  .skill-mastery .c{ font-size:11px; opacity:.85; }
+  /* 持续 buff 状态条：释放技能后清楚显示仍生效（图标+剩余秒数） */
+  .buff-bar{ position:absolute; top:6px; left:8px; right:8px; display:flex; gap:6px; justify-content:center;
+    pointer-events:none; z-index:3; }
+  .buff-pill{ font-size:11px; font-weight:800; padding:3px 9px; border-radius:10px; }
+  .buff-pill.berserk{ background:rgba(255,91,110,.92); color:#fff; }
+  .buff-pill.gold{ background:rgba(255,203,61,.95); color:#1b1033; }
+  /* 连击状态显示 */
+  .combo-box{ position:absolute; bottom:10px; left:50%; transform:translateX(-50%); font-size:14px; font-weight:800;
+    color:var(--gold); text-shadow:0 1px 4px #000; opacity:0; transition:opacity .2s; z-index:3;
+    pointer-events:none; white-space:nowrap; }
+  .combo-box.show{ opacity:1; }
+  .combo-box.pulse{ animation:comboPulse .25s ease; }
+  @keyframes comboPulse{ 0%{ transform:translateX(-50%) scale(1.3);} 100%{ transform:translateX(-50%) scale(1);} }
+  .tap-zone.berserk{ box-shadow: inset 0 0 46px rgba(255,91,110,.5); } /* 狂暴红光晕 */
+  .skill .sk-btn{ padding:7px 12px; font-size:12px; border:none; border-radius:10px;
+    background:linear-gradient(135deg,#ff8a3d,#ff5b6e); color:#fff; font-weight:700; min-width:66px; }
+  .skill .sk-btn:disabled{ background:#4a3a6e; color:#8d7db5; cursor:not-allowed; box-shadow:none; }
+
+  .footer{margin-top:14px; display:flex; gap:8px;}
+  .footer button{
+    flex:1; background:var(--panel); color:var(--muted);
+    border:1px solid #ffffff14; border-radius:12px; padding:10px;
+    font-size:12px; cursor:pointer;
+  }
+  .footer button:active{transform:scale(.97);}
+  .tip{font-size:11px; color:var(--muted); text-align:center; margin-top:10px; line-height:1.6;}
+
+  /* 批量购买数量选择器 */
+  .buy-amount{
+    display:flex; align-items:center; gap:10px;
+    background:var(--panel); border:1px solid #ffffff10;
+    border-radius:14px; padding:8px 12px; margin:10px 0 4px;
+  }
+  .buy-amount .ba-label{font-size:12px; color:var(--muted); white-space:nowrap;}
+  .buy-amount .ba-opts{display:flex; gap:6px; flex:1; justify-content:flex-end;}
+  .ba-opts button{
+    border:1px solid #ffffff18; background:transparent; color:var(--muted);
+    border-radius:10px; padding:6px 12px; font-size:13px; font-weight:700;
+    cursor:pointer; transition:all .12s; min-width:48px;
+  }
+  .ba-opts button:hover{color:var(--text); border-color:#ffffff30;}
+  .ba-opts button.active{
+    background:var(--gold); color:#1b1033; border-color:var(--gold);
+    box-shadow:0 2px 10px #ffce4a33;
+  }
+  /* 转生（Prestige）相关样式 */
+  .box.prestige .v{color:var(--gold);}              /* 重生加成数值用金色突出 */
+  .prestige-btn{
+    flex:1.4; background:linear-gradient(135deg,#ffce4a,#ff9d2f); color:#1b1033;
+    border:none; border-radius:12px; padding:10px; font-size:12px; font-weight:800;
+    cursor:pointer; box-shadow:0 2px 12px #ffce4a44;
+  }
+  .prestige-btn:active{transform:scale(.97);}
+  .prestige-btn:disabled{
+    background:#4a3a6e; color:#8d7db5; cursor:not-allowed; box-shadow:none;
+  }
+  .prestige-btn.locked{
+    background:#4a3a6e; color:#8d7db5; cursor:not-allowed; box-shadow:none;
+  }
+  .modal .buy.secondary{background:#3a2a5e; color:#e7defb; box-shadow:none; margin-top:8px;}
+</style>
+</head>
+<body>
+<div id="diffToast"></div>
+<div id="offlineModal" class="modal-mask" style="display:none">
+  <div class="modal">
+    <h3>💤 离线收益</h3>
+    <p>你离开了 <b id="offlineTime">--</b></p>
+    <p class="sub">英雄们替你刷怪赚到了</p>
+    <div class="offline-gold">💰 +<span id="offlineGold">0</span></div>
+    <p class="sub" id="offlineEssence" style="display:none"></p>
+    <button id="offlineClaim" class="buy">领取</button>
+  </div>
+</div>
+<div id="prestigeModal" class="modal-mask" style="display:none">
+  <div class="modal">
+    <h3 id="prestigeTitle">🌟 转生</h3>
+    <p id="prestigeBody"></p>
+    <div class="offline-gold" id="prestigeReward" style="display:none"></div>
+    <button id="prestigeConfirm" class="buy" style="display:none">确认转生</button>
+    <button id="prestigeCancel" class="buy secondary" style="display:none">再想想</button>
+    <button id="prestigeOk" class="buy secondary" style="display:none">知道了</button>
+  </div>
+</div>
+<div id="confirmModal" class="modal-mask" style="display:none">
+  <div class="modal">
+    <h3 id="confirmTitle">提示</h3>
+    <p id="confirmBody"></p>
+    <button id="confirmOk" class="buy">确定</button>
+    <button id="confirmCancel" class="buy secondary">取消</button>
+  </div>
+</div>
+<div class="app">
+  <!-- 顶部固定区：数据栏 + 打怪区（滚动时吸顶，方便边升级边打怪） -->
+  <div class="topbar">
+    <!-- 顶部状态栏 -->
+    <div class="hud">
+      <div class="box gold"><div class="k">金币</div><div class="v" id="gold">0</div></div>
+      <div class="box"><div class="k">关卡</div><div class="v" id="stage">1</div></div>
+      <div class="box"><div class="k">每秒伤害</div><div class="v" id="dps">0</div></div>
+      <div class="box"><div class="k">难度成长</div><div class="v" id="growth">1.18</div></div>
+      <div class="box essence"><div class="k">精华</div><div class="v" id="essence">0</div></div>
+      <div class="box prestige"><div class="k">重生加成</div><div class="v" id="prestige">×1.00</div></div>
+    </div>
+
+    <!-- 战斗区：点这里打怪 -->
+    <div class="stage">
+      <div class="enemy-name">第 <b id="stage2">1</b> 关 · <span id="enemyName">史莱姆</span></div>
+      <div id="monsterPips" class="pips"></div>
+      <div class="tap-zone" id="tapZone">
+        <div class="enemy" id="enemy">🟢</div>
+        <div class="buff-bar" id="buffBar"></div>
+        <div class="combo-box" id="comboBox"></div>
+      </div>
+      <div class="hpbar"><div class="hpfill" id="hpfill"></div></div>
+      <div class="hptext" id="hptext">HP 10 / 10</div>
+      <div class="boss-timer" id="bossTimerWrap" style="display:none">
+        <div class="boss-timer-fill" id="bossTimerFill"></div>
+        <span class="boss-timer-text" id="bossTimerText">30.0s</span>
+      </div>
+      <button id="bossContinue" class="boss-continue" style="display:none">⚔️ 继续挑战 BOSS（第 <span id="bossContinueStage"></span> 关）</button>
+    </div>
+  </div>
+
+  <!-- 主动技能（能量+冷却）：核心循环变成“何时放技能”的时机决策 -->
+  <div class="title"><h2>⚡ 主动技能</h2><span class="hint">能量 <span id="energyVal">100</span>/<span id="energyMax">100</span></span></div>
+  <div class="skills" id="skillList"></div>
+  <button id="skillMastery" class="skill-mastery">📘 技能精通 Lv.0 · 冷却 -0% · 升级 <span class="c">0 精</span></button>
+
+  <!-- 英雄商店 -->
+  <div class="title"><h2 id="heroTitle">🦸 英雄（自动输出）</h2><span class="hint">觉醒=全队共鸣</span></div>
+  <!-- 批量购买数量选择器：同时作用于英雄与点击升级 -->
+  <div class="buy-amount">
+    <span class="ba-label">购买数量</span>
+    <div class="ba-opts" id="buyAmountOpts">
+      <button data-amt="1" class="active">×1</button>
+      <button data-amt="10">×10</button>
+      <button data-amt="100">×100</button>
+      <button data-amt="max">最大</button>
+    </div>
+  </div>
+  <div class="list" id="heroList"></div>
+
+  <!-- 升级面板 -->
+  <div class="title"><h2>⬆️ 我的强化</h2><span class="hint">提升点击伤害</span></div>
+  <div class="list">
+    <div class="card">
+      <div class="emoji">👊</div>
+      <div class="info">
+        <div class="name">点击伤害 Lv.<span id="tapLv">1</span></div>
+        <div class="sub">每次点击造成 <span id="tapDmg">1</span> 伤害</div>
+        <div class="power" id="tapPower"></div>
+      </div>
+      <button class="buy" id="buyTap">升级<span class="c" id="tapCost">25</span></button>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button id="prestigeBtn" class="prestige-btn locked">转生（需第100关）</button>
+    <button id="resetBtn">重置存档</button>
+    <button id="saveBtn">手动存档</button>
+  </div>
+  <div class="tip">提示：英雄会自动打怪（放置收益）；<b>快速连点</b>可累积「连击」倍率（停手约 2 秒清零），活跃手点比纯放置更强。<br>商店显示<b>已拥有的全部英雄</b> + 末尾一张<b>即将可购买</b>的下一个单位，并标出本次可提升的战力。<br>击破 BOSS 得「灵魂精华」，<b>觉醒</b>任意英雄为<b>全队</b>永久加伤（军团共鸣）；<b>精华转生后保留</b>，放心转生。转生需第 100 关。<br>⚡ <b>主动技能</b>消耗「能量」(随时间/点击回复)并有冷却：狂暴=点击×10、黄金=金币×5、时停=Boss倒计时+5s，随<b>英雄总等级</b>解锁；用精华买<b>技能精通</b>可永久减冷却。<br>进度自动存于本机浏览器。</div>
+</div>
+
+<script>
+/* =========================================================================
+   1) 配置区 —— 想调难度/手感，改这里就行
+   ========================================================================= */
+const CONFIG = {
+  baseTap: 1,          // 1级点击伤害
+  tapCostBase: 25,     // 升级点击的第1次花费
+  tapCostGrowth: 1.15, // 每次升级花费 ×1.15
+
+  enemyHpBase: 10,     // 第1关敌人血量
+  enemyHpGrowth: 1.18, // 每过一关敌人血量 ×1.18（>金币成长1.13，避免英雄DPS永久反超导致秒杀；越高越硬核）
+  bossEvery: 5,        // 每5关一个 Boss（血量×10）
+  bossHpMult: 10,
+  bossTimeLimit: 30,   // Boss 关限时(秒)：时间内没击杀则 Boss 失败，退回上一小怪关练级（普通关不受影响）
+  bossGoldMult: 8,     // Boss 击破奖励倍数（原为硬编码5，适当提高通关奖励）
+  monstersPerStage: 10, // 普通关卡的小怪数量（Boss 关固定 1 只）
+
+  goldBase: 5,         // 第1关击杀给的金币
+  goldGrowth: 1.13,    // 每过一关金币 ×1.13
+
+  critChance: 0.05,    // 暴击概率 5%
+  critMult: 5,         // 暴击伤害 ×5
+
+  // 离线收益（放置游戏核心留存钩子）：关掉游戏也能按 DPS 累积金币
+  offlineMinSeconds: 60,     // 离线低于这么久不结算（避免切标签误触发）
+  offlineMaxSeconds: 28800,  // 离线收益最多按 8 小时计算（再多也不结算）
+  offlineRate: 0.6,          // 离线效率（主动游玩收益的 60%）
+
+  // 转生/重生（Prestige）：后期纵向目标——重置本局换取永久伤害加成，打破难度天花板
+  prestigeUnlockStage: 100,  // 达到(本局最高)第几关才解锁转生（50→100，拉长前期、避免过早转生）
+  prestigeDivisor: 5,        // 点数公式分母：floor((bestStage/5)^1.5)
+  prestigePerPoint: 0.1,     // 每点重生点数 +10% 永久伤害（tap 与英雄 DPS 都乘）
+
+  // 英雄觉醒 · 军团共鸣（重新设计，替代旧版套利觉醒）
+  // 旧版按“英雄梯度”定价：只觉醒最贵单位最划算、低费单位不如买新 → 是设计缺陷。
+  // 新版：觉醒【任一已雇佣英雄】消耗精华，给【全队英雄】永久 +awakenGlobalBonus 伤害
+  //（所有英雄觉醒次数叠加计算）。每个英雄觉醒收益相同 → 无套利、无陷阱，鼓励分散投资整支军团。
+  // 觉醒是“本局”投资（随转生重置），但灵魂精华转生后保留，鼓励玩家转生；转生的 prestigeMult 才是永久加成。
+  bossEssenceDivisor: 10,    // 每过这么多关，Boss 掉落精华 +1：floor(stage/10)
+  awakenCostBase: 5,         // 单次觉醒基础精华消耗（所有英雄相同，不随梯度）
+  awakenCostGrowth: 2.2,     // 同一英雄再次觉醒消耗 ×2.2（越叠越贵，鼓励分散给多英雄）
+  awakenGlobalBonus: 0.05,   // 每觉醒任意英雄 1 次，全队英雄伤害 +5% [PLACEHOLDER]
+  awakenLevelStep: 50,       // 觉醒等级门槛：英雄需达到「整五十级」(50/100/150...)才能觉醒 [PLACEHOLDER]；原 10 太频繁，11 个单位把精华摊薄，改为 50 让每次觉醒更值钱
+
+  // 主动技能（能量+冷却模型）：让核心循环从纯数值变“何时放技能”的时机决策
+  // 能量：共享池，随时间+点击回复；每个技能消耗能量并有独立冷却（能量满也不能连放，冷却卡最小间隔）
+  energyMax: 100,         // 能量池上限
+  energyRegen: 6,         // 每秒自然回复能量 [PLACEHOLDER]
+  energyPerTap: 1,        // 每次点击额外回复能量（奖励活跃手点）[PLACEHOLDER]
+  // 技能解锁改为跟随“英雄总等级”提升（不再是关卡），更能体现养成进度 [PLACEHOLDER]
+  skillUnlockHeroLv: { berserk:1, gold:12, time:30 },
+  // 连击系统：快速连点累积连击倍率，停手约 comboDecay 秒衰减归零 [PLACEHOLDER]
+  comboPerTap: 0.04,   // 每次点击增加的连击倍率
+  comboMax: 3.0,       // 连击倍率上限（×3.0）
+  comboDecay: 2.0,     // 停手多少秒后连击清零
+  // 技能精通（后期减冷却的元进度）：用灵魂精华购买，永久降低所有技能冷却 [PLACEHOLDER]
+  masteryBaseCost: 50,   // 第 1 级消耗精华
+  masteryCostGrowth: 1.6,// 每级精华消耗 ×增长
+  cdrPerMastery: 0.04,   // 每级 -4% 冷却
+  cdrCap: 0.5,           // 冷却减免上限 50%（约 12 级满）
+  skills: {
+    berserk: { name:"狂暴", icon:"🔥", energyCost:40, duration:8,  cooldown:60, tapMult:10,
+      desc:"点击伤害 ×10，持续 8 秒。Boss 残血时开，抢在限时内击杀。" },
+    gold:    { name:"黄金", icon:"💰", energyCost:50, duration:20, cooldown:120, goldMult:5,
+      desc:"金币获取 ×5，持续 20 秒。攒钱升级英雄前开启，收益翻倍。" },
+    time:    { name:"时停", icon:"⏱️", energyCost:35, cooldown:90, freeze:5,
+      desc:"Boss 倒计时 +5 秒（瞬时）。快超时时开，争取最后输出窗口。" },
+  },
+};
+
+// 难度自适应（动态难度）参数 —— 详见下方 adaptDifficulty()
+// 思路：把“每关血量成长系数”当成一个会自我修正的移动目标，让游戏始终停在
+// “有挑战但不卡死”的区间，而不是被英雄DPS反超(秒杀无聊)或把人卡死(弃游)。
+const DIFF = {
+  minGrowth: 1.10,   // 难度下限（别让怪太软，低于金币成长1.13时会自动回升）
+  maxGrowth: 1.35,   // 难度上限（别把人卡死）
+  step: 0.01,        // 每次调整幅度（每关成长 ×或÷这个量）
+  oneShotStreakNeed: 3, // 连续几关“秒杀级”才上调一次难度（带迟滞，防抖动）
+  hardSeconds: 40,   // 一关耗时超过这么久算“卡关”，下调难度帮玩家一把
+};
+
+// 敌人外观：普通怪 + Boss，按关卡循环取用
+const NORMAL_ENEMIES = ["🟢","👹","👻","🐍","🦂","🦇","🕷️","💀"];
+const BOSS_ENEMIES   = ["🐲","👺","🧟","👿","🦖"];
+
+// 英雄列表：加新英雄只要在这里加一行
+const HEROES = [
+  {id:"knight",  name:"剑士",   emoji:"⚔️", baseCost:25,    baseDps:1,    growth:1.07},
+  {id:"archer",  name:"弓箭手", emoji:"🏹", baseCost:120,   baseDps:8,    growth:1.07},
+  {id:"mage",    name:"法师",   emoji:"🧙", baseCost:600,   baseDps:47,   growth:1.07},
+  {id:"priest",  name:"牧师",   emoji:"✨", baseCost:2500,  baseDps:260,  growth:1.07},
+  {id:"dragon",  name:"龙骑士", emoji:"🐉", baseCost:12000, baseDps:1500, growth:1.07},
+  {id:"angel",   name:"天使",   emoji:"😇", baseCost:60000, baseDps:9000, growth:1.07},
+  {id:"demon",   name:"恶魔",   emoji:"😈", baseCost:300000,    baseDps:55000,    growth:1.07},
+  {id:"titan",   name:"泰坦",   emoji:"🗿", baseCost:1500000,   baseDps:330000,   growth:1.07},
+  {id:"phoenix", name:"凤凰",   emoji:"🔥", baseCost:7500000,   baseDps:2000000,  growth:1.07},
+  {id:"reaper",  name:"死神",   emoji:"💀", baseCost:38000000,  baseDps:12000000, growth:1.07},
+  {id:"goddess", name:"女神",   emoji:"👸", baseCost:190000000, baseDps:75000000, growth:1.07},
+];
+
+/* =========================================================================
+   2) 存档（游戏进度就存在浏览器的 localStorage 里）
+   ========================================================================= */
+const SAVE_KEY = "tapHeroSave_v1";
+let state = {
+  gold: 0,
+  stage: 1,
+  tapLevel: 1,
+  heroes: {},      // { knight: 等级, archer: 等级, ... }
+  enemyHp: 0,      // 当前敌人剩余血量（不存档也行，下面会重算）
+  monsterIndex: 1, // 当前关卡内第几只怪（1基；同关多只，清完才进下一关）
+  dynGrowth: 1.18, // 难度自适应：当前实际使用的每关血量成长系数（会浮动）
+  bossLoop: false, // 是否处于“Boss 循环”（刚从 Boss 失败回退过）：期间冻结难度上调，击破 Boss 才解除
+  lastSeen: 0,     // 上次活跃时间戳(ms)，用于离线收益结算（0=首次/无记录）
+  prestige: 0,     // 累计重生点数（永久，转生后保留并累积）
+  bestStage: 1,    // 本局到达过的最高关卡（用于计算转生可得点数；转生后归 1）
+  essence: 0,      // 灵魂精华（Boss 掉落，用于英雄觉醒；转生后保留，鼓励转生）
+  awaken: {},      // { heroId: 觉醒次数 }；觉醒是“本局”投资，转生时重置（但精华保留）
+  energy: 100,     // 主动技能能量池（共享，随时间+点击回复）
+  skillActive: {}, // { skillId: 剩余激活秒数 }，0=未激活（转生时重置）
+  skillCd: {},     // { skillId: 剩余冷却秒数 }，0=可用（转生时重置）
+  combo: 0,        // 连击倍率累加值（tapDamage 叠加，1+combo 为最终倍率），0=无连击
+  comboTimer: 0,   // 距上次点击的秒数（用于衰减）
+  skillMastery: 0, // 技能精通等级（永久，用精华购买，降低所有技能冷却）
+};
+
+// 难度自适应相关“运行时”变量（不存档，每次开局重新算）
+let dynGrowth = CONFIG.enemyHpGrowth; // 实际使用的成长系数，会上下浮动
+let oneShotStreak = 0;  // 连续“秒杀级”关计数
+let stuckStreak = 0;    // 连续“卡关”计数
+let stageStartTime = 0; // 当前关开始时间戳
+let stageTrivial = false; // 当前关是否“秒杀级”（怪血 <= 单次攻击力）
+let bossTimeLeft = 0;     // 当前 Boss 剩余时间(秒)，仅 Boss 关有效；非 Boss 关为 0
+
+function load(){
+  try{
+    const raw = localStorage.getItem(SAVE_KEY);
+    if(raw){
+      const s = JSON.parse(raw);
+      Object.assign(state, s);
+      for(const h of HEROES){
+        if(state.heroes[h.id]===undefined) state.heroes[h.id]=0;
+        if(state.awaken[h.id]===undefined) state.awaken[h.id]=0;
+      }
+      if(state.essence===undefined) state.essence=0;
+      if(state.monsterIndex===undefined) state.monsterIndex=1;
+      if(state.dynGrowth===undefined) state.dynGrowth=CONFIG.enemyHpGrowth;
+      if(state.bossLoop===undefined) state.bossLoop=false;
+      if(state.prestige===undefined) state.prestige=0;
+      if(state.bestStage===undefined) state.bestStage=1;
+      if(state.bestStage < state.stage) state.bestStage = state.stage; // 兼容：最高关不低于当前关
+      if(state.lastSeen===undefined) state.lastSeen=Date.now(); // 旧存档兼容：无此字段则视为现在
+      if(state.energy===undefined) state.energy = CONFIG.energyMax;
+      if(state.skillActive===undefined) state.skillActive = {};
+      if(state.skillCd===undefined) state.skillCd = {};
+      if(state.combo===undefined) state.combo = 0;
+      if(state.comboTimer===undefined) state.comboTimer = 0;
+      if(state.skillMastery===undefined) state.skillMastery = 0;
+      // 主动技能：冷却可保留，激活中的 buff 跨存档不应残留（避免离线/重开还在生效）
+      for(const id in CONFIG.skills){ state.skillCd[id] = state.skillCd[id]||0; state.skillActive[id] = 0; }
+    }
+  }catch(e){ console.warn("读取存档失败", e); }
+}
+function save(){
+  state.lastSeen = Date.now();  // 记录“最后一次活跃”，供离线收益结算
+  localStorage.setItem(SAVE_KEY, JSON.stringify(state));
+}
+
+// 通用游戏内确认弹窗（替代原生 confirm，避免预览/WebView 拦截导致“点了没反应”）
+let _confirmCb = null;
+function showConfirm(title, bodyHtml, onConfirm){
+  const mask = document.getElementById("confirmModal");
+  if(!mask) return;
+  document.getElementById("confirmTitle").textContent = title;
+  document.getElementById("confirmBody").innerHTML = bodyHtml;
+  _confirmCb = (typeof onConfirm === "function") ? onConfirm : null;
+  mask.style.display = "flex";
+}
+function closeConfirm(){ document.getElementById("confirmModal").style.display = "none"; _confirmCb = null; }
+
+function reset(){
+  showConfirm("重置存档", "确定清空<b>所有进度</b>吗？此操作<b>不可恢复</b>。", ()=>{
+    localStorage.removeItem(SAVE_KEY);
+    state = { gold:0, stage:1, tapLevel:1, heroes:{}, essence:0, awaken:{}, enemyHp:0, monsterIndex:1, dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:Date.now(), prestige:0, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery:0 };
+    HEROES.forEach(h=>{ state.heroes[h.id]=0; state.awaken[h.id]=0; });
+    dynGrowth = state.dynGrowth; oneShotStreak = 0; stuckStreak = 0;
+    save(); spawnEnemy(); onStageBegin(); renderAll();
+    diffToast("已重置存档");
+  });
+}
+
+/* =========================================================================
+   2.5) 离线收益：关掉游戏也能按 DPS 累积金币（放置游戏核心留存钩子）
+   ========================================================================= */
+// 把秒数格式化成“X 小时 Y 分 / Y 分 Z 秒 / Z 秒”
+function fmtTime(sec){
+  sec = Math.floor(sec);
+  const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+  if(h>0) return h + " 小时 " + m + " 分";
+  if(m>0) return m + " 分 " + s + " 秒";
+  return s + " 秒";
+}
+// 进入游戏时结算离线收益：按离开时的 DPS，估算离线期间英雄替你刷怪赚到的金币
+function applyOfflineEarnings(){
+  if(!state.lastSeen) return;                 // 首次游玩（无记录）不结算
+  const now = Date.now();
+  let elapsed = (now - state.lastSeen) / 1000; // 实际离线秒数
+  if(elapsed < CONFIG.offlineMinSeconds) return;   // 太短（如切个标签）不结算
+  const capped = Math.min(elapsed, CONFIG.offlineMaxSeconds); // 封顶，避免无限累积
+  const dps = totalDps();
+  if(dps <= 0) return;                         // 没买英雄，离线无产出
+  // 离线每秒产出 ≈ 每秒击杀数 × 每只金币（按离开时所在关估算）
+  const hp = enemyMaxHp(state.stage);
+  const killsPerSec = dps / hp;
+  const goldPerSec = killsPerSec * goldReward(state.stage);
+  const earned = Math.floor(goldPerSec * capped * CONFIG.offlineRate);
+  if(earned <= 0) return;
+  state.gold += earned;
+  // 离线期间英雄也会击杀 Boss，按比例发放「灵魂精华」（觉醒系统资源）
+  const bossesOffline = Math.floor((killsPerSec * capped) / CONFIG.monstersPerStage);
+  const essenceGained = bossesOffline * bossEssenceGain(state.stage);
+  if(essenceGained > 0) state.essence += essenceGained;
+  save();                                      // 更新 lastSeen=now，避免重复结算
+  showOfflineModal(elapsed, earned, essenceGained);
+}
+// 弹出离线收益结算面板
+function showOfflineModal(elapsed, earned, essenceGained){
+  const mask = document.getElementById("offlineModal");
+  if(!mask) return;
+  document.getElementById("offlineTime").textContent = fmtTime(Math.min(elapsed, CONFIG.offlineMaxSeconds));
+  document.getElementById("offlineGold").textContent = fmt(earned);
+  const eLine = document.getElementById("offlineEssence");
+  if(eLine){
+    if(essenceGained > 0){ eLine.style.display = "block"; eLine.textContent = "✦ 灵魂精华 +" + fmt(essenceGained); }
+    else eLine.style.display = "none";
+  }
+  mask.style.display = "flex";
+}
+
+/* =========================================================================
+   3) 数值计算
+   ========================================================================= */
+function tapDamage(){ return CONFIG.baseTap * state.tapLevel * prestigeMult() * awakenGlobalMult() * skillTapMult() * comboMult(); }
+
+function totalDps(){
+  let dps = 0;
+  for(const h of HEROES){
+    const lv = state.heroes[h.id] || 0;
+    if(lv>0) dps += h.baseDps * lv * awakenGlobalMult() * prestigeMult();
+  }
+  return dps;
+}
+
+// 转生永久伤害加成：每 1 点重生点数 +prestigePerPoint（默认 +10%）
+function prestigeMult(){ return 1 + CONFIG.prestigePerPoint * (state.prestige || 0); }
+// 按本局最高关预估本次转生可得点数（floor((bestStage/divisor)^1.5)）
+function prestigeGain(){ return Math.floor(Math.pow(state.bestStage / CONFIG.prestigeDivisor, 1.5)); }
+
+// 军团共鸣：所有英雄觉醒次数之和 → 全队英雄永久加伤倍率
+function totalAwakenLevels(){ let t = 0; for(const h of HEROES) t += (state.awaken[h.id]||0); return t; }
+function awakenGlobalMult(){ return 1 + CONFIG.awakenGlobalBonus * totalAwakenLevels(); }
+
+/* =========================================================================
+   3.5) 主动技能（能量+冷却模型）
+   - 三个可点技能：狂暴(点击×N)、黄金(金币×N)、时停(Boss倒计时+N秒)
+   - 共享能量池：随时间+点击回复；每个技能消耗能量并有独立冷却（能量满也不能连放）
+   - 按关卡逐步解锁，避免一上来信息过载
+   ========================================================================= */
+function totalHeroLevels(){ let s=0; for(const h of HEROES) s += (state.heroes[h.id]||0); return s; }
+function skillUnlocked(id){ return totalHeroLevels() >= CONFIG.skillUnlockHeroLv[id]; }
+function cdr(){ return Math.min(CONFIG.cdrCap, state.skillMastery * CONFIG.cdrPerMastery); } // 技能精通带来的冷却减免（0~0.5）
+function comboMult(){ return Math.min(CONFIG.comboMax, 1 + state.combo); }
+function masteryCost(){ return Math.ceil(CONFIG.masteryBaseCost * Math.pow(CONFIG.masteryCostGrowth, state.skillMastery)); }
+function skillTapMult(){ return (state.skillActive.berserk||0) > 0 ? CONFIG.skills.berserk.tapMult : 1; }
+function skillGoldMult(){ return (state.skillActive.gold||0) > 0 ? CONFIG.skills.gold.goldMult : 1; }
+function useSkill(id){
+  const cfg = CONFIG.skills[id];
+  if(!skillUnlocked(id)) return;                 // 未解锁
+  if((state.skillCd[id]||0) > 0) return;         // 冷却中
+  if(state.energy < cfg.energyCost) return;      // 能量不足
+  if(id === "time" && !isBoss(state.stage)){ diffToast("⏱ 时停仅 Boss 关可用"); return; }
+  state.energy -= cfg.energyCost;
+  state.skillCd[id] = cfg.cooldown * (1 - cdr());   // 技能精通降低实际冷却
+  if(id === "time"){
+    bossTimeLeft += cfg.freeze;                  // 时停：Boss 倒计时直接延长（瞬时效果）
+    diffToast("⏱ 时停！Boss 倒计时 +" + cfg.freeze + "s");
+  } else {
+    state.skillActive[id] = cfg.duration;        // 狂暴/黄金：进入持续 buff
+    diffToast("⚡ " + cfg.name + " 启动！");
+  }
+  renderSkills();
+}
+
+// 技能面板只生成一次 DOM，之后只更新能量与按钮状态
+let skillRefs = {};
+function buildSkills(){
+  const wrap = document.getElementById("skillList");
+  if(!wrap) return;
+  wrap.innerHTML = "";
+  for(const id in CONFIG.skills){
+    const cfg = CONFIG.skills[id];
+    const el = document.createElement("div");
+    el.className = "skill";
+    el.innerHTML = `
+      <div class="sk-icon">${cfg.icon}</div>
+      <div class="sk-info">
+        <div class="sk-name">${cfg.name} <span class="sk-state" data-state></span></div>
+        <div class="sk-sub" data-sub></div>
+        <div class="sk-desc" data-desc>${cfg.desc}</div>
+      </div>
+      <button class="sk-btn" data-use>释放</button>`;
+    el.querySelector("[data-use]").addEventListener("click", ()=>useSkill(id));
+    wrap.appendChild(el);
+    skillRefs[id] = {
+      el,
+      state: el.querySelector("[data-state]"),
+      sub: el.querySelector("[data-sub]"),
+      btn: el.querySelector("[data-use]"),
+    };
+  }
+}
+function renderSkills(){
+  const ev = document.getElementById("energyVal");
+  if(ev) ev.textContent = Math.floor(state.energy);
+  const em = document.getElementById("energyMax");
+  if(em) em.textContent = CONFIG.energyMax;
+  const red = cdr();
+  for(const id in CONFIG.skills){
+    const cfg = CONFIG.skills[id];
+    const ref = skillRefs[id];
+    if(!ref) continue;
+    const effCd = cfg.cooldown * (1 - red);
+    const cd = state.skillCd[id]||0;
+    const act = state.skillActive[id]||0;
+    if(!skillUnlocked(id)){
+      ref.el.classList.remove("active"); ref.el.classList.add("locked");
+      ref.state.textContent = "";
+      ref.sub.textContent = "英雄总等级 " + CONFIG.skillUnlockHeroLv[id] + " 解锁";
+      ref.btn.disabled = true; ref.btn.textContent = "未解锁";
+    } else if(cd > 0){
+      ref.el.classList.toggle("active", act>0); ref.el.classList.remove("locked");
+      ref.state.textContent = act>0 ? "进行中" : "";
+      ref.sub.textContent = (act>0 ? ("剩余 "+act.toFixed(1)+"s · ") : "") + "冷却 " + cd.toFixed(1) + "s";
+      ref.btn.disabled = true; ref.btn.textContent = "冷却 " + Math.ceil(cd) + "s";
+    } else if(state.energy < cfg.energyCost){
+      ref.el.classList.remove("active"); ref.el.classList.remove("locked");
+      ref.state.textContent = "";
+      ref.sub.textContent = "需 " + cfg.energyCost + " 能量";
+      ref.btn.disabled = true; ref.btn.textContent = "能量不足";
+    } else {
+      ref.el.classList.toggle("active", act>0); ref.el.classList.remove("locked");
+      ref.state.textContent = act>0 ? ("进行中 "+act.toFixed(1)+"s") : "";
+      const cdTxt = effCd < cfg.cooldown ? ("（冷却 "+effCd.toFixed(0)+"s · 精通-"+Math.round(red*100)+"%）") : "";
+      ref.sub.textContent = "耗能 " + cfg.energyCost + (id==="time" ? " · Boss 关可用" : "") + cdTxt;
+      ref.btn.disabled = false; ref.btn.textContent = "释放";
+    }
+  }
+  renderBuffBar();   // 持续 buff 状态条：一眼看清技能是否还在生效
+  // 技能精通按钮（后期用精华永久减冷却）
+  const mb = document.getElementById("skillMastery");
+  if(mb){
+    if(red >= CONFIG.cdrCap){
+      mb.disabled = true;
+      mb.innerHTML = "技能精通 Lv." + state.skillMastery + " · 冷却 -" + Math.round(red*100) + "%（已满）";
+    } else {
+      const c = masteryCost();
+      mb.disabled = state.essence < c;
+      mb.innerHTML = "📘 技能精通 Lv." + state.skillMastery + " · 冷却 -" + Math.round(red*100) + "% · 升级 <span class=\"c\">" + c + " 精</span>";
+    }
+  }
+}
+// 持续 buff 状态条：释放狂暴/黄金后在战斗区显示图标+剩余秒数；狂暴时战斗区红光晕
+function renderBuffBar(){
+  const bar = document.getElementById("buffBar");
+  if(!bar) return;
+  const b = state.skillActive.berserk||0;
+  const g = state.skillActive.gold||0;
+  let html = "";
+  if(b>0) html += '<span class="buff-pill berserk">🔥 狂暴 '+b.toFixed(1)+'s</span>';
+  if(g>0) html += '<span class="buff-pill gold">💰 黄金 '+g.toFixed(1)+'s</span>';
+  bar.innerHTML = html;
+  const zone = document.getElementById("tapZone");
+  if(zone) zone.classList.toggle("berserk", b>0);
+}
+function buyMastery(){
+  const c = masteryCost();
+  if(state.essence < c) return;
+  state.essence -= c;
+  state.skillMastery += 1;
+  renderAll();
+  diffToast("📘 技能精通 Lv." + state.skillMastery + " · 冷却 -" + Math.round(cdr()*100) + "%");
+}
+
+function tapUpgradeCost(){ return Math.ceil(CONFIG.tapCostBase * Math.pow(CONFIG.tapCostGrowth, state.tapLevel-1)); }
+function heroCost(h){ return Math.ceil(h.baseCost * Math.pow(h.growth, state.heroes[h.id]||0)); }
+
+/* 批量购买工具：英雄与点击升级共用同一套等比数列成本公式
+   - costForN(baseCost, growth, level, n)：从 level 起买 n 级的总花费（逐级取整后求和）
+   - maxAffordable(baseCost, growth, level, gold)：金币最多能买几级，返回 {count, cost}
+   说明：英雄等级从 0 起，点击升级的“等级”基准是 tapLevel-1（与 tapUpgradeCost 对齐） */
+function costForN(baseCost, growth, level, n){
+  let total = 0;
+  for(let i=0; i<n; i++) total += Math.ceil(baseCost * Math.pow(growth, level + i));
+  return total;
+}
+function maxAffordable(baseCost, growth, level, gold){
+  let count = 0, total = 0;
+  while(true){
+    const c = Math.ceil(baseCost * Math.pow(growth, level + count));
+    if(total + c > gold) break;      // 再加一级就超预算了
+    total += c; count++;
+    if(count > 100000) break;        // 安全阀，避免极端情况死循环
+  }
+  return { count, cost: total };
+}
+
+function isBoss(stage){ return stage % CONFIG.bossEvery === 0; }
+function monstersInStage(stage){ return isBoss(stage) ? 1 : CONFIG.monstersPerStage; }
+function enemyMaxHp(stage){
+  let hp = CONFIG.enemyHpBase * Math.pow(dynGrowth, stage-1);
+  if(isBoss(stage)) hp *= CONFIG.bossHpMult;
+  return Math.ceil(hp);
+}
+function goldReward(stage){
+  let g = CONFIG.goldBase * Math.pow(CONFIG.goldGrowth, stage-1);
+  if(isBoss(stage)) g *= CONFIG.bossGoldMult;
+  return Math.ceil(g * skillGoldMult());   // 黄金技能生效时金币 ×goldMult
+}
+// 击破 Boss 掉落的灵魂精华：随关卡缓慢增长，作为英雄觉醒的唯一来源
+function bossEssenceGain(stage){ return Math.max(1, Math.floor(stage / CONFIG.bossEssenceDivisor)); }
+
+/* 数字美化：1234 -> 1.2K，1234567 -> 1.2M */
+function fmt(n){
+  if(n < 1000) return Math.floor(n).toString();
+  const units = ["K","M","B","T","aa","ab","ac"];
+  let u = -1;
+  while(n >= 1000 && u < units.length-1){ n/=1000; u++; }
+  return n.toFixed(2).replace(/\.?0+$/,"") + units[u];
+}
+
+/* =========================================================================
+   4) 战斗逻辑
+   ========================================================================= */
+function spawnEnemy(){
+  state.enemyHp = enemyMaxHp(state.stage);
+  renderEnemy();
+}
+
+// 新的一关开始：记录起点时间，并判断这一关是不是“秒杀级”
+// 秒杀级 = 怪的最大血量 <= 玩家单次能造成的伤害（点击或英雄DPS任一）
+function onStageBegin(){
+  stageStartTime = Date.now();
+  const perHit = Math.max(tapDamage(), totalDps());
+  stageTrivial = enemyMaxHp(state.stage) <= perHit;
+  bossTimeLeft = isBoss(state.stage) ? CONFIG.bossTimeLimit : 0; // Boss 关开始倒计时
+}
+
+// 难度自适应核心：根据刚结束这一关的表现，微调 dynGrowth（每关血量成长系数）
+//  太容易(连续秒杀级) -> 调高成长，怪越来越厚
+//  卡太久(一关超阈值) -> 调低成长，避免把人卡死
+//  刚好在“甜区”      -> 两个计数清零
+// 带迟滞(连续N关才动) + 上下限，避免每关抖动。
+function adaptDifficulty(){
+  const duration = (Date.now() - stageStartTime) / 1000;
+  if(stageTrivial){
+    stuckStreak = 0;
+    oneShotStreak++;
+    if(oneShotStreak >= DIFF.oneShotStreakNeed){
+      oneShotStreak = 0;
+      if(state.bossLoop){
+        // 处于 Boss 循环：冻结难度上调，避免练级越顺、Boss 反而越厚
+        diffToast("🔒 Boss 循环中·难度上调冻结");
+      } else if(dynGrowth < DIFF.maxGrowth){
+        dynGrowth = Math.min(DIFF.maxGrowth, +(dynGrowth + DIFF.step).toFixed(3));
+        state.dynGrowth = dynGrowth;
+        save();
+        diffToast("难度提升 ▲ 成长×" + dynGrowth.toFixed(2));
+      }
+    }
+  } else if(duration > DIFF.hardSeconds){
+    oneShotStreak = 0;
+    stuckStreak++;
+    if(dynGrowth > DIFF.minGrowth){
+      dynGrowth = Math.max(DIFF.minGrowth, +(dynGrowth - DIFF.step).toFixed(3));
+      stuckStreak = 0;
+      state.dynGrowth = dynGrowth;
+      save();
+      diffToast("难度下调 ▼ 成长×" + dynGrowth.toFixed(2));
+    }
+  } else {
+    oneShotStreak = 0;
+    stuckStreak = 0;
+  }
+}
+
+// 难度变化时的轻提示（右上角短暂出现）
+function diffToast(msg){
+  const t = document.getElementById("diffToast");
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(diffToast._t);
+  diffToast._t = setTimeout(()=>t.classList.remove("show"), 1600);
+}
+
+// Boss 限时失败：不调低成长难度，退回上一小怪关卡重新练级再来（不丢金币/英雄）
+function bossTimeout(){
+  state.stage -= 1;          // 从 Boss 关(S) 退回 S-1（普通关，便于攒金币升级）
+  state.monsterIndex = 1;
+  if(state.bossLoop !== true){
+    state.bossLoop = true;   // 进入 Boss 循环：期间冻结难度上调，击破 Boss 才解除
+    save();
+  }
+  onStageBegin();            // 重置该关计时/秒杀判定（普通关 bossTimeLeft=0）
+  spawnEnemy();
+  renderContinue();          // 显示“继续挑战 BOSS”按钮
+  diffToast("⏱ Boss 失败，退回第 " + state.stage + " 关练级（难度上调已冻结）");
+}
+
+// 玩家点“继续挑战 BOSS”：手动进入 Boss 关，解除循环/冻结
+function continueBoss(){
+  if(!state.bossLoop) return;
+  state.stage += 1;          // 进入 Boss 关（S-1 -> S）
+  if(state.stage > state.bestStage) state.bestStage = state.stage;
+  state.monsterIndex = 1;
+  state.bossLoop = false;    // 解除 Boss 循环，难度上调恢复
+  save();
+  onStageBegin();            // 启动 Boss 倒计时
+  spawnEnemy();
+  renderContinue();          // 隐藏按钮
+  diffToast("⚔️ 挑战 BOSS 第 " + state.stage + " 关！");
+}
+
+// 根据 bossLoop 状态显示/隐藏“继续挑战 BOSS”按钮
+function renderContinue(){
+  const btn = document.getElementById("bossContinue");
+  if(!btn) return;
+  if(state.bossLoop){
+    document.getElementById("bossContinueStage").textContent = state.stage + 1;
+    btn.style.display = "block";
+  } else {
+    btn.style.display = "none";
+  }
+}
+
+// 造成伤害：amount 可能很大（英雄DPS），所以要循环处理连杀
+function dealDamage(amount){
+  while(amount > 0 && state.enemyHp <= amount){
+    amount -= state.enemyHp;       // 剩余伤害结转
+    killEnemy();                   // 击杀 -> 进下一关 + 出新怪
+  }
+  if(state.enemyHp > 0) state.enemyHp -= amount;
+  renderEnemy();
+}
+
+function killEnemy(){
+  const finishedBoss = isBoss(state.stage);
+  state.gold += goldReward(state.stage);
+  if(finishedBoss) state.essence += bossEssenceGain(state.stage); // Boss 掉落灵魂精华
+  const total = monstersInStage(state.stage);
+  if(state.monsterIndex < total){
+    state.monsterIndex += 1;   // 同关卡下一只是怪
+  } else {
+    const nextStage = state.stage + 1;
+    // Boss 循环中：不自动进入 Boss 关，留在当前小怪关继续练级，等玩家点“继续挑战”
+    if(state.bossLoop && isBoss(nextStage)){
+      state.monsterIndex = 1;  // 重置本关小怪，可继续刷金币
+      onStageBegin();          // 刷新本关计时/秒杀判定
+      spawnEnemy();
+      renderContinue();        // 显示“继续挑战 BOSS”按钮
+      return;
+    }
+    adaptDifficulty();         // 本关清完，先按本关表现评估难度
+    state.stage = nextStage;   // 进下一关
+    if(state.stage > state.bestStage) state.bestStage = state.stage; // 记录本局最高关
+    state.monsterIndex = 1;
+    if(finishedBoss){
+      state.bossLoop = false;  // 击破 Boss：解除 Boss 循环，恢复难度上调
+      save();
+      diffToast("🏆 Boss 击破！奖励 ×" + CONFIG.bossGoldMult + " 💰（难度冻结解除）");
+    }
+    onStageBegin();            // 记录新关起点 + 是否秒杀级
+  }
+  spawnEnemy();                // 按新的 (stage, monsterIndex) 出新怪
+}
+
+// 玩家点击
+function onTap(clientX, clientY){
+  state.combo = Math.min(CONFIG.comboMax - 1, state.combo + CONFIG.comboPerTap); // 连击累加（倍率上限 comboMax）
+  state.comboTimer = 0;
+  let dmg = tapDamage();
+  let crit = Math.random() < CONFIG.critChance;
+  if(crit) dmg *= CONFIG.critMult;
+  dealDamage(dmg);
+  floatDamage(dmg, crit, clientX, clientY);
+  state.energy = Math.min(CONFIG.energyMax, state.energy + CONFIG.energyPerTap); // 点击回复能量，奖励活跃游玩
+  renderCombo();
+  renderHud();
+  renderShop(); // 金币变化可能影响购买状态
+  renderSkills();
+}
+// 连击状态显示：tap-zone 内显示当前连击倍率并带脉冲动画
+function renderCombo(){
+  const box = document.getElementById("comboBox");
+  if(!box) return;
+  if(state.combo > 0.001){
+    box.textContent = "🔥 连击 ×" + comboMult().toFixed(2);
+    box.classList.add("show");
+    box.classList.remove("pulse"); void box.offsetWidth; box.classList.add("pulse"); // 重启动画
+  } else {
+    box.classList.remove("show");
+  }
+}
+
+function floatDamage(dmg, crit, x, y){
+  const zone = document.getElementById("tapZone");
+  const rect = zone.getBoundingClientRect();
+  const span = document.createElement("span");
+  span.className = "dmg" + (crit ? " crit" : "");
+  span.textContent = (crit?"暴击 ":"") + fmt(dmg);
+  // 飘字位置：优先点哪显哪，否则随机
+  const px = x!=null ? (x - rect.left) : rect.width/2 + (Math.random()*60-30);
+  const py = y!=null ? (y - rect.top)  : rect.height/2;
+  span.style.left = px + "px";
+  span.style.top  = py + "px";
+  zone.appendChild(span);
+  setTimeout(()=>span.remove(), 700);
+}
+
+/* =========================================================================
+   5) 渲染（把数据画到页面上）
+   ========================================================================= */
+function renderHud(){
+  document.getElementById("gold").textContent  = fmt(state.gold);
+  document.getElementById("essence").textContent = fmt(state.essence);
+  document.getElementById("stage").textContent = state.stage;
+  document.getElementById("stage2").textContent= state.stage;
+  document.getElementById("dps").textContent   = fmt(totalDps());
+  document.getElementById("tapLv").textContent = state.tapLevel;
+  document.getElementById("tapDmg").textContent= fmt(tapDamage());
+  // 点击升级的批量购买显示：按当前选择的数量显示花费与按钮状态
+  const tapLv = state.tapLevel - 1;
+  let tapN, tapCost, tapAfford;
+  if(buyAmount === "max"){
+    const m = maxAffordable(CONFIG.tapCostBase, CONFIG.tapCostGrowth, tapLv, state.gold);
+    tapN = m.count; tapCost = m.cost; tapAfford = tapN >= 1;
+  } else {
+    tapN = buyAmount;
+    tapCost = costForN(CONFIG.tapCostBase, CONFIG.tapCostGrowth, tapLv, tapN);
+    tapAfford = state.gold >= tapCost;
+  }
+  document.getElementById("tapCost").textContent = fmt(tapCost) + " 金";
+  document.getElementById("buyTap").disabled = !tapAfford;
+  document.getElementById("buyTap").firstChild.textContent = "升级" + (buyAmount===1 ? "" : (buyAmount==="max" ? " ×最大" : " ×"+tapN));
+  // 本次升级可提升的每次点击战力（含转生与军团共鸣倍率）——设计点：与英雄卡一致，明确显示可提升的战力
+  const tapMult = prestigeMult() * awakenGlobalMult();
+  document.getElementById("tapPower").textContent = tapN>=1
+    ? ("本次升级 +"+fmt(CONFIG.baseTap * tapN * tapMult)+" 伤害")
+    : "金币不足，无法升级";
+  document.getElementById("growth").textContent = dynGrowth.toFixed(2) + (state.bossLoop ? " 🔒" : "");
+  // 转生加成显示 + 转生按钮状态（未解锁/可获点数）
+  document.getElementById("prestige").textContent = "×" + prestigeMult().toFixed(2);
+  const pBtn = document.getElementById("prestigeBtn");
+  if(pBtn){
+    if(state.bestStage < CONFIG.prestigeUnlockStage){
+      pBtn.classList.add("locked");
+      pBtn.textContent = "转生（需第" + CONFIG.prestigeUnlockStage + "关）";
+    } else {
+      pBtn.classList.remove("locked");
+      pBtn.textContent = "🌟 转生（+" + prestigeGain() + " 点）";
+    }
+  }
+}
+
+function renderEnemy(){
+  const boss = isBoss(state.stage);
+  const total = monstersInStage(state.stage);
+  // 外观：Boss 按关卡取；普通怪按 (stage+monsterIndex) 取，同关每只长相略有变化
+  const e = boss
+    ? BOSS_ENEMIES[(Math.floor(state.stage/CONFIG.bossEvery)) % BOSS_ENEMIES.length]
+    : NORMAL_ENEMIES[(state.stage + state.monsterIndex) % NORMAL_ENEMIES.length];
+  document.getElementById("enemy").textContent = e;
+  document.getElementById("enemyName").textContent = boss ? "BOSS ⏱ 限时" : ("怪物 " + state.monsterIndex + "/" + total);
+  const max = enemyMaxHp(state.stage);
+  const pct = Math.max(0, Math.min(100, state.enemyHp / max * 100));
+  document.getElementById("hpfill").style.width = pct + "%";
+  document.getElementById("hptext").textContent = "HP " + fmt(state.enemyHp) + " / " + fmt(max);
+
+  // Boss 限时进度条：仅 Boss 关显示，普通关隐藏
+  const bt = document.getElementById("bossTimerWrap");
+  if(boss){
+    bt.style.display = "block";
+    const bp = Math.max(0, Math.min(100, bossTimeLeft / CONFIG.bossTimeLimit * 100));
+    document.getElementById("bossTimerFill").style.width = bp + "%";
+    document.getElementById("bossTimerText").textContent = bossTimeLeft.toFixed(1) + "s";
+    bt.classList.toggle("danger", bossTimeLeft <= 10); // 最后10秒变红警示
+  } else {
+    bt.style.display = "none";
+  }
+
+  // 小怪进度点：已清掉的标金色，剩下的灰色（Boss 关隐藏）
+  const pips = document.getElementById("monsterPips");
+  if(boss){
+    pips.innerHTML = "";
+    pips.style.display = "none";
+  } else {
+    pips.style.display = "flex";
+    const key = state.stage + "_" + state.monsterIndex + "_" + total;
+    if(key !== lastPipKey){
+      lastPipKey = key;
+      let html = "";
+      for(let i=1; i<=total; i++) html += '<span class="pip' + (i < state.monsterIndex ? " killed" : "") + '"></span>';
+      pips.innerHTML = html;
+    }
+  }
+  renderContinue();
+}
+
+// 英雄商店：已拥有的英雄全部显示，未购买的隐藏，只在末尾露出一张“即将可购买”的下一个单位
+// （Tap Titans / Clicker Heroes 经典布局：owned + 1 preview，避免 11 张卡挤屏、又不错过已买单位）
+let buyAmount = 1;       // 批量购买数量：1 / 10 / 100 / "max"
+let lastPipKey = "";     // 进度点只在 (关, 当前怪, 总数) 变化时重画，避免每帧重建 DOM
+let heroCardRefs = {};   // 每个英雄卡片的 DOM 引用缓存
+
+// 英雄商店只生成一次 DOM（每个英雄一张卡），之后只更新显示/隐藏与文字按钮状态
+function buildShop(){
+  const wrap = document.getElementById("heroList");
+  wrap.innerHTML = "";
+  for(const h of HEROES){
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML = `
+      <div class="emoji">${h.emoji}</div>
+      <div class="info">
+        <div class="name">${h.name} <span data-lv></span></div>
+        <div class="sub" data-sub></div>
+        <div class="power" data-power></div>
+      </div>
+      <div class="actions">
+        <button class="buy" data-buy>雇佣<span class="c" data-cost></span></button>
+        <button class="buy awaken" data-awaken>觉醒<span class="c" data-essence></span></button>
+      </div>`;
+    const btn = card.querySelector("[data-buy]");
+    btn.addEventListener("click", ()=>buyHero(h));
+    const aBtn = card.querySelector("[data-awaken]");
+    aBtn.addEventListener("click", ()=>awakenHero(h));
+    wrap.appendChild(card);
+    heroCardRefs[h.id] = {
+      card,
+      lv: card.querySelector("[data-lv]"),
+      sub: card.querySelector("[data-sub]"),
+      power: card.querySelector("[data-power]"),
+      cost: card.querySelector("[data-cost]"),
+      essence: card.querySelector("[data-essence]"),
+      btn, aBtn,
+    };
+  }
+}
+function renderShop(){
+  const hTitle = document.getElementById("heroTitle");
+  if(hTitle) hTitle.textContent = "🦸 英雄 · 军团共鸣 ×" + awakenGlobalMult().toFixed(2);
+  // 已拥有最高阶英雄的索引 -> 其下一个单位作为“即将可购买”的预览露出；其余未购买全部隐藏
+  let highestOwned = -1;
+  HEROES.forEach((h,i)=>{ if((state.heroes[h.id]||0) > 0) highestOwned = i; });
+  const previewIndex = highestOwned + 1;   // 末尾露出的一张未购买单位（如已全拥有则无预览）
+  const mult = awakenGlobalMult();
+  HEROES.forEach((h,i)=>{
+    const ref = heroCardRefs[h.id];
+    const lv = state.heroes[h.id]||0;
+    const owned = lv > 0;
+    const isPreview = (i === previewIndex);   // 这一张是“即将可购买”的预览
+    if(!(owned || isPreview)){ ref.card.style.display = "none"; return; }
+    ref.card.style.display = "";              // 已拥有 或 预览 -> 显示
+    const aw = state.awaken[h.id]||0;
+    ref.lv.textContent = lv>0 ? ("Lv."+lv) : "";
+    // 该英雄当前每秒贡献（受共鸣倍率影响）
+    const heroDpsNow = h.baseDps * lv * mult;
+    // 本次购买/升级的数量与花费（受批量购买数量影响）
+    let buyN, buyCost, buyAfford;
+    if(buyAmount === "max"){
+      const m = maxAffordable(h.baseCost, h.growth, lv, state.gold);
+      buyN = m.count; buyCost = m.cost; buyAfford = buyN >= 1;
+    } else {
+      buyN = buyAmount;
+      buyCost = costForN(h.baseCost, h.growth, lv, buyN);
+      buyAfford = state.gold >= buyCost;   // 固定数量：买满才点亮，点一下必得 n 级
+    }
+    // 本次购买/升级可提升的每秒战力（设计点：明确显示单位购买/升级所能提高的战力）
+    const gain = h.baseDps * buyN * mult;
+    ref.sub.textContent = lv>0
+      ? ("当前每秒 +"+fmt(heroDpsNow)+" 伤害" + (aw>0 ? " · 已觉醒×"+aw : ""))
+      : ("雇佣后每秒 +"+fmt(h.baseDps*mult)+" 伤害");
+    ref.power.textContent = buyN>=1
+      ? ("本次"+(lv>0?"升级":"购买")+" +"+fmt(gain)+"/秒")
+      : "金币不足，无法购买";
+    ref.cost.textContent = fmt(buyCost) + " 金";
+    ref.btn.disabled = !buyAfford;
+    ref.btn.firstChild.textContent = (lv>0 ? "升级" : "雇佣") + (buyAmount===1 ? "" : (buyAmount==="max" ? " ×最大" : " ×"+buyN));
+    // 觉醒按钮：需先雇佣；消耗精华，为【全队】永久加伤（军团共鸣）
+    const aCost = awakenCost(h);
+    ref.essence.textContent = fmt(aCost) + " 精";
+    if(lv<=0){
+      ref.aBtn.disabled = true;
+      ref.aBtn.firstChild.textContent = "需雇佣";
+    } else if(lv % CONFIG.awakenLevelStep !== 0){
+      // 未达到整十级：觉醒锁定，提示下一个里程碑等级
+      ref.aBtn.disabled = true;
+      const need = (Math.floor(lv / CONFIG.awakenLevelStep) + 1) * CONFIG.awakenLevelStep;
+      ref.aBtn.firstChild.textContent = "Lv." + need + " 可觉醒";
+    } else {
+      ref.aBtn.disabled = state.essence < aCost;
+      ref.aBtn.firstChild.textContent = (aw>0 ? "再觉醒×"+aw : "觉醒");
+    }
+  });
+}
+function renderAll(){ renderHud(); renderEnemy(); renderShop(); renderSkills(); }
+
+/* =========================================================================
+   6) 购买操作
+   ========================================================================= */
+function buyTap(){
+  const lv = state.tapLevel - 1;   // 点击升级的成本基准（与 tapUpgradeCost 对齐）
+  const n = buyAmount === "max"
+    ? maxAffordable(CONFIG.tapCostBase, CONFIG.tapCostGrowth, lv, state.gold).count
+    : buyAmount;
+  if(n <= 0) return;
+  // 逐级扣费，避免批量时金币计算偏差
+  let spent = 0, bought = 0;
+  for(let i=0; i<n; i++){
+    const c = Math.ceil(CONFIG.tapCostBase * Math.pow(CONFIG.tapCostGrowth, lv + i));
+    if(spent + c > state.gold) break;
+    spent += c; bought++;
+  }
+  if(bought <= 0) return;
+  state.gold -= spent;
+  state.tapLevel += bought;
+  renderHud(); renderShop();
+}
+function buyHero(h){
+  const lv = state.heroes[h.id] || 0;
+  const n = buyAmount === "max"
+    ? maxAffordable(h.baseCost, h.growth, lv, state.gold).count
+    : buyAmount;
+  if(n <= 0) return;
+  // 逐级扣费，避免批量时金币计算偏差
+  let spent = 0, bought = 0;
+  for(let i=0; i<n; i++){
+    const c = Math.ceil(h.baseCost * Math.pow(h.growth, lv + i));
+    if(spent + c > state.gold) break;
+    spent += c; bought++;
+  }
+  if(bought <= 0) return;
+  state.gold -= spent;
+  state.heroes[h.id] = lv + bought;
+  renderAll();
+}
+
+// 英雄觉醒（Awakening）：让已掉队英雄“重新变强”的中期系统
+// 用 Boss 掉落的灵魂精华觉醒英雄：等级不变，伤害永久 ×awakenMult（×2 起，每次叠加）。
+// 觉醒是“本局”投资，转生时随英雄一起重置（但灵魂精华保留，新一局可继续用）；转生的 prestigeMult 才是永久加成。
+function awakenCost(h){
+  const aw = state.awaken[h.id] || 0;          // 所有英雄基础消耗相同，仅随“该英雄已觉醒次数”递增
+  return Math.ceil(CONFIG.awakenCostBase * Math.pow(CONFIG.awakenCostGrowth, aw));
+}
+function awakenHero(h){
+  const lv = state.heroes[h.id]||0;
+  if(lv <= 0){ diffToast("需先雇佣「" + h.name + "」"); return; }
+  // 觉醒门槛：只有达到「整十级」(CONFIG.awakenLevelStep) 才能觉醒 → 让“把英雄练到里程碑”成为真实决策
+  if(lv % CONFIG.awakenLevelStep !== 0){
+    const need = (Math.floor(lv / CONFIG.awakenLevelStep) + 1) * CONFIG.awakenLevelStep;
+    diffToast("「" + h.name + "」需达到 Lv." + need + " 才能觉醒");
+    return;
+  }
+  const cost = awakenCost(h);
+  if(state.essence < cost) return;
+  state.essence -= cost;
+  state.awaken[h.id] = (state.awaken[h.id]||0) + 1;
+  renderAll();
+  diffToast("✦ " + h.name + " 觉醒！军团共鸣 全队伤害 ×" + awakenGlobalMult().toFixed(2));
+}
+
+/* =========================================================================
+   6.5) 转生 / 重生（Prestige）—— 后期纵向目标
+   设计：达到解锁关后，主动重置本局（金币/英雄/关卡/难度/bossLoop/bestStage），
+   换取“重生点数”永久保留并累积，每点 +prestigePerPoint 永久伤害。
+   这样即使难度自适应把每关血量锁在天花板，永久加成也能复利叠加、不断推更高关。
+   ========================================================================= */
+// 点击转生按钮：弹出游戏内自建确认面板（不依赖原生 confirm，避免预览/WebView 拦截导致“点了没反应”）
+function openPrestigeModal(){
+  const mask = document.getElementById("prestigeModal");
+  if(!mask) return;
+  const title = document.getElementById("prestigeTitle");
+  const body  = document.getElementById("prestigeBody");
+  const reward = document.getElementById("prestigeReward");
+  const confirmBtn = document.getElementById("prestigeConfirm");
+  const cancelBtn  = document.getElementById("prestigeCancel");
+  const okBtn      = document.getElementById("prestigeOk");
+  if(state.bestStage < CONFIG.prestigeUnlockStage){
+    // 未解锁：给明确反馈，而不是静默无反应
+    title.textContent = "🔒 转生尚未解锁";
+    body.innerHTML = "需先到达第 <b>" + CONFIG.prestigeUnlockStage + "</b> 关才能转生。<br>当前本局最高：第 <b>" + state.bestStage + "</b> 关。";
+    reward.style.display = "none";
+    confirmBtn.style.display = "none";
+    cancelBtn.style.display = "none";
+    okBtn.style.display = "block";
+  } else {
+    const gain = prestigeGain();
+    title.textContent = "🌟 转生";
+    body.innerHTML = "将重置本局进度（金币/英雄/关卡），<br>但<b>灵魂精华保留</b>，永久获得 <b>" + gain + "</b> 点重生加成。";
+    reward.style.display = "block";
+    reward.innerHTML = "伤害 ×" + (prestigeMult() + CONFIG.prestigePerPoint * gain).toFixed(2) +
+                       "　（总计 " + (state.prestige + gain) + " 点）";
+    confirmBtn.style.display = "block";
+    cancelBtn.style.display = "block";
+    okBtn.style.display = "none";
+  }
+  mask.style.display = "flex";
+}
+function closePrestigeModal(){ document.getElementById("prestigeModal").style.display = "none"; }
+// 确认转生：重置本局，保留并累积重生点数
+function doPrestige(){
+  closePrestigeModal();
+  if(state.bestStage < CONFIG.prestigeUnlockStage) return;
+  const gain = prestigeGain();
+  if(gain <= 0) return;
+  const keepPrestige = state.prestige + gain;
+  const keepLastSeen = Date.now();
+  const keepEssence = state.essence;   // 精华转生后保留，避免“用不完的精华被清零”，鼓励玩家转生
+  state = {
+    gold:0, stage:1, tapLevel:1, heroes:{}, essence:keepEssence, awaken:{}, enemyHp:0, monsterIndex:1,
+    dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:keepLastSeen,
+    prestige: keepPrestige, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery: state.skillMastery,
+  };
+  HEROES.forEach(h=>{ state.heroes[h.id]=0; state.awaken[h.id]=0; });
+  dynGrowth = state.dynGrowth; oneShotStreak = 0; stuckStreak = 0;
+  save();
+  spawnEnemy();
+  onStageBegin();
+  renderAll();
+  diffToast("🌟 转生成功！+ " + gain + " 点 · 伤害 ×" + prestigeMult().toFixed(2));
+}
+
+/* =========================================================================
+   7) 主循环（英雄的 DPS 持续打怪 = 放置收益）
+   ========================================================================= */
+let lastT = performance.now();
+function loop(now){
+  const dt = Math.min(0.1, (now - lastT)/1000); // 秒，最多按0.1秒算，防卡顿跳变
+  lastT = now;
+  // 主动技能：能量回复 + 激活/冷却倒计时
+  state.energy = Math.min(CONFIG.energyMax, state.energy + CONFIG.energyRegen * dt);
+  for(const id in CONFIG.skills){
+    if(state.skillActive[id] > 0) state.skillActive[id] = Math.max(0, state.skillActive[id] - dt);
+    if(state.skillCd[id] > 0) state.skillCd[id] = Math.max(0, state.skillCd[id] - dt);
+  }
+  // 连击衰减：停手超过 comboDecay 秒则清零
+  if(state.combo > 0){
+    state.comboTimer += dt;
+    if(state.comboTimer >= CONFIG.comboDecay){ state.combo = 0; renderCombo(); }
+  }
+  const dps = totalDps();
+  if(dps > 0) dealDamage(dps * dt);   // 英雄DPS持续打；本帧若击杀Boss会直接进下一关
+  // Boss 限时：仅 Boss 关倒计时；若本帧已击杀Boss则 state.stage 已不是Boss，不触发超时
+  if(isBoss(state.stage)){
+    bossTimeLeft -= dt;
+    if(bossTimeLeft <= 0) bossTimeout();
+  }
+  renderHud(); renderEnemy(); renderShop(); renderSkills();
+  requestAnimationFrame(loop);
+}
+
+/* =========================================================================
+   8) 启动
+   ========================================================================= */
+function init(){
+  load();
+  // 确保英雄等级字段齐全
+  HEROES.forEach(h=>{ if(state.heroes[h.id]===undefined) state.heroes[h.id]=0; if(state.awaken[h.id]===undefined) state.awaken[h.id]=0; });
+  dynGrowth = state.dynGrowth !== undefined ? state.dynGrowth : CONFIG.enemyHpGrowth;
+  if(!state.enemyHp || state.enemyHp <= 0) spawnEnemy();
+  onStageBegin(); // 记录起始关，用于难度评估
+  applyOfflineEarnings(); // 结算离线收益（若有），会弹出领取面板
+
+  buildShop();
+  buildSkills();
+  renderAll();
+
+  // 点击敌人 = 攻击
+  const zone = document.getElementById("tapZone");
+  zone.addEventListener("pointerdown", (e)=> onTap(e.clientX, e.clientY));
+
+  document.getElementById("buyTap").addEventListener("click", buyTap);
+  document.getElementById("skillMastery").addEventListener("click", buyMastery);
+  document.getElementById("resetBtn").addEventListener("click", reset);
+  document.getElementById("bossContinue").addEventListener("click", continueBoss);
+  // 批量购买数量选择器：切换 buyAmount 并刷新商店/升级面板的花费与按钮状态
+  const opts = document.getElementById("buyAmountOpts");
+  opts.querySelectorAll("button").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      buyAmount = b.dataset.amt === "max" ? "max" : parseInt(b.dataset.amt, 10);
+      opts.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
+      b.classList.add("active");
+      renderShop(); renderHud();   // 立即按新数量刷新花费显示
+    });
+  });
+  document.getElementById("offlineClaim").addEventListener("click", ()=>{
+    document.getElementById("offlineModal").style.display = "none";
+  });
+  document.getElementById("saveBtn").addEventListener("click", ()=>{ save(); diffToast("💾 已存档！"); });
+  document.getElementById("prestigeBtn").addEventListener("click", openPrestigeModal);
+  document.getElementById("prestigeConfirm").addEventListener("click", doPrestige);
+  document.getElementById("prestigeCancel").addEventListener("click", closePrestigeModal);
+  document.getElementById("prestigeOk").addEventListener("click", closePrestigeModal);
+  document.getElementById("confirmOk").addEventListener("click", ()=>{ if(_confirmCb) _confirmCb(); closeConfirm(); });
+  document.getElementById("confirmCancel").addEventListener("click", closeConfirm);
+
+  // 自动存档：每 5 秒存一次
+  setInterval(save, 5000);
+  // 离开页面时也存
+  window.addEventListener("beforeunload", save);
+
+  requestAnimationFrame(loop);
+}
+init();
+</script>
+</body>
+</html>

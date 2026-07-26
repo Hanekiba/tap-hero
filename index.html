@@ -27,7 +27,7 @@
     --text:#f3ecff;
     --muted:#b9a9e0;
   }
-  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent; touch-action:manipulation;}
   html,body{margin:0;}
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
@@ -1174,14 +1174,16 @@ function renderShop(){
     if(lv<=0){
       ref.aBtn.disabled = true;
       ref.aBtn.firstChild.textContent = "需雇佣";
-    } else if(lv % CONFIG.awakenLevelStep !== 0){
-      // 未达到整十级：觉醒锁定，提示下一个里程碑等级
-      ref.aBtn.disabled = true;
-      const need = (Math.floor(lv / CONFIG.awakenLevelStep) + 1) * CONFIG.awakenLevelStep;
-      ref.aBtn.firstChild.textContent = "Lv." + need + " 可觉醒";
     } else {
-      ref.aBtn.disabled = state.essence < aCost;
-      ref.aBtn.firstChild.textContent = (aw>0 ? "再觉醒×"+aw : "觉醒");
+      // 觉醒门槛：以「已觉醒次数」推算下一个整五十级里程碑；等级≥该里程碑即可觉醒（允许升过整数点后补觉，不再要求恰好卡在整数点）
+      const nextMilestone = (aw + 1) * CONFIG.awakenLevelStep;
+      if(lv < nextMilestone){
+        ref.aBtn.disabled = true;
+        ref.aBtn.firstChild.textContent = "Lv." + nextMilestone + " 可觉醒";
+      } else {
+        ref.aBtn.disabled = state.essence < aCost;
+        ref.aBtn.firstChild.textContent = (aw>0 ? "再觉醒×"+aw : "觉醒");
+      }
     }
   });
 }
@@ -1237,10 +1239,11 @@ function awakenCost(h){
 function awakenHero(h){
   const lv = state.heroes[h.id]||0;
   if(lv <= 0){ diffToast("需先雇佣「" + h.name + "」"); return; }
-  // 觉醒门槛：只有达到「整十级」(CONFIG.awakenLevelStep) 才能觉醒 → 让“把英雄练到里程碑”成为真实决策
-  if(lv % CONFIG.awakenLevelStep !== 0){
-    const need = (Math.floor(lv / CONFIG.awakenLevelStep) + 1) * CONFIG.awakenLevelStep;
-    diffToast("「" + h.name + "」需达到 Lv." + need + " 才能觉醒");
+  // 觉醒门槛：以「已觉醒次数」推算下一个整五十级里程碑；等级≥该里程碑即可觉醒（允许升过整数点后补觉，不再要求恰好卡在整数点）
+  const aw = state.awaken[h.id] || 0;
+  const nextMilestone = (aw + 1) * CONFIG.awakenLevelStep;
+  if(lv < nextMilestone){
+    diffToast("「" + h.name + "」需达到 Lv." + nextMilestone + " 才能觉醒");
     return;
   }
   const cost = awakenCost(h);

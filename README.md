@@ -1,5 +1,5 @@
 # 点击放置游戏 · Tap Idle
-
+https://hanekiba.github.io/tap-hero/
 一个用单个 HTML 文件做成的点击 / 放置（idle）小游戏，无需任何构建步骤，双击 `index.html` 即可在浏览器游玩。
 
 ## 怎么玩

@@ -265,6 +265,100 @@
     background:#4a3a6e; color:#8d7db5; cursor:not-allowed; box-shadow:none;
   }
   .modal .buy.secondary{background:#3a2a5e; color:#e7defb; box-shadow:none; margin-top:8px;}
+  /* ===== 新系统覆盖层（神器/装备/成就页） ===== */
+  .title-tag{ font-size:11px; color:var(--gold); text-align:center; margin-top:4px; min-height:14px; font-weight:700; }
+  .overlay{ position:fixed; inset:0; z-index:60; background:rgba(8,4,16,.82); backdrop-filter:blur(3px);
+    display:flex; justify-content:center; align-items:flex-start; overflow:auto; padding:14px 10px 40px; }
+  .overlay-box{ width:100%; max-width:440px; background:var(--panel2); border:1px solid #ffffff1a; border-radius:18px;
+    padding:14px 14px 22px; box-shadow:0 12px 32px rgba(0,0,0,.55); }
+  .overlay-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .overlay-head h2{ margin:0; font-size:18px; }
+  .ov-close{ border:none; background:var(--panel); color:var(--text); border-radius:10px; width:34px; height:34px; font-size:16px; cursor:pointer; }
+  .ov-close:active{ transform:scale(.94); }
+  .art-bar{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:10px; font-size:12px; color:var(--muted); }
+  .art-bar b{ color:var(--text); }
+  .art-bar .buy{ flex:1; min-width:120px; padding:9px; }
+  /* 神器卡片 */
+  .art-list{ display:flex; flex-direction:column; gap:8px; }
+  .art-card{ background:var(--panel); border-radius:12px; padding:8px 10px; }
+  .art-card.got{ box-shadow:0 0 0 1px #ffffff22 inset; }
+  .art-top{ display:flex; align-items:center; gap:8px; }
+  .art-icon{ font-size:22px; }
+  .art-name{ flex:1; font-weight:700; font-size:14px; }
+  .art-rar{ font-size:11px; font-weight:700; }
+  .art-desc{ font-size:11px; color:var(--muted); margin-top:3px; }
+  .art-up{ margin-top:6px; border:none; border-radius:9px; padding:6px 10px; font-size:12px; font-weight:700; background:linear-gradient(135deg,#7c5cff,#b06bff); color:#fff; cursor:pointer; }
+  .art-up.dis{ background:#4a3a6e; color:#8d7db5; cursor:not-allowed; }
+  .art-max{ margin-top:6px; font-size:12px; color:var(--gold); font-weight:700; }
+  .art-lock{ margin-top:6px; font-size:11px; color:var(--muted); }
+  /* 装备槽 / 背包 */
+  .gear-slots{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px; }
+  .slot-card{ background:var(--panel); border-radius:12px; padding:8px; }
+  .slot-name{ font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .slot-gear{ display:flex; gap:8px; align-items:center; background:var(--panel2); border-radius:10px; padding:6px; }
+  .slot-empty{ font-size:12px; color:var(--muted); padding:10px 4px; text-align:center; }
+  .g-emoji{ font-size:26px; }
+  .g-info{ flex:1; min-width:0; }
+  .g-name{ font-size:13px; font-weight:700; }
+  .g-rar{ font-size:10px; }
+  .g-affix{ font-size:10px; color:var(--muted); margin-top:2px; line-height:1.35; }
+  .g-btns{ display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
+  .g-btns button{ border:none; border-radius:8px; padding:5px 8px; font-size:11px; font-weight:700; background:var(--panel2); color:var(--text); cursor:pointer; }
+  .g-btns button:active{ transform:scale(.95); }
+  .gear-inv{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
+  .gear-card{ display:flex; gap:8px; align-items:center; background:var(--panel); border-radius:12px; padding:8px; }
+  .forge-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .forge-row .buy{ flex:1; min-width:90px; padding:9px; }
+  .forge-row select{ flex:1; min-width:100px; border-radius:10px; padding:8px; background:var(--panel); color:var(--text); border:1px solid #ffffff20; }
+  .preset-row{ display:flex; gap:6px; flex-wrap:wrap; }
+  .preset-row button{ border:none; border-radius:9px; padding:7px 10px; font-size:12px; font-weight:700; background:var(--panel); color:var(--text); cursor:pointer; }
+  .preset-row button:disabled{ color:#8d7db5; cursor:not-allowed; }
+  .synergy-hint{ background:linear-gradient(135deg,#3a2a5e,#2a3a6e); }
+  /* 成就页（复用已有 class 名，补全样式） */
+  .ach-topbar{ font-size:12px; color:var(--muted); margin-bottom:8px; }
+  .ach-topbar b{ color:var(--gold); font-size:14px; }
+  .ach-tabs{ display:flex; flex-wrap:wrap; gap:5px; margin-bottom:10px; }
+  .ach-tabs button{ border:1px solid #ffffff18; background:transparent; color:var(--muted); border-radius:10px; padding:5px 9px; font-size:11px; font-weight:700; cursor:pointer; }
+  .ach-tabs button.active{ background:var(--gold); color:#1b1033; border-color:var(--gold); }
+  .ach-stats{ display:grid; grid-template-columns:1fr 1fr; gap:6px 12px; background:var(--panel); border-radius:12px; padding:10px; margin-bottom:10px; font-size:11px; }
+  .ach-stats .stat{ display:flex; justify-content:space-between; }
+  .ach-stats .stat b{ color:var(--text); }
+  .ach-avatar{ width:44px; height:44px; border-radius:50%; background:var(--panel); display:flex; align-items:center; justify-content:center; font-size:22px; margin:0 auto 2px; }
+  .ach-avatar.f-conquer{ box-shadow:0 0 0 2px #b06bff; }
+  .ach-avatar.f-awaken{ box-shadow:0 0 0 2px #ffcb3d; }
+  .ach-avatar.f-reincarn{ box-shadow:0 0 0 2px #48e0a0; }
+  .ach-avatar.f-master{ box-shadow:0 0 0 2px #ff5b6e; }
+  .ach-avatar.f-pantheon{ box-shadow:0 0 0 2px #b58cff; }
+  .ach-avatar.f-skill{ box-shadow:0 0 0 2px #4a9eff; }
+  .ach-avatar.f-omnipotent{ box-shadow:0 0 0 2px #ffcb3d; }
+  .ach-avatar-name{ text-align:center; font-size:12px; font-weight:700; margin-bottom:6px; }
+  .ach-list{ display:flex; flex-direction:column; gap:8px; }
+  .ach-card{ background:var(--panel); border-radius:12px; padding:9px 11px; }
+  .ach-card.unlocked{ box-shadow:0 0 0 1px #ffffff22 inset; }
+  .ach-card.ultimate{ background:linear-gradient(135deg,#3a2a5e,#2a1a4a); }
+  .ach-card.hidden-locked{ opacity:.6; }
+  .ach-top{ display:flex; align-items:center; gap:8px; }
+  .ach-icon{ font-size:20px; }
+  .ach-name{ flex:1; font-weight:700; font-size:14px; }
+  .ach-status{ font-size:16px; }
+  .ach-desc{ font-size:11px; color:var(--muted); margin-top:3px; }
+  .ach-progress-bar{ height:7px; background:#160c2b; border-radius:5px; overflow:hidden; margin-top:6px; }
+  .ach-progress-fill{ height:100%; background:linear-gradient(90deg,var(--gold),#ffb24d); }
+  .ach-progress-text{ font-size:10px; color:var(--muted); text-align:right; }
+  .ach-reward{ font-size:11px; color:var(--green); margin-top:5px; }
+  .ach-reward.done{ color:var(--gold); }
+  .ach-equip-title{ margin-top:6px; border:none; border-radius:9px; padding:5px 10px; font-size:11px; font-weight:700; background:var(--panel2); color:var(--text); cursor:pointer; }
+  .ach-equip-title.active{ background:var(--gold); color:#1b1033; }
+  .collect-title{ font-size:12px; font-weight:700; color:var(--muted); margin:10px 0 6px; }
+  .ach-title-chip{ border:1px solid #ffffff20; background:transparent; color:var(--text); border-radius:10px; padding:6px 10px; font-size:12px; cursor:pointer; margin:3px; }
+  .ach-title-chip.active{ background:var(--gold); color:#1b1033; }
+  .badge-grid, .frame-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+  .badge, .frame-chip{ width:54px; text-align:center; font-size:20px; background:var(--panel); border-radius:10px; padding:6px 2px; }
+  .badge.got, .frame-chip:not(.locked){ box-shadow:0 0 0 1px var(--gold) inset; }
+  .frame-chip.locked{ opacity:.45; }
+  .frame-chip.active{ box-shadow:0 0 0 2px var(--gold); }
+  .frame-chip span, .badge span{ display:block; font-size:9px; color:var(--muted); margin-top:2px; }
+  #diffToast.ach-unlock{ background:rgba(40,25,70,.95); border:1px solid var(--gold); }
 </style>
 </head>
 <body>
@@ -276,6 +370,7 @@
     <p class="sub">英雄们替你刷怪赚到了</p>
     <div class="offline-gold">💰 +<span id="offlineGold">0</span></div>
     <p class="sub" id="offlineEssence" style="display:none"></p>
+    <p class="sub" id="offlinePush" style="display:none"></p>
     <button id="offlineClaim" class="buy">领取</button>
   </div>
 </div>
@@ -309,6 +404,7 @@
       <div class="box essence"><div class="k">精华</div><div class="v" id="essence">0</div></div>
       <div class="box prestige"><div class="k">重生加成</div><div class="v" id="prestige">×1.00</div></div>
     </div>
+    <div id="titleTag" class="title-tag"></div>
 
     <!-- 战斗区：点这里打怪 -->
     <div class="stage">
@@ -367,7 +463,57 @@
     <button id="resetBtn">重置存档</button>
     <button id="saveBtn">手动存档</button>
   </div>
-  <div class="tip">提示：英雄会自动打怪（放置收益）；<b>快速连点</b>可累积「连击」倍率（停手约 2 秒清零），活跃手点比纯放置更强。<br>商店显示<b>已拥有的全部英雄</b> + 末尾一张<b>即将可购买</b>的下一个单位，并标出本次可提升的战力。<br>击破 BOSS 得「灵魂精华」，<b>觉醒</b>任意英雄为<b>全队</b>永久加伤（军团共鸣）；<b>精华转生后保留</b>，放心转生。转生需第 100 关。<br>⚡ <b>主动技能</b>消耗「能量」(随时间/点击回复)并有冷却：狂暴=点击×10、黄金=金币×5、时停=Boss倒计时+5s，随<b>英雄总等级</b>解锁；用精华买<b>技能精通</b>可永久减冷却。<br>进度自动存于本机浏览器。</div>
+  <div class="footer">
+    <button id="artifactBtn">✨ 神器</button>
+    <button id="gearBtn">🛡️ 装备</button>
+    <button id="achBtn">🏆 成就</button>
+  </div>
+  <div class="tip">提示：英雄会自动打怪（放置收益）；<b>快速连点</b>可累积「连击」倍率（停手约 2 秒清零），活跃手点比纯放置更强。<br>商店显示<b>已拥有的全部英雄</b> + 末尾一张<b>即将可购买</b>的下一个单位，并标出本次可提升的战力。<br>击破 BOSS 得「灵魂精华」，<b>觉醒</b>任意英雄为<b>全队</b>永久加伤（军团共鸣）；<b>精华转生后保留</b>，放心转生。转生需第 100 关。<br>⚡ <b>技能</b>来自已装备的装备：消耗「能量」释放，各有冷却；<b>守护戒指</b>被动让 Boss 关 +5s 且满能量自动射击；用精华买<b>技能精通</b>可永久减冷却；合理配装可触发<b>连携</b>。<br>进度自动存于本机浏览器。</div>
+</div>
+
+<!-- 成就页 -->
+<div id="achPage" class="overlay" style="display:none">
+  <div class="overlay-box">
+    <div class="overlay-head"><h2>🏆 成就</h2><button id="achClose" class="ov-close">✕</button></div>
+    <div class="ach-topbar">进度 <b id="achProgress">0/50</b></div>
+    <div id="achTabs" class="ach-tabs"></div>
+    <div id="achStats" class="ach-stats"></div>
+    <div id="achList" class="ach-list"></div>
+  </div>
+</div>
+
+<!-- 神器页 -->
+<div id="artPage" class="overlay" style="display:none">
+  <div class="overlay-box">
+    <div class="overlay-head"><h2>✨ 神器</h2><button id="artClose" class="ov-close">✕</button></div>
+    <div class="art-bar">
+      <span>粉尘 <b id="artDust">0</b></span>
+      <span>图鉴 <b id="artOwned">0/21</b></span>
+      <button id="artPull" class="buy">单抽(<span id="artCost1"></span>精)</button>
+      <button id="artPull10" class="buy">十连(<span id="artCost10"></span>精)</button>
+    </div>
+    <div id="artList" class="art-list"></div>
+  </div>
+</div>
+
+<!-- 装备页 -->
+<div id="gearPage" class="overlay" style="display:none">
+  <div class="overlay-box">
+    <div class="overlay-head"><h2>🛡️ 装备</h2><button id="gearClose" class="ov-close">✕</button></div>
+    <div class="art-bar"><span>碎片 <b id="gearDust">0</b></span><span>已装备 / 背包</span></div>
+    <div id="gearSlots" class="gear-slots"></div>
+    <div class="title"><h2>背包</h2></div>
+    <div id="gearInv" class="gear-inv"></div>
+    <div class="title"><h2>锻造（消耗精华）</h2></div>
+    <div class="forge-row">
+      <button id="forgeRandom" class="buy">随机(<span id="forgeCost1"></span>精)</button>
+      <button id="forgeTargeted" class="buy">定向(<span id="forgeCost2"></span>精)</button>
+      <select id="forgeType"></select>
+      <button id="forgePrecise" class="buy">精准(<span id="forgeCost3"></span>精)</button>
+    </div>
+    <div class="title"><h2>预设配装</h2></div>
+    <div id="presetRow" class="preset-row"></div>
+  </div>
 </div>
 
 <script>
@@ -471,6 +617,117 @@ const HEROES = [
 ];
 
 /* =========================================================================
+   神器系统配置（v1.3，21 神器）+ 装备×技能系统配置（v1.1，12 装备/4槽/10连携）
+   这些常量仅被下方定义的函数在运行期调用；本块位于 init() 之前，运行期均可用。
+   ========================================================================= */
+const MAIN_AFFIX_BASE = { tapDmg:0.15, dps:0.15, global:0.15, critChance:0.10, gold:0.15 };
+function rarCoeff(r){ return (GEAR_RARITY[r]||GEAR_RARITY.common).mainCoeff; }
+
+const ARTIFACTS = [
+  { id:"blade",      name:"神圣之刃", emoji:"⚔️", rarity:"common",    effect:"dropRate",      perLevel:0.02, maxLevel:50, desc:"装备掉落率 +2%/级" },
+  { id:"badge",      name:"英雄纹章", emoji:"🛡️", rarity:"common",    effect:"forgeDiscount", perLevel:0.03, maxLevel:50, desc:"锻造费用 -3%/级" },
+  { id:"coin",       name:"幸运硬币", emoji:"🪙", rarity:"common",    effect:"bossEssence",   perLevel:0.05, maxLevel:50, desc:"Boss精华掉落 +5%/级" },
+  { id:"compass",    name:"灵魂罗盘", emoji:"🧭", rarity:"common",    effect:"essence",       perLevel:0.05, maxLevel:50, desc:"精华获取 +5%/级" },
+  { id:"eye",        name:"精准之眼", emoji:"👁️", rarity:"common",    effect:"synergy",       perLevel:0.03, maxLevel:50, desc:"连携效果增强 +3%/级" },
+  { id:"razor",      name:"致命利刃", emoji:"🗡️", rarity:"rare",      effect:"critMult",      perLevel:0.30, maxLevel:40, desc:"暴击伤害 +30%/级" },
+  { id:"wristband",  name:"连击护腕", emoji:"🥊", rarity:"rare",      effect:"comboPerTap",   perLevel:0.002, maxLevel:40, desc:"连击每点增量 +0.002/级" },
+  { id:"eternity",   name:"永恒印记", emoji:"♾️", rarity:"rare",      effect:"global",        perLevel:0.05, maxLevel:40, desc:"全局伤害 +5%/级" },
+  { id:"resonance",  name:"觉醒共鸣", emoji:"🌀", rarity:"rare",      effect:"awakenBonus",   perLevel:0.001, maxLevel:40, desc:"觉醒全队加成增量 +0.1%/级" },
+  { id:"critheart",  name:"暴击之心", emoji:"💥", rarity:"rare",      effect:"critEnergy",    perLevel:0.1,  maxLevel:40, desc:"暴击时回能 +0.1/级" },
+  { id:"berserk",    name:"狂战之魂", emoji:"🔥", rarity:"epic",      effect:"skillDur",      perLevel:0.05, maxLevel:30, desc:"全技能持续时间 +5%/级" },
+  { id:"hourglass",  name:"守护沙漏", emoji:"⏳", rarity:"epic",      effect:"bossDmg",       perLevel:0.06, maxLevel:30, desc:"Boss伤害 +6%/级" },
+  { id:"grail",      name:"转生圣杯", emoji:"🏆", rarity:"epic",      effect:"prestige",      perLevel:0.04, maxLevel:30, desc:"重生点数 +4%/级" },
+  { id:"pocketwatch",name:"离线怀表", emoji:"🕰️", rarity:"epic",      effect:"offline",       perLevel:0.04, maxLevel:30, desc:"离线效率 +4%/级" },
+  { id:"banner",     name:"扫荡军旗", emoji:"🚩", rarity:"epic",      effect:"monsterReduce", perLevel:0.5,  maxLevel:20, desc:"每关小怪 -0.5只/级" },
+  { id:"passport",   name:"远征令牌", emoji:"🗺️", rarity:"epic",      effect:"offlinePush",   perLevel:2,    maxLevel:30, desc:"离线自动推关 +2关/级" },
+  { id:"comet",      name:"毁灭连锁", emoji:"☄️", rarity:"epic",      effect:"overkillTransfer", perLevel:0.04, maxLevel:30, desc:"溢出伤害传递 +4%/级" },
+  { id:"balance",    name:"命运天平", emoji:"⚖️", rarity:"legendary", effect:"diffMin",       perLevel:0.002, maxLevel:20, desc:"难度下限 -0.002/级" },
+  { id:"genesis",    name:"创世之心", emoji:"💎", rarity:"legendary", effect:"energyMax",     perLevel:5,    maxLevel:20, desc:"能量上限 +5/级" },
+  { id:"dice",       name:"命运骰子", emoji:"🎲", rarity:"legendary", effect:"prestigeDouble", perLevel:0.01, maxLevel:30, desc:"转生点数 +1%/级概率翻倍" },
+  { id:"pantheon",   name:"万神殿",   emoji:"🏛️", rarity:"legendary", effect:"synergyGlobal", perLevel:0.005, maxLevel:20, desc:"每拥有1个其他神器，全神器效果 +0.5%/级" },
+];
+const ARTIFACT_RARITY = {
+  common:    { name:"普通", color:"#9aa0b5", pullRate:0.50, upgradeMult:1 },
+  rare:      { name:"稀有", color:"#4a9eff", pullRate:0.30, upgradeMult:2 },
+  epic:      { name:"史诗", color:"#b06bff", pullRate:0.15, upgradeMult:4 },
+  legendary: { name:"传说", color:"#ffcb3d", pullRate:0.05, upgradeMult:8 },
+};
+const ARTIFACT_PULL = {
+  baseCost: 20, costGrowth: 1.08, dustPerRarity: { common:5, rare:15, epic:50, legendary:200 },
+  pityThreshold: 40, collectionThreshold: 100, tenPullEpicGuarantee: true,
+};
+const FORGE_DISCOUNT_MIN = 0.10;
+const OFFLINE_PUSH = { stageTimeThreshold: 40, bossNoDrop: true };
+const MONSTER_REDUCE_MIN = 2;
+
+const GEARS = [
+  { id:"flame_sword",   name:"炽焰之剑", emoji:"🗡️", type:"weapon", skillId:"berserk",
+    mainAffix:"tapDmg", skill:{name:"狂暴",icon:"🔥",energyCost:40,duration:8,cooldown:50,tapMult:8, desc:"点击伤害×8，持续8秒"}, school:"tap" },
+  { id:"thunder_sword", name:"雷神之剑", emoji:"⚡", type:"weapon", skillId:"dual_track",
+    mainAffix:"tapDmg", skill:{name:"双轨",icon:"⚡",energyCost:45,duration:8,cooldown:60,tapBonus:2.0,dpsBonus:2.0, desc:"点击+200%且DPS+200%，持续8秒"}, school:"hybrid" },
+  { id:"blast_staff",   name:"爆裂法杖", emoji:"🪄", type:"weapon", skillId:"aoe_storm",
+    mainAffix:"tapDmg", skill:{name:"AOE风暴",icon:"💥",energyCost:35,cooldown:35,aoeSeconds:3, desc:"对当前关所有怪物造成3秒DPS伤害"}, school:"dps" },
+  { id:"command_armor", name:"统帅胸甲", emoji:"🎽", type:"armor", skillId:"legion_charge",
+    mainAffix:"dps", skill:{name:"军团冲锋",icon:"⚔️",energyCost:40,duration:10,cooldown:50,dpsMult:6, desc:"英雄DPS×6，持续10秒"}, school:"dps" },
+  { id:"life_armor",    name:"生命胸甲", emoji:"🦺", type:"armor", skillId:"feedback",
+    mainAffix:"dps", skill:{name:"反哺",icon:"♻️",energyCost:30,duration:10,cooldown:45,feedbackRate:0.2, desc:"DPS的20%转化为点击伤害，持续10秒"}, school:"hybrid" },
+  { id:"time_armor",    name:"时光胸甲", emoji:"🧥", type:"armor", skillId:"offline_boost",
+    mainAffix:"dps", skill:{name:"离线加速",icon:"🕰️",energyCost:30,duration:20,cooldown:60,offlineBoost:1.0, desc:"离线效率+100%，持续20秒"}, school:"dps" },
+  { id:"hunter_ring",   name:"猎手戒指", emoji:"💍", type:"ring", skillId:"deadly_crit",
+    mainAffix:"critChance", skill:{name:"致命暴击",icon:"🎯",energyCost:30,duration:10,cooldown:40,critChanceBonus:0.4,critMultBonus:2.0, desc:"暴击率+40%，暴击伤害+200%，持续10秒"}, school:"tap" },
+  { id:"greed_ring",    name:"贪婪戒指", emoji:"💍", type:"ring", skillId:"gold_skill",
+    mainAffix:"gold", skill:{name:"黄金",icon:"💰",energyCost:50,duration:20,cooldown:100,goldMult:5, desc:"金币获取×5，持续20秒"}, school:"universal" },
+  { id:"guard_ring",    name:"守护戒指", emoji:"💍", type:"ring", skillId:"guard",
+    mainAffix:"global", skill:{name:"守护",icon:"🛡️",passive:true,bossTimeBonus:5,autoShot:true, desc:"被动：Boss关限时+5秒；满能量时自动释放最低能耗技能"}, school:"universal" },
+  { id:"resonance_badge",name:"共鸣勋章",emoji:"🎖️", type:"badge", skillId:"resonance",
+    mainAffix:"global", skill:{name:"共鸣",icon:"🔗",energyCost:35,duration:8,cooldown:50,dpsMult:3,needCombo:0.5, desc:"连击≥50%时DPS×3，持续8秒"}, school:"hybrid" },
+  { id:"berserker_badge",name:"战狂勋章",emoji:"🏅", type:"badge", skillId:"rage_combo",
+    mainAffix:"comboMax", skill:{name:"暴怒连打",icon:"👊",energyCost:25,cooldown:30,hits:5, desc:"立即进行5次点击伤害"}, school:"tap" },
+  { id:"gale_badge",    name:"疾风勋章", emoji:"🎗️", type:"badge", skillId:"combo_storm",
+    mainAffix:"global", skill:{name:"连击风暴",icon:"🌪️",energyCost:35,duration:6,cooldown:45, desc:"连击锁满且不衰减，持续6秒"}, school:"tap" },
+];
+const GEAR_RARITY = {
+  common:    { name:"普通", color:"#9aa0b5", dropRate:0.45, mainCoeff:1.0, subCount:0, upgradeMult:1, maxLevel:10 },
+  rare:      { name:"稀有", color:"#4a9eff", dropRate:0.35, mainCoeff:1.5, subCount:1, upgradeMult:2, maxLevel:15 },
+  epic:      { name:"史诗", color:"#b06bff", dropRate:0.15, mainCoeff:2.2, subCount:2, upgradeMult:4, maxLevel:20 },
+  legendary: { name:"传说", color:"#ffcb3d", dropRate:0.05, mainCoeff:3.5, subCount:2, upgradeMult:8, maxLevel:25 },
+};
+const GEAR_CONFIG = {
+  gearUnlockStage: 5,
+  upgradeBaseCost: 500, upgradeGrowth: 1.20, mainPerLevel: 0.15, subPerLevel: 0.10,
+  subValueRange: { min:0.02, max:0.08 },
+  forgeRandomCost: 30, forgeTargetedCost: 80, forgePreciseCost: 200,
+  dustPerRarity: { common:2, rare:6, epic:20, legendary:60 },
+  breakThroughCost: { "common->rare":10, "rare->epic":30, "epic->legendary":100 },
+  swapCooldown: 30, bossDropRate: 0.25, bossCenturyDropRate: 1.0, gearSlotCount: 4,
+};
+const SUB_AFFIX_POOL = [
+  { type:"tapDmg",      baseMin:0.02, baseMax:0.05 },
+  { type:"dps",         baseMin:0.02, baseMax:0.05 },
+  { type:"global",      baseMin:0.01, baseMax:0.03 },
+  { type:"critChance",  baseMin:0.01, baseMax:0.02 },
+  { type:"critMult",    baseMin:0.10, baseMax:0.20 },
+  { type:"comboMax",    baseMin:0.10, baseMax:0.30 },
+  { type:"gold",        baseMin:0.03, baseMax:0.08 },
+  { type:"essence",     baseMin:0.02, baseMax:0.05 },
+  { type:"offline",     baseMin:0.02, baseMax:0.05 },
+  { type:"skillDmg",    baseMin:0.03, baseMax:0.08 },
+];
+const SYNERGIES = [
+  { id:"crit_chain", name:"暴击连锁", skillIds:["combo_storm","deadly_crit"], desc:"连击风暴生效时，致命暴击暴击率额外+20%", bonus:{ target:"deadly_crit", critChanceBonus:0.20 } },
+  { id:"legion_aoe", name:"军团共鸣", skillIds:["legion_charge","aoe_storm"], desc:"军团冲锋生效时，AOE风暴伤害提升至5秒DPS", bonus:{ target:"aoe_storm", aoeSeconds:5 } },
+  { id:"dual_resonance", name:"双轨共振", skillIds:["resonance","feedback"], desc:"共鸣DPS×3→×4，反哺转化率20%→30%", bonus:{ target:"resonance", dpsMult:4, target2:"feedback", feedbackRate:0.30 } },
+  { id:"dual_track_resonance", name:"双轨共鸣", skillIds:["dual_track","resonance"], desc:"双轨生效时，共鸣DPS×3→×4，双轨点击增益+200%→+250%", bonus:{ target:"resonance", dpsMult:4, target2:"dual_track", tapBonus:2.5 } },
+  { id:"gold_legion", name:"黄金军团", skillIds:["gold_skill","legion_charge"], desc:"军团冲锋生效时，金币获取额外+100%", bonus:{ target:"gold_skill", goldMult:10 } },
+  { id:"crit_execute", name:"暴击抢杀", skillIds:["deadly_crit","rage_combo"], desc:"致命暴击生效时，暴怒连打每次点击必定暴击", bonus:{ target:"rage_combo", alwaysCrit:true } },
+  { id:"storm_offline", name:"风暴清场", skillIds:["aoe_storm","offline_boost"], desc:"离线加速生效时，AOE风暴3秒→4秒DPS，离线加速20s→25s", bonus:{ target:"aoe_storm", aoeSeconds:4, target2:"offline_boost", duration:25 } },
+  { id:"triple_resonance", name:"共振双轨", skillIds:["resonance","dual_track","feedback"], desc:"三件齐配：共鸣×3→×5，反哺20%→35%，双轨+200%→+300%", bonus:{ target:"resonance", dpsMult:5, target2:"feedback", feedbackRate:0.35, target3:"dual_track", tapBonus:3.0, dpsBonus:3.0 } },
+  { id:"gold_resonance", name:"黄金共鸣", skillIds:["gold_skill","resonance"], desc:"共鸣触发期间，击杀金币额外×2（叠加黄金×5即×10）", bonus:{ target:"gold_skill", resonanceGoldMult:2 } },
+  { id:"guard_burst", name:"守护爆发", skillIds:["guard","berserk"], desc:"守护+爆发技能：Boss+5s，爆发技能持续+3s", bonus:{ target:"berserk", durationBonus:3, targetAlt:["legion_charge","dual_track"], durationBonusAlt:3 } },
+];
+const GEAR_SKILL_IDS = GEARS.map(g=>g.skillId);
+
+/* =========================================================================
    2) 存档（游戏进度就存在浏览器的 localStorage 里）
    ========================================================================= */
 const SAVE_KEY = "tapHeroSave_v1";
@@ -494,6 +751,53 @@ let state = {
   combo: 0,        // 连击倍率累加值（tapDamage 叠加，1+combo 为最终倍率），0=无连击
   comboTimer: 0,   // 距上次点击的秒数（用于衰减）
   skillMastery: 0, // 技能精通等级（永久，用精华购买，降低所有技能冷却）
+
+  // ===== 成就系统字段（全部转生保留，除非注明运行时）=====
+  achievements: {},        // { 成就ID:true } 已解锁记录
+  equippedTitle: null,     // 当前装备的称号（null=未装备）
+  equippedFrame: "default",// 当前装备头像框ID
+  // 统计字段（成就检测数据源，只增不减，转生保留）
+  totalTaps: 0,
+  totalKills: 0,
+  totalBossKills: 0,
+  totalBossFails: 0,
+  totalGoldEarned: 0,
+  totalEssenceEarned: 0,
+  totalPrestiges: 0,
+  totalPulls: 0,
+  bestStageEver: 1,
+  totalPlayTime: 0,
+  totalEssenceSpentOnForge: 0,
+  totalForgeCount: 0,
+  totalSkillUses: 0,
+  // 运行时/布尔标记（转生保留与否见 doPrestige）
+  maxComboHit: false,
+  oneShotBossKill: false,
+  offlineMaxed: false,
+  bossFight3Skills: false,
+  comebackAfter10Fails: false,
+  lastPrestigeTime: 0,
+  consecutiveCrits: 0,
+  sessionTaps: 0,
+  bossFightSkillsUsed: {},
+  gearBuildsCompleted: {},
+  // ===== 神器系统字段（转生保留）=====
+  artifacts: {},
+  pityCounter: 0,
+  collectionCounter: 0,
+  artifactDust: 0,
+  artifactGuideSeen: false,
+  // ===== 装备系统字段（转生保留）=====
+  gearInventory: [],
+  equipped: { weapon:null, armor:null, ring:null, badge:null },
+  gearDust: 0,
+  gearGuideSeen: false,
+  gearSwapCd: { weapon:0, armor:0, ring:0, badge:0 },
+  gearPresets: [],
+  // ===== 连携/流派追踪（转生保留）=====
+  everSynergy: false,
+  synergySet: {},
+  comboAchievesTriggered: {},
 };
 
 // 难度自适应相关“运行时”变量（不存档，每次开局重新算）
@@ -529,7 +833,52 @@ function load(){
       if(state.comboTimer===undefined) state.comboTimer = 0;
       if(state.skillMastery===undefined) state.skillMastery = 0;
       // 主动技能：冷却可保留，激活中的 buff 跨存档不应残留（避免离线/重开还在生效）
-      for(const id in CONFIG.skills){ state.skillCd[id] = state.skillCd[id]||0; state.skillActive[id] = 0; }
+      for(const id of GEAR_SKILL_IDS){ state.skillCd[id] = state.skillCd[id]||0; state.skillActive[id] = 0; }
+      // ===== 成就系统字段补全（v1 旧档兼容，全部转生保留）=====
+      if(state.achievements===undefined) state.achievements = {};
+      if(state.equippedTitle===undefined) state.equippedTitle = null;
+      if(state.equippedFrame===undefined) state.equippedFrame = "default";
+      if(state.totalTaps===undefined) state.totalTaps = 0;
+      if(state.totalKills===undefined) state.totalKills = 0;
+      if(state.totalBossKills===undefined) state.totalBossKills = 0;
+      if(state.totalBossFails===undefined) state.totalBossFails = 0;
+      if(state.totalGoldEarned===undefined) state.totalGoldEarned = 0;
+      if(state.totalEssenceEarned===undefined) state.totalEssenceEarned = 0;
+      if(state.totalPrestiges===undefined) state.totalPrestiges = 0;
+      if(state.totalPulls===undefined) state.totalPulls = 0;
+      if(state.bestStageEver===undefined) state.bestStageEver = state.bestStage || 1;
+      if(state.totalPlayTime===undefined) state.totalPlayTime = 0;
+      if(state.totalEssenceSpentOnForge===undefined) state.totalEssenceSpentOnForge = 0;
+      if(state.totalForgeCount===undefined) state.totalForgeCount = 0;
+      if(state.totalSkillUses===undefined) state.totalSkillUses = 0;
+      if(state.maxComboHit===undefined) state.maxComboHit = false;
+      if(state.oneShotBossKill===undefined) state.oneShotBossKill = false;
+      if(state.offlineMaxed===undefined) state.offlineMaxed = false;
+      if(state.bossFight3Skills===undefined) state.bossFight3Skills = false;
+      if(state.comebackAfter10Fails===undefined) state.comebackAfter10Fails = false;
+      if(state.lastPrestigeTime===undefined) state.lastPrestigeTime = 0;
+      if(state.consecutiveCrits===undefined) state.consecutiveCrits = 0;
+      if(state.sessionTaps===undefined) state.sessionTaps = 0;
+      if(state.bossFightSkillsUsed===undefined) state.bossFightSkillsUsed = {};
+      if(state.gearBuildsCompleted===undefined) state.gearBuildsCompleted = {};
+      if(state.comboAchievesTriggered===undefined) state.comboAchievesTriggered = {};
+      // ===== 神器系统字段（v1.3）=====
+      if(state.artifacts===undefined) state.artifacts={};
+      if(state.pityCounter===undefined) state.pityCounter=0;
+      if(state.collectionCounter===undefined) state.collectionCounter=0;
+      if(state.artifactDust===undefined) state.artifactDust=0;
+      if(state.artifactGuideSeen===undefined) state.artifactGuideSeen=false;
+      // ===== 装备系统字段（v1.1）=====
+      if(state.gearInventory===undefined) state.gearInventory=[];
+      if(state.equipped===undefined) state.equipped={weapon:null,armor:null,ring:null,badge:null};
+      if(state.gearDust===undefined) state.gearDust=0;
+      if(state.gearGuideSeen===undefined) state.gearGuideSeen=false;
+      if(state.gearSwapCd===undefined) state.gearSwapCd={weapon:0,armor:0,ring:0,badge:0};
+      if(state.gearPresets===undefined) state.gearPresets=[];
+      if(state.everSynergy===undefined) state.everSynergy=false;
+      if(state.synergySet===undefined) state.synergySet={};
+      // bestStageEver 不低于当前 bestStage
+      if(state.bestStageEver < (state.bestStage||1)) state.bestStageEver = state.bestStage||1;
     }
   }catch(e){ console.warn("读取存档失败", e); }
 }
@@ -553,7 +902,9 @@ function closeConfirm(){ document.getElementById("confirmModal").style.display =
 function reset(){
   showConfirm("重置存档", "确定清空<b>所有进度</b>吗？此操作<b>不可恢复</b>。", ()=>{
     localStorage.removeItem(SAVE_KEY);
-    state = { gold:0, stage:1, tapLevel:1, heroes:{}, essence:0, awaken:{}, enemyHp:0, monsterIndex:1, dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:Date.now(), prestige:0, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery:0 };
+    state = { gold:0, stage:1, tapLevel:1, heroes:{}, essence:0, awaken:{}, enemyHp:0, monsterIndex:1, dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:Date.now(), prestige:0, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery:0,
+      achievements:{}, equippedTitle:null, equippedFrame:"default", totalTaps:0, totalKills:0, totalBossKills:0, totalBossFails:0, totalGoldEarned:0, totalEssenceEarned:0, totalPrestiges:0, totalPulls:0, bestStageEver:1, totalPlayTime:0, totalEssenceSpentOnForge:0, totalForgeCount:0, totalSkillUses:0, maxComboHit:false, oneShotBossKill:false, offlineMaxed:false, bossFight3Skills:false, comebackAfter10Fails:false, lastPrestigeTime:0, consecutiveCrits:0, sessionTaps:0, bossFightSkillsUsed:{}, gearBuildsCompleted:{}, comboAchievesTriggered:{},
+      artifacts:{}, pityCounter:0, collectionCounter:0, artifactDust:0, artifactGuideSeen:false, gearInventory:[], equipped:{weapon:null,armor:null,ring:null,badge:null}, gearDust:0, gearGuideSeen:false, gearSwapCd:{weapon:0,armor:0,ring:0,badge:0}, gearPresets:[], everSynergy:false, synergySet:{} };
     HEROES.forEach(h=>{ state.heroes[h.id]=0; state.awaken[h.id]=0; });
     dynGrowth = state.dynGrowth; oneShotStreak = 0; stuckStreak = 0;
     save(); spawnEnemy(); onStageBegin(); renderAll();
@@ -579,24 +930,28 @@ function applyOfflineEarnings(){
   let elapsed = (now - state.lastSeen) / 1000; // 实际离线秒数
   if(elapsed < CONFIG.offlineMinSeconds) return;   // 太短（如切个标签）不结算
   const capped = Math.min(elapsed, CONFIG.offlineMaxSeconds); // 封顶，避免无限累积
+  if(elapsed >= CONFIG.offlineMaxSeconds) state.offlineMaxed = true; // X4 佛系玩家
   const dps = totalDps();
   if(dps <= 0) return;                         // 没买英雄，离线无产出
   // 离线每秒产出 ≈ 每秒击杀数 × 每只金币（按离开时所在关估算）
   const hp = enemyMaxHp(state.stage);
   const killsPerSec = dps / hp;
   const goldPerSec = killsPerSec * goldReward(state.stage);
-  const earned = Math.floor(goldPerSec * capped * CONFIG.offlineRate);
+  const rate = CONFIG.offlineRate + gearOfflineRate() + artOfflineRate();
+  const earned = Math.floor(goldPerSec * capped * rate);
   if(earned <= 0) return;
   state.gold += earned;
   // 离线期间英雄也会击杀 Boss，按比例发放「灵魂精华」（觉醒系统资源）
-  const bossesOffline = Math.floor((killsPerSec * capped) / CONFIG.monstersPerStage);
+  const bossesOffline = Math.floor((killsPerSec * capped) / Math.max(1, monstersInStage(state.stage)));
   const essenceGained = bossesOffline * bossEssenceGain(state.stage);
   if(essenceGained > 0) state.essence += essenceGained;
+  // v1.3 #19 远征令牌：离线自动推关（受卡关阈值+时长约束，不触发装备掉落）
+  const prog = applyOfflineProgression(capped);
   save();                                      // 更新 lastSeen=now，避免重复结算
-  showOfflineModal(elapsed, earned, essenceGained);
+  showOfflineModal(elapsed, earned, essenceGained, prog);
 }
 // 弹出离线收益结算面板
-function showOfflineModal(elapsed, earned, essenceGained){
+function showOfflineModal(elapsed, earned, essenceGained, prog){
   const mask = document.getElementById("offlineModal");
   if(!mask) return;
   document.getElementById("offlineTime").textContent = fmtTime(Math.min(elapsed, CONFIG.offlineMaxSeconds));
@@ -606,13 +961,24 @@ function showOfflineModal(elapsed, earned, essenceGained){
     if(essenceGained > 0){ eLine.style.display = "block"; eLine.textContent = "✦ 灵魂精华 +" + fmt(essenceGained); }
     else eLine.style.display = "none";
   }
+  const pLine = document.getElementById("offlinePush");
+  if(pLine){
+    if(prog && prog.stagesPushed > 0){ pLine.style.display = "block"; pLine.textContent = "🗺️ 离线推关 +" + prog.stagesPushed + " 关"; }
+    else pLine.style.display = "none";
+  }
   mask.style.display = "flex";
 }
 
 /* =========================================================================
    3) 数值计算
    ========================================================================= */
-function tapDamage(){ return CONFIG.baseTap * state.tapLevel * prestigeMult() * awakenGlobalMult() * skillTapMult() * comboMult(); }
+function tapDamage(){
+  const boss = isBoss(state.stage);
+  let m = CONFIG.baseTap * state.tapLevel * prestigeMult() * awakenGlobalMult() * skillTapMult() * comboMult();
+  m *= gearTapMult() * gearGlobalMult() * artGlobalMult();
+  if(boss) m *= (1 + artBossDmg());
+  return m;
+}
 
 function totalDps(){
   let dps = 0;
@@ -620,110 +986,204 @@ function totalDps(){
     const lv = state.heroes[h.id] || 0;
     if(lv>0) dps += h.baseDps * lv * awakenGlobalMult() * prestigeMult();
   }
+  let mult = gearDpsMult() * gearGlobalMult() * artGlobalMult();
+  // 军团冲锋（DPS流）：英雄DPS ×N
+  if((state.skillActive.legion_charge||0) > 0){ const def = GEARS.find(g=>g.skillId==="legion_charge"); mult *= def ? def.skill.dpsMult : 6; }
+  // 双轨（混合流）：DPS +N%（受连携放大）
+  if((state.skillActive.dual_track||0) > 0){
+    const def = GEARS.find(g=>g.skillId==="dual_track"); let db = def ? def.skill.dpsBonus : 2.0;
+    const syn8 = activeSynergies().find(s=>s.id==="triple_resonance"); const syn4 = activeSynergies().find(s=>s.id==="dual_track_resonance");
+    if(syn8) db = syn8.bonus.dpsBonus; else if(syn4) db = syn4.bonus.dpsBonus;
+    mult *= (1 + db);
+  }
+  // 共鸣（混合流）：连击≥50%时 DPS ×N（受连携放大）
+  if((state.skillActive.resonance||0) > 0){
+    const def = GEARS.find(g=>g.skillId==="resonance"); const need = (def ? def.skill.needCombo : 0.5) * (CONFIG.comboMax + gearComboMax());
+    if(comboMult() >= need){
+      let dm = def ? def.skill.dpsMult : 3;
+      const syn3 = activeSynergies().find(s=>s.id==="dual_resonance"); const syn8 = activeSynergies().find(s=>s.id==="triple_resonance");
+      if(syn8) dm = syn8.bonus.dpsMult; else if(syn3) dm = syn3.bonus.dpsMult;
+      mult *= dm;
+    }
+  }
+  dps *= mult;
+  if(isBoss(state.stage)) dps *= (1 + artBossDmg());
   return dps;
 }
 
 // 转生永久伤害加成：每 1 点重生点数 +prestigePerPoint（默认 +10%）
 function prestigeMult(){ return 1 + CONFIG.prestigePerPoint * (state.prestige || 0); }
 // 按本局最高关预估本次转生可得点数（floor((bestStage/divisor)^1.5)）
-function prestigeGain(){ return Math.floor(Math.pow(state.bestStage / CONFIG.prestigeDivisor, 1.5)); }
+function prestigeGain(){
+  let g = Math.floor(Math.pow(state.bestStage / CONFIG.prestigeDivisor, 1.5));
+  g = Math.floor(g * artPrestigeMult());
+  if(Math.random() < artPrestigeDouble()) g *= 2;   // #18 命运骰子概率翻倍
+  return Math.max(0, g);
+}
 
 // 军团共鸣：所有英雄觉醒次数之和 → 全队英雄永久加伤倍率
 function totalAwakenLevels(){ let t = 0; for(const h of HEROES) t += (state.awaken[h.id]||0); return t; }
-function awakenGlobalMult(){ return 1 + CONFIG.awakenGlobalBonus * totalAwakenLevels(); }
+function awakenGlobalMult(){ return 1 + (CONFIG.awakenGlobalBonus + artAwakenBonus()) * totalAwakenLevels(); }
 
 /* =========================================================================
-   3.5) 主动技能（能量+冷却模型）
-   - 三个可点技能：狂暴(点击×N)、黄金(金币×N)、时停(Boss倒计时+N秒)
-   - 共享能量池：随时间+点击回复；每个技能消耗能量并有独立冷却（能量满也不能连放）
-   - 按关卡逐步解锁，避免一上来信息过载
+   3.5) 主动技能（能量+冷却模型）—— v1.1 重构为「装备绑定技能」
+   技能来自已装备的装备（12 件装备各绑定 1 个技能）；释放消耗能量并有独立冷却。
+   守护戒指为被动（Boss+5s + 满能量自动射击），不占主动技能槽。
    ========================================================================= */
 function totalHeroLevels(){ let s=0; for(const h of HEROES) s += (state.heroes[h.id]||0); return s; }
-function skillUnlocked(id){ return totalHeroLevels() >= CONFIG.skillUnlockHeroLv[id]; }
 function cdr(){ return Math.min(CONFIG.cdrCap, state.skillMastery * CONFIG.cdrPerMastery); } // 技能精通带来的冷却减免（0~0.5）
-function comboMult(){ return Math.min(CONFIG.comboMax, 1 + state.combo); }
+function comboMult(){
+  if((state.skillActive.combo_storm||0) > 0) return CONFIG.comboMax + gearComboMax(); // 连击风暴：锁满且不衰减
+  return Math.min(CONFIG.comboMax + gearComboMax(), 1 + state.combo);
+}
 function masteryCost(){ return Math.ceil(CONFIG.masteryBaseCost * Math.pow(CONFIG.masteryCostGrowth, state.skillMastery)); }
-function skillTapMult(){ return (state.skillActive.berserk||0) > 0 ? CONFIG.skills.berserk.tapMult : 1; }
-function skillGoldMult(){ return (state.skillActive.gold||0) > 0 ? CONFIG.skills.gold.goldMult : 1; }
-function useSkill(id){
-  const cfg = CONFIG.skills[id];
-  if(!skillUnlocked(id)) return;                 // 未解锁
-  if((state.skillCd[id]||0) > 0) return;         // 冷却中
-  if(state.energy < cfg.energyCost) return;      // 能量不足
-  if(id === "time" && !isBoss(state.stage)){ diffToast("⏱ 时停仅 Boss 关可用"); return; }
-  state.energy -= cfg.energyCost;
-  state.skillCd[id] = cfg.cooldown * (1 - cdr());   // 技能精通降低实际冷却
-  if(id === "time"){
-    bossTimeLeft += cfg.freeze;                  // 时停：Boss 倒计时直接延长（瞬时效果）
-    diffToast("⏱ 时停！Boss 倒计时 +" + cfg.freeze + "s");
-  } else {
-    state.skillActive[id] = cfg.duration;        // 狂暴/黄金：进入持续 buff
-    diffToast("⚡ " + cfg.name + " 启动！");
+
+// 释放装备技能：id 来自已装备装备的技能
+function useSkill(skillId){
+  if(!isSkillEquipped(skillId)) return;          // 该装备未装备
+  const def = GEARS.find(g => g.skillId === skillId);
+  if(!def || !def.skill) return;
+  const sk = def.skill;
+  if(sk.passive) return;                          // 被动技能（守护）不可主动释放
+  if((state.skillCd[skillId]||0) > 0) return;     // 冷却中
+  if(state.energy < sk.energyCost) return;        // 能量不足
+  state.energy -= sk.energyCost;
+  // 连携：守护爆发延长爆发技能持续 +3s
+  let durBonus = 0;
+  const guardBurst = activeSynergies().find(s => s.id === "guard_burst");
+  if(guardBurst && (skillId === "berserk" || skillId === "legion_charge" || skillId === "dual_track")) durBonus = 3;
+  state.skillCd[skillId] = sk.cooldown * (1 - cdr());
+  applySkillEffect(skillId, sk, durBonus);
+  state.totalSkillUses++; checkAchievements("skill");
+  // Boss 战内技能记录（成就 S4）
+  if(isBoss(state.stage)){
+    state.bossFightSkillsUsed[skillId] = true;
+    if(Object.keys(state.bossFightSkillsUsed).length >= 3) state.bossFight3Skills = true;
   }
   renderSkills();
 }
-
-// 技能面板只生成一次 DOM，之后只更新能量与按钮状态
+// 执行技能效果（各技能分支）
+function applySkillEffect(skillId, sk, durBonus){
+  durBonus = durBonus || 0;
+  const skillMult = gearSkillMult();             // 技能伤害词条增强
+  const dur = sk.duration ? sk.duration * artSkillDur() : 0;
+  switch(skillId){
+    case "berserk":      state.skillActive.berserk = dur + durBonus; break;
+    case "combo_storm":  state.skillActive.combo_storm = dur; break;
+    case "deadly_crit":  state.skillActive.deadly_crit = dur; break;
+    case "rage_combo": { // 即时：N 次点击伤害；连携6暴击抢杀：致命暴击生效时必定暴击
+      const critActive = (state.skillActive.deadly_crit||0) > 0;
+      const critExecute = activeSynergies().find(s => s.id === "crit_execute");
+      for(let i=0;i<sk.hits;i++){
+        if(critActive && critExecute) dealDamage(tapDamage() * (CONFIG.critMult + gearCritMult() + artCritMult()));
+        else dealDamage(tapDamage());
+      }
+      break;
+    }
+    case "legion_charge": state.skillActive.legion_charge = dur + durBonus; break;
+    case "aoe_storm": {   // 即时：对当前关所有怪物造成 N 秒 DPS 伤害
+      const syn2 = activeSynergies().find(s => s.id === "legion_aoe");
+      const syn7 = activeSynergies().find(s => s.id === "storm_offline");
+      let seconds = sk.aoeSeconds;
+      if(syn2 && (state.skillActive.legion_charge||0) > 0) seconds = syn2.bonus.aoeSeconds;
+      if(syn7 && (state.skillActive.offline_boost||0) > 0) seconds = syn7.bonus.aoeSeconds;
+      dealDamage(totalDps() * seconds);
+      break;
+    }
+    case "offline_boost": { // 连携7：离线加速 20s→25s
+      const syn7 = activeSynergies().find(s => s.id === "storm_offline");
+      state.skillActive.offline_boost = syn7 ? syn7.bonus.duration : dur;
+      break;
+    }
+    case "resonance":    state.skillActive.resonance = dur; break;
+    case "feedback":     state.skillActive.feedback = dur; break;
+    case "dual_track":   state.skillActive.dual_track = dur + durBonus; break;
+    case "gold_skill":   state.skillActive.gold_skill = dur; break;
+  }
+}
+// 自动射击：loop 每帧检查（守护戒指被动）
+function autoShotTick(){
+  if(!hasAutoShot()) return;
+  if(state.energy < energyCap()) return;          // 仅满能量触发
+  let best = null, bestCost = Infinity;
+  for(const gear of equippedGears()){
+    const def = GEARS.find(g => g.id === gear.typeId);
+    if(!def || !def.skill || def.skill.passive) continue;
+    if((state.skillCd[def.skillId]||0) > 0) continue;
+    if(def.skill.energyCost < bestCost){ bestCost = def.skill.energyCost; best = def.skillId; }
+  }
+  if(best) useSkill(best);
+}
+// 技能面板只生成一次 DOM（已装备装备的技能），之后只更新能量与按钮状态
 let skillRefs = {};
+let builtSkillKey = "";
 function buildSkills(){
   const wrap = document.getElementById("skillList");
   if(!wrap) return;
   wrap.innerHTML = "";
-  for(const id in CONFIG.skills){
-    const cfg = CONFIG.skills[id];
+  skillRefs = {};
+  const ids = [];
+  for(const gear of equippedGears()){
+    const def = GEARS.find(g => g.id === gear.typeId);
+    if(def && def.skill && !def.skill.passive) ids.push(def.skillId);
+  }
+  builtSkillKey = ids.join(",");
+  for(const skillId of ids){
+    const def = GEARS.find(g => g.skillId === skillId);
+    const sk = def.skill;
     const el = document.createElement("div");
     el.className = "skill";
     el.innerHTML = `
-      <div class="sk-icon">${cfg.icon}</div>
+      <div class="sk-icon">${sk.icon}</div>
       <div class="sk-info">
-        <div class="sk-name">${cfg.name} <span class="sk-state" data-state></span></div>
+        <div class="sk-name">${sk.name} <span class="sk-state" data-state></span></div>
         <div class="sk-sub" data-sub></div>
-        <div class="sk-desc" data-desc>${cfg.desc}</div>
+        <div class="sk-desc" data-desc>${sk.desc}</div>
       </div>
       <button class="sk-btn" data-use>释放</button>`;
-    el.querySelector("[data-use]").addEventListener("click", ()=>useSkill(id));
+    el.querySelector("[data-use]").addEventListener("click", ()=>useSkill(skillId));
     wrap.appendChild(el);
-    skillRefs[id] = {
-      el,
-      state: el.querySelector("[data-state]"),
-      sub: el.querySelector("[data-sub]"),
-      btn: el.querySelector("[data-use]"),
-    };
+    skillRefs[skillId] = { el, state: el.querySelector("[data-state]"), sub: el.querySelector("[data-sub]"), btn: el.querySelector("[data-use]") };
   }
+  // 连携提示
+  const syns = activeSynergies();
+  if(syns.length > 0){
+    const hint = document.createElement("div");
+    hint.className = "skill synergy-hint";
+    hint.innerHTML = `<div class="sk-info"><div class="sk-name">🔗 连携激活 ×${syns.length}</div><div class="sk-desc">${syns.map(s=>s.name).join("、")}</div></div>`;
+    wrap.appendChild(hint);
+  }
+  renderBuffBar();
 }
 function renderSkills(){
   const ev = document.getElementById("energyVal");
   if(ev) ev.textContent = Math.floor(state.energy);
   const em = document.getElementById("energyMax");
-  if(em) em.textContent = CONFIG.energyMax;
+  if(em) em.textContent = energyCap();
+  // 装备集变化则重建面板
+  const ids = [];
+  for(const gear of equippedGears()){ const def = GEARS.find(g=>g.id===gear.typeId); if(def && def.skill && !def.skill.passive) ids.push(def.skillId); }
+  if(ids.join(",") !== builtSkillKey) buildSkills();
   const red = cdr();
-  for(const id in CONFIG.skills){
-    const cfg = CONFIG.skills[id];
-    const ref = skillRefs[id];
-    if(!ref) continue;
-    const effCd = cfg.cooldown * (1 - red);
-    const cd = state.skillCd[id]||0;
-    const act = state.skillActive[id]||0;
-    if(!skillUnlocked(id)){
-      ref.el.classList.remove("active"); ref.el.classList.add("locked");
-      ref.state.textContent = "";
-      ref.sub.textContent = "英雄总等级 " + CONFIG.skillUnlockHeroLv[id] + " 解锁";
-      ref.btn.disabled = true; ref.btn.textContent = "未解锁";
-    } else if(cd > 0){
-      ref.el.classList.toggle("active", act>0); ref.el.classList.remove("locked");
+  for(const skillId in skillRefs){
+    const def = GEARS.find(g => g.skillId === skillId); if(!def) continue;
+    const sk = def.skill; const ref = skillRefs[skillId];
+    const cd = state.skillCd[skillId]||0; const act = state.skillActive[skillId]||0;
+    const effCd = sk.cooldown * (1 - red);
+    if(cd > 0){
+      ref.el.classList.remove("active");
       ref.state.textContent = act>0 ? "进行中" : "";
-      ref.sub.textContent = (act>0 ? ("剩余 "+act.toFixed(1)+"s · ") : "") + "冷却 " + cd.toFixed(1) + "s";
-      ref.btn.disabled = true; ref.btn.textContent = "冷却 " + Math.ceil(cd) + "s";
-    } else if(state.energy < cfg.energyCost){
-      ref.el.classList.remove("active"); ref.el.classList.remove("locked");
-      ref.state.textContent = "";
-      ref.sub.textContent = "需 " + cfg.energyCost + " 能量";
+      ref.sub.textContent = (act>0 ? ("剩余 "+act.toFixed(1)+"s · ") : "") + "冷却 "+cd.toFixed(1)+"s";
+      ref.btn.disabled = true; ref.btn.textContent = "冷却 "+Math.ceil(cd)+"s";
+    } else if(state.energy < sk.energyCost){
+      ref.el.classList.remove("active"); ref.state.textContent = "";
+      ref.sub.textContent = "需 "+sk.energyCost+" 能量";
       ref.btn.disabled = true; ref.btn.textContent = "能量不足";
     } else {
-      ref.el.classList.toggle("active", act>0); ref.el.classList.remove("locked");
+      ref.el.classList.toggle("active", act>0);
       ref.state.textContent = act>0 ? ("进行中 "+act.toFixed(1)+"s") : "";
-      const cdTxt = effCd < cfg.cooldown ? ("（冷却 "+effCd.toFixed(0)+"s · 精通-"+Math.round(red*100)+"%）") : "";
-      ref.sub.textContent = "耗能 " + cfg.energyCost + (id==="time" ? " · Boss 关可用" : "") + cdTxt;
+      const cdTxt = effCd < sk.cooldown ? ("（冷却 "+effCd.toFixed(0)+"s · 精通-"+Math.round(red*100)+"%）") : "";
+      ref.sub.textContent = "耗能 "+sk.energyCost + cdTxt;
       ref.btn.disabled = false; ref.btn.textContent = "释放";
     }
   }
@@ -733,7 +1193,7 @@ function renderSkills(){
   if(mb){
     if(red >= CONFIG.cdrCap){
       mb.disabled = true;
-      mb.innerHTML = "技能精通 Lv." + state.skillMastery + " · 冷却 -" + Math.round(red*100) + "%（已满）";
+      mb.innerHTML = "📘 技能精通 Lv." + state.skillMastery + " · 冷却 -" + Math.round(red*100) + "%（已满）";
     } else {
       const c = masteryCost();
       mb.disabled = state.essence < c;
@@ -741,24 +1201,27 @@ function renderSkills(){
     }
   }
 }
-// 持续 buff 状态条：释放狂暴/黄金后在战斗区显示图标+剩余秒数；狂暴时战斗区红光晕
+// 持续 buff 状态条：释放技能后在战斗区显示图标+剩余秒数
 function renderBuffBar(){
   const bar = document.getElementById("buffBar");
   if(!bar) return;
-  const b = state.skillActive.berserk||0;
-  const g = state.skillActive.gold||0;
+  const labels = {
+    berserk:["🔥 狂暴","berserk"], dual_track:["⚡ 双轨",""], gold_skill:["💰 黄金","gold"],
+    resonance:["🔗 共鸣",""], legion_charge:["⚔️ 冲锋",""], combo_storm:["🌪️ 风暴",""],
+    deadly_crit:["🎯 暴击",""], feedback:["♻️ 反哺",""], offline_boost:["🕰️ 离线",""]
+  };
   let html = "";
-  if(b>0) html += '<span class="buff-pill berserk">🔥 狂暴 '+b.toFixed(1)+'s</span>';
-  if(g>0) html += '<span class="buff-pill gold">💰 黄金 '+g.toFixed(1)+'s</span>';
+  for(const id in labels){ const t = state.skillActive[id]||0; if(t>0) html += '<span class="buff-pill '+labels[id][1]+'">'+labels[id][0]+' '+t.toFixed(1)+'s</span>'; }
   bar.innerHTML = html;
   const zone = document.getElementById("tapZone");
-  if(zone) zone.classList.toggle("berserk", b>0);
+  if(zone) zone.classList.toggle("berserk", (state.skillActive.berserk||0) > 0);
 }
 function buyMastery(){
   const c = masteryCost();
   if(state.essence < c) return;
   state.essence -= c;
   state.skillMastery += 1;
+  checkAchievements("mastery");
   renderAll();
   diffToast("📘 技能精通 Lv." + state.skillMastery + " · 冷却 -" + Math.round(cdr()*100) + "%");
 }
@@ -787,7 +1250,7 @@ function maxAffordable(baseCost, growth, level, gold){
 }
 
 function isBoss(stage){ return stage % CONFIG.bossEvery === 0; }
-function monstersInStage(stage){ return isBoss(stage) ? 1 : CONFIG.monstersPerStage; }
+function monstersInStage(stage){ return isBoss(stage) ? 1 : Math.max(MONSTER_REDUCE_MIN, CONFIG.monstersPerStage - Math.floor(artMonsterReduce())); }
 function enemyMaxHp(stage){
   let hp = CONFIG.enemyHpBase * Math.pow(dynGrowth, stage-1);
   if(isBoss(stage)) hp *= CONFIG.bossHpMult;
@@ -796,10 +1259,12 @@ function enemyMaxHp(stage){
 function goldReward(stage){
   let g = CONFIG.goldBase * Math.pow(CONFIG.goldGrowth, stage-1);
   if(isBoss(stage)) g *= CONFIG.bossGoldMult;
-  return Math.ceil(g * skillGoldMult());   // 黄金技能生效时金币 ×goldMult
+  let mult = skillGoldMult() * gearGoldMult();
+  if((state.skillActive.resonance||0) > 0 && activeSynergies().some(s=>s.id==="gold_resonance")) mult *= 2; // 黄金共鸣连携
+  return Math.ceil(g * mult);
 }
 // 击破 Boss 掉落的灵魂精华：随关卡缓慢增长，作为英雄觉醒的唯一来源
-function bossEssenceGain(stage){ return Math.max(1, Math.floor(stage / CONFIG.bossEssenceDivisor)); }
+function bossEssenceGain(stage){ return Math.max(1, Math.floor(stage / CONFIG.bossEssenceDivisor * artBossEssence() * artEssenceMult() * gearEssenceMult())); }
 
 /* 数字美化：1234 -> 1.2K，1234567 -> 1.2M */
 function fmt(n){
@@ -824,7 +1289,8 @@ function onStageBegin(){
   stageStartTime = Date.now();
   const perHit = Math.max(tapDamage(), totalDps());
   stageTrivial = enemyMaxHp(state.stage) <= perHit;
-  bossTimeLeft = isBoss(state.stage) ? CONFIG.bossTimeLimit : 0; // Boss 关开始倒计时
+  bossTimeLeft = isBoss(state.stage) ? CONFIG.bossTimeLimit + gearBossTime() : 0; // Boss 关开始倒计时（守护戒指 +5s）
+  if(isBoss(state.stage)) state.bossFightSkillsUsed = {};   // 重置本场 Boss 战技能记录（成就 S4）
 }
 
 // 难度自适应核心：根据刚结束这一关的表现，微调 dynGrowth（每关血量成长系数）
@@ -852,8 +1318,8 @@ function adaptDifficulty(){
   } else if(duration > DIFF.hardSeconds){
     oneShotStreak = 0;
     stuckStreak++;
-    if(dynGrowth > DIFF.minGrowth){
-      dynGrowth = Math.max(DIFF.minGrowth, +(dynGrowth - DIFF.step).toFixed(3));
+    if(dynGrowth > DIFF.minGrowth - artDiffMin()){
+      dynGrowth = Math.max(DIFF.minGrowth - artDiffMin(), +(dynGrowth - DIFF.step).toFixed(3));
       stuckStreak = 0;
       state.dynGrowth = dynGrowth;
       save();
@@ -877,6 +1343,7 @@ function diffToast(msg){
 
 // Boss 限时失败：不调低成长难度，退回上一小怪关卡重新练级再来（不丢金币/英雄）
 function bossTimeout(){
+  state.totalBossFails++;     // X7 败而不馁计数
   state.stage -= 1;          // 从 Boss 关(S) 退回 S-1（普通关，便于攒金币升级）
   state.monsterIndex = 1;
   if(state.bossLoop !== true){
@@ -918,8 +1385,23 @@ function renderContinue(){
 // 造成伤害：amount 可能很大（英雄DPS），所以要循环处理连杀
 function dealDamage(amount){
   while(amount > 0 && state.enemyHp <= amount){
-    amount -= state.enemyHp;       // 剩余伤害结转
-    killEnemy();                   // 击杀 -> 进下一关 + 出新怪
+    const before = state.enemyHp;
+    // 一击必杀检测：当前是 Boss 且满血，且本次伤害足以击杀（F9/X6 隐藏成就）
+    if(isBoss(state.stage) && before >= enemyMaxHp(state.stage) - 0.5 && amount >= enemyMaxHp(state.stage)){
+      state.oneShotBossKill = true; unlockAch("F9"); unlockAch("X6");
+    }
+    const overflow = amount - before;     // 单只怪溢出伤害
+    amount -= before;
+    killEnemy();                          // 击杀 -> 进下一关 + 出新怪
+    // v1.3 #20 溢出伤害传递：小怪溢出伤害传递给同关下一只（Boss 关不传递）
+    const rate = artOverkillTransfer();
+    if(rate > 0 && !isBoss(state.stage) && state.monsterIndex > 1){
+      const transfer = overflow * rate;
+      if(transfer > 0){
+        state.enemyHp -= transfer;
+        if(state.enemyHp <= 0) killEnemy(); // 传递击杀下一只（单级；碾压清场）
+      }
+    }
   }
   if(state.enemyHp > 0) state.enemyHp -= amount;
   renderEnemy();
@@ -927,8 +1409,23 @@ function dealDamage(amount){
 
 function killEnemy(){
   const finishedBoss = isBoss(state.stage);
-  state.gold += goldReward(state.stage);
-  if(finishedBoss) state.essence += bossEssenceGain(state.stage); // Boss 掉落灵魂精华
+  const g = goldReward(state.stage);
+  state.gold += g;
+  state.totalKills++;                 // 成就统计：累计击杀
+  state.totalGoldEarned += g;         // 成就统计：累计金币
+  if(finishedBoss){
+    const eg = bossEssenceGain(state.stage);
+    state.essence += eg;
+    state.totalBossKills++;           // 成就统计：Boss 击杀
+    state.totalEssenceEarned += eg;   // 成就统计：累计精华
+    if(bossTimeLeft > 0 && bossTimeLeft <= 1) unlockAch("X3");   // X3 极限反杀（隐藏）
+    if(state.totalBossFails >= 10) unlockAch("X7");              // X7 败而不馁（隐藏）
+  }
+  if(finishedBoss) dropEquipment();   // v1.1 Boss 掉落装备
+  // 连携 / 流派追踪（成就 G5/S3/G6/G7 用）
+  const syns = activeSynergies();
+  if(syns.length > 0){ state.everSynergy = true; for(const s of syns) state.synergySet[s.id] = true; }
+  const sch = currentSchool(); if(sch) state.gearBuildsCompleted[sch] = true;
   const total = monstersInStage(state.stage);
   if(state.monsterIndex < total){
     state.monsterIndex += 1;   // 同关卡下一只是怪
@@ -940,11 +1437,13 @@ function killEnemy(){
       onStageBegin();          // 刷新本关计时/秒杀判定
       spawnEnemy();
       renderContinue();        // 显示“继续挑战 BOSS”按钮
+      checkAchievements("kill");
       return;
     }
     adaptDifficulty();         // 本关清完，先按本关表现评估难度
     state.stage = nextStage;   // 进下一关
-    if(state.stage > state.bestStage) state.bestStage = state.stage; // 记录本局最高关
+    if(state.stage > state.bestStage) state.bestStage = state.stage;          // 记录本局最高关
+    if(state.stage > (state.bestStageEver||1)) state.bestStageEver = state.stage; // 成就：历史最高关
     state.monsterIndex = 1;
     if(finishedBoss){
       state.bossLoop = false;  // 击破 Boss：解除 Boss 循环，恢复难度上调
@@ -954,18 +1453,34 @@ function killEnemy(){
     onStageBegin();            // 记录新关起点 + 是否秒杀级
   }
   spawnEnemy();                // 按新的 (stage, monsterIndex) 出新怪
+  checkAchievements("kill");
+  checkAchievements("stage");
 }
 
 // 玩家点击
 function onTap(clientX, clientY){
-  state.combo = Math.min(CONFIG.comboMax - 1, state.combo + CONFIG.comboPerTap); // 连击累加（倍率上限 comboMax）
+  const cap = energyCap();
+  state.combo = Math.min((CONFIG.comboMax + gearComboMax()) - 1, state.combo + CONFIG.comboPerTap + artComboPerTap()); // 连击累加（含神器 #7）
   state.comboTimer = 0;
+  state.totalTaps++; state.sessionTaps++;                 // 成就统计：累计点击 + 本局点击
+  if(comboMult() >= CONFIG.comboMax + gearComboMax()) state.maxComboHit = true; // F8 连击上限
   let dmg = tapDamage();
-  let crit = Math.random() < CONFIG.critChance;
-  if(crit) dmg *= CONFIG.critMult;
+  const cc = CONFIG.critChance + gearCritChance();
+  const cm = CONFIG.critMult + gearCritMult() + artCritMult();
+  let crit = Math.random() < cc;
+  if(crit){
+    dmg *= cm;
+    state.consecutiveCrits++;
+    state.energy = Math.min(cap, state.energy + artCritEnergy());   // #17 暴击回能
+  } else {
+    state.consecutiveCrits = 0;
+    state.energy = Math.min(cap, state.energy + CONFIG.energyPerTap); // 点击回复能量
+  }
   dealDamage(dmg);
   floatDamage(dmg, crit, clientX, clientY);
-  state.energy = Math.min(CONFIG.energyMax, state.energy + CONFIG.energyPerTap); // 点击回复能量，奖励活跃游玩
+  if(state.sessionTaps >= 1000) unlockAch("X1");          // X1 隐藏：本局点击1000次
+  if(state.consecutiveCrits >= 3) unlockAch("X2");        // X2 隐藏：连续3暴击
+  checkAchievements("tap");
   renderCombo();
   renderHud();
   renderShop(); // 金币变化可能影响购买状态
@@ -1032,6 +1547,8 @@ function renderHud(){
   document.getElementById("growth").textContent = dynGrowth.toFixed(2) + (state.bossLoop ? " 🔒" : "");
   // 转生加成显示 + 转生按钮状态（未解锁/可获点数）
   document.getElementById("prestige").textContent = "×" + prestigeMult().toFixed(2);
+  const tt = document.getElementById("titleTag");
+  if(tt) tt.textContent = state.equippedTitle ? ("🎖 " + state.equippedTitle) : "";
   const pBtn = document.getElementById("prestigeBtn");
   if(pBtn){
     if(state.bestStage < CONFIG.prestigeUnlockStage){
@@ -1190,6 +1707,297 @@ function renderShop(){
 function renderAll(){ renderHud(); renderEnemy(); renderShop(); renderSkills(); }
 
 /* =========================================================================
+   9) 成就系统（Achievement System）—— 记录者，零数值干预
+   设计点：装备/神器相关成就(cond 检测 state.gears / state.artifacts)在本轮尚未实装
+   对应系统时自然返回 false（优雅降级），等装备/神器系统接入后自动对接，无需改此处。
+   ========================================================================= */
+// 进度型成就的进度计算 helper：当前值封顶到目标值
+function p(cur, tar){ return { current: Math.min(cur||0, tar), target: tar }; }
+// === 统计/状态 helper（未实装系统用空容器防御，避免报错）===
+function ownedHeroCount(){ let n=0; for(const h of HEROES) if((state.heroes[h.id]||0)>0) n++; return n; }
+function totalAwaken(){ let t=0; for(const h of HEROES) t += (state.awaken[h.id]||0); return t; }
+function anyHeroLv(n){ return HEROES.some(h => (state.heroes[h.id]||0) >= n); }
+function allHeroesAwakened(){ return HEROES.every(h => (state.awaken[h.id]||0) >= 1); }
+function ownedGearList(){ // 已拥有的全部装备（已装备 + 背包）
+  const list = [];
+  for(const slot in state.equipped){ const g = state.equipped[slot]; if(g) list.push(g); }
+  for(const g of (state.gearInventory||[])) list.push(g);
+  return list;
+}
+function gearsCount(){ return ownedGearList().length; }
+function gearsSlotsFull(){ const g = state.equipped; return !!(g.weapon && g.armor && g.ring && g.badge); }
+function hasLegendaryGear(){ return ownedGearList().some(x => x.rarity==="legendary"); }
+function hasAnySynergy(){ return !!state.everSynergy; }
+function synergyCount(){ return Object.keys(state.synergySet||{}).length; }
+function distinctArtifacts(){ const a = state.artifacts; if(!a) return 0; return Object.values(a).filter(v => v > 0).length; }
+function hasLegendaryArtifact(){ const a = state.artifacts; if(!a) return false; return Object.keys(a).some(id => a[id] > 0 && (ARTIFACTS.find(x=>x.id===id)||{}).rarity==="legendary"); }
+function artifactMaxLevel(r){ return ({normal:50, rare:40, epic:30, legendary:20})[r] || 50; }
+function allArtifactsMaxed(){
+  return ARTIFACTS.every(a => (state.artifacts[a.id]||0) >= a.maxLevel);
+}
+function gearBuildsAll3(){ const b = state.gearBuildsCompleted||{}; return !!(b.tap && b.dps && b.hybrid); }
+function allUltimateCombo(){
+  return state.totalPrestiges>=100 && allHeroesAwakened() && distinctArtifacts()>=21 && gearsSlotsFull() && ownedGearList().every(g=>g.rarity==="legendary");
+}
+// 速通：转生后 5 分钟内再次到 100 关（离线时间不计入，用 lastPrestigeTime 比对）
+function speedrun100(){
+  return state.totalPrestiges>=1 && state.lastPrestigeTime>0
+    && (Date.now() - state.lastPrestigeTime) < 300000
+    && state.bestStageEver >= 100;
+}
+
+// 奖励文案
+function rewardText(ach){
+  const map = { title:"称号", badge:"徽章", frame:"头像框" };
+  return (map[ach.rewardType]||"奖励") + "「" + ach.reward + "」";
+}
+
+// === 50 个成就配置表（cond 返回布尔；prog 可选，返回 {current,target} 用于进度条；隐藏成就不显示进度）===
+const ACHIEVEMENTS = {
+  // —— 战斗 ——
+  F1:{ name:"初出茅庐", icon:"🗡️", cat:"combat", diff:"easy", hidden:false, reward:"新兵", rewardType:"title", desc:"到达第10关", cond:s=>s.bestStageEver>=10, prog:s=>p(s.bestStageEver,10) },
+  F2:{ name:"关卡收割者", icon:"🏔️", cat:"combat", diff:"normal", hidden:false, reward:"探险者", rewardType:"title", desc:"到达第100关", cond:s=>s.bestStageEver>=100, prog:s=>p(s.bestStageEver,100) },
+  F3:{ name:"深渊行者", icon:"🌋", cat:"combat", diff:"challenge", hidden:false, reward:"深渊行者", rewardType:"title", desc:"到达第500关", cond:s=>s.bestStageEver>=500, prog:s=>p(s.bestStageEver,500) },
+  F4:{ name:"无尽征服者", icon:"♾️", cat:"combat", diff:"ultimate", hidden:false, ultimate:true, reward:"征服之冠", rewardType:"frame", desc:"到达第2000关", cond:s=>s.bestStageEver>=2000, prog:s=>p(s.bestStageEver,2000) },
+  F5:{ name:"屠龙勇士", icon:"🐲", cat:"combat", diff:"easy", hidden:false, reward:"屠龙", rewardType:"badge", desc:"击杀10个Boss", cond:s=>s.totalBossKills>=10, prog:s=>p(s.totalBossKills,10) },
+  F6:{ name:"Boss猎人", icon:"💀", cat:"combat", diff:"normal", hidden:false, reward:"猎人", rewardType:"title", desc:"击杀200个Boss", cond:s=>s.totalBossKills>=200, prog:s=>p(s.totalBossKills,200) },
+  F7:{ name:"Boss梦魇", icon:"👿", cat:"combat", diff:"challenge", hidden:false, reward:"梦魇", rewardType:"title", desc:"击杀2000个Boss", cond:s=>s.totalBossKills>=2000, prog:s=>p(s.totalBossKills,2000) },
+  F8:{ name:"连击大师", icon:"🔥", cat:"combat", diff:"normal", hidden:false, reward:"连击大师", rewardType:"title", desc:"连击倍率达到上限 ×3.0", cond:s=>s.maxComboHit },
+  F9:{ name:"一击必杀", icon:"⚡", cat:"combat", diff:"challenge", hidden:false, reward:"必杀", rewardType:"badge", desc:"满血一击击杀Boss", cond:s=>s.oneShotBossKill },
+  // —— 英雄 ——
+  H1:{ name:"第一个伙伴", icon:"🤝", cat:"hero", diff:"easy", hidden:false, reward:"队长", rewardType:"title", desc:"雇佣第1个英雄", cond:s=>ownedHeroCount()>=1, prog:s=>p(ownedHeroCount(),1) },
+  H2:{ name:"军团初成", icon:"⚔️", cat:"hero", diff:"normal", hidden:false, reward:"小队长", rewardType:"title", desc:"雇佣5个不同英雄", cond:s=>ownedHeroCount()>=5, prog:s=>p(ownedHeroCount(),5) },
+  H3:{ name:"全员集结", icon:"🦸", cat:"hero", diff:"challenge", hidden:false, reward:"军团长", rewardType:"title", desc:"雇佣全部11个英雄", cond:s=>ownedHeroCount()>=11, prog:s=>p(ownedHeroCount(),11) },
+  H4:{ name:"精锐之师", icon:"💪", cat:"hero", diff:"normal", hidden:false, reward:"精锐", rewardType:"badge", desc:"任一英雄达到Lv.100", cond:s=>anyHeroLv(100) },
+  H5:{ name:"觉醒先锋", icon:"✦", cat:"hero", diff:"normal", hidden:false, reward:"觉醒者", rewardType:"title", desc:"完成第1次觉醒", cond:s=>totalAwaken()>=1, prog:s=>p(totalAwaken(),1) },
+  H6:{ name:"共鸣大师", icon:"🌀", cat:"hero", diff:"challenge", hidden:false, reward:"共鸣大师", rewardType:"title", desc:"累计觉醒50次", cond:s=>totalAwaken()>=50, prog:s=>p(totalAwaken(),50) },
+  H7:{ name:"全员觉醒", icon:"👑", cat:"hero", diff:"ultimate", hidden:false, ultimate:true, reward:"觉醒光环", rewardType:"frame", desc:"全部11英雄各觉醒≥1次", cond:s=>allHeroesAwakened() },
+  // —— 转生 ——
+  P1:{ name:"涅槃重生", icon:"🌟", cat:"prestige", diff:"easy", hidden:false, reward:"重生者", rewardType:"title", desc:"完成第1次转生", cond:s=>s.totalPrestiges>=1, prog:s=>p(s.totalPrestiges,1) },
+  P2:{ name:"轮回行者", icon:"🔄", cat:"prestige", diff:"normal", hidden:false, reward:"轮回者", rewardType:"title", desc:"累计转生10次", cond:s=>s.totalPrestiges>=10, prog:s=>p(s.totalPrestiges,10) },
+  P3:{ name:"转生大师", icon:"🏆", cat:"prestige", diff:"challenge", hidden:false, reward:"超脱者", rewardType:"title", desc:"累计转生50次", cond:s=>s.totalPrestiges>=50, prog:s=>p(s.totalPrestiges,50) },
+  P4:{ name:"点数积累", icon:"✨", cat:"prestige", diff:"normal", hidden:false, reward:"星辉", rewardType:"badge", desc:"累计获得100点重生点数", cond:s=>s.prestige>=100, prog:s=>p(s.prestige,100) },
+  P5:{ name:"点数洪流", icon:"💫", cat:"prestige", diff:"challenge", hidden:false, reward:"星河", rewardType:"title", desc:"累计获得1000点重生点数", cond:s=>s.prestige>=1000, prog:s=>p(s.prestige,1000) },
+  P6:{ name:"轮回至尊", icon:"👑", cat:"prestige", diff:"ultimate", hidden:false, ultimate:true, reward:"轮回之环", rewardType:"frame", desc:"累计转生100次", cond:s=>s.totalPrestiges>=100, prog:s=>p(s.totalPrestiges,100) },
+  // —— 装备（本轮未实装：cond 依赖 state.gears，自然降级）——
+  G1:{ name:"初次武装", icon:"🛡️", cat:"gear", diff:"easy", hidden:false, reward:"武装者", rewardType:"title", desc:"获得第1件装备", cond:s=>gearsCount()>=1, prog:s=>p(gearsCount(),1) },
+  G2:{ name:"全副武装", icon:"🎽", cat:"gear", diff:"normal", hidden:false, reward:"全副武装", rewardType:"title", desc:"4个槽位全部装备", cond:s=>gearsSlotsFull() },
+  G3:{ name:"传说降临", icon:"🟡", cat:"gear", diff:"challenge", hidden:false, reward:"传说", rewardType:"badge", desc:"获得1件传说装备", cond:s=>hasLegendaryGear() },
+  G4:{ name:"锻造大师", icon:"🔨", cat:"gear", diff:"normal", hidden:false, reward:"锻造师", rewardType:"title", desc:"累计锻造10次", cond:s=>(s.totalForgeCount||0)>=10, prog:s=>p(s.totalForgeCount,10) },
+  G5:{ name:"连携新手", icon:"🔗", cat:"gear", diff:"easy", hidden:false, reward:"连携", rewardType:"badge", desc:"触发1次装备连携", cond:s=>hasAnySynergy() },
+  G6:{ name:"连携大师", icon:"⛓️", cat:"gear", diff:"challenge", hidden:false, reward:"连携大师", rewardType:"title", desc:"触发全部10种连携", cond:s=>synergyCount()>=10, prog:s=>p(synergyCount(),10) },
+  G7:{ name:"流派宗师", icon:"🎯", cat:"gear", diff:"ultimate", hidden:false, ultimate:true, reward:"宗师之冕", rewardType:"frame", desc:"集齐3种流派各一套配装", cond:s=>gearBuildsAll3() },
+  // —— 神器（本轮未实装：cond 依赖 state.artifacts，自然降级）——
+  A1:{ name:"神器初现", icon:"✨", cat:"artifact", diff:"easy", hidden:false, reward:"寻宝者", rewardType:"title", desc:"获得第1个神器", cond:s=>distinctArtifacts()>=1, prog:s=>p(distinctArtifacts(),1) },
+  A2:{ name:"收藏家", icon:"📚", cat:"artifact", diff:"normal", hidden:false, reward:"收藏家", rewardType:"title", desc:"收集10个不同神器", cond:s=>distinctArtifacts()>=10, prog:s=>p(distinctArtifacts(),10) },
+  A3:{ name:"神器图鉴", icon:"📖", cat:"artifact", diff:"challenge", hidden:false, reward:"图鉴大师", rewardType:"title", desc:"收集全部21个神器", cond:s=>distinctArtifacts()>=21, prog:s=>p(distinctArtifacts(),21) },
+  A4:{ name:"召唤十连", icon:"🎰", cat:"artifact", diff:"easy", hidden:false, reward:"召唤", rewardType:"badge", desc:"累计召唤10次", cond:s=>(s.totalPulls||0)>=10, prog:s=>p(s.totalPulls,10) },
+  A5:{ name:"重氪玩家", icon:"💎", cat:"artifact", diff:"challenge", hidden:false, reward:"召唤师", rewardType:"title", desc:"累计召唤50次", cond:s=>(s.totalPulls||0)>=50, prog:s=>p(s.totalPulls,50) },
+  A6:{ name:"传说神器", icon:"🟡", cat:"artifact", diff:"challenge", hidden:false, reward:"神器传说", rewardType:"badge", desc:"获得1个传说神器", cond:s=>hasLegendaryArtifact() },
+  A7:{ name:"万神殿", icon:"🏛️", cat:"artifact", diff:"ultimate", hidden:false, ultimate:true, reward:"万神之光", rewardType:"frame", desc:"全部21神器均满级", cond:s=>allArtifactsMaxed() },
+  // —— 技能 ——
+  S1:{ name:"技能初试", icon:"⚡", cat:"skill", diff:"easy", hidden:false, reward:"施法者", rewardType:"title", desc:"释放第1次主动技能", cond:s=>(s.totalSkillUses||0)>=1, prog:s=>p(s.totalSkillUses,1) },
+  S2:{ name:"技能老手", icon:"🎯", cat:"skill", diff:"normal", hidden:false, reward:"法师", rewardType:"title", desc:"累计释放100次技能", cond:s=>(s.totalSkillUses||0)>=100, prog:s=>p(s.totalSkillUses,100) },
+  S3:{ name:"连携触发", icon:"🔗", cat:"skill", diff:"easy", hidden:false, reward:"连携", rewardType:"badge", desc:"触发1次技能连携", cond:s=>hasAnySynergy() },
+  S4:{ name:"能量管理", icon:"🔋", cat:"skill", diff:"normal", hidden:false, reward:"能量大师", rewardType:"title", desc:"单次Boss战释放3个不同技能", cond:s=>s.bossFight3Skills },
+  S5:{ name:"精通之路", icon:"📘", cat:"skill", diff:"normal", hidden:false, reward:"精通", rewardType:"badge", desc:"技能精通达到Lv.10", cond:s=>s.skillMastery>=10, prog:s=>p(s.skillMastery,10) },
+  S6:{ name:"全技能精通", icon:"📜", cat:"skill", diff:"ultimate", hidden:false, ultimate:true, reward:"精通之徽", rewardType:"frame", desc:"技能精通达到满级", cond:s=>cdr()>=CONFIG.cdrCap },
+  // —— 经济 ——
+  E1:{ name:"小有积蓄", icon:"💰", cat:"economy", diff:"easy", hidden:false, reward:"存钱罐", rewardType:"title", desc:"累计获得10万金币", cond:s=>s.totalGoldEarned>=100000, prog:s=>p(s.totalGoldEarned,100000) },
+  E2:{ name:"富甲一方", icon:"💎", cat:"economy", diff:"normal", hidden:false, reward:"富豪", rewardType:"title", desc:"累计获得1亿金币", cond:s=>s.totalGoldEarned>=1e8, prog:s=>p(s.totalGoldEarned,1e8) },
+  E3:{ name:"精华沉淀", icon:"✦", cat:"economy", diff:"normal", hidden:false, reward:"精华", rewardType:"badge", desc:"累计获得500精华", cond:s=>s.totalEssenceEarned>=500, prog:s=>p(s.totalEssenceEarned,500) },
+  E4:{ name:"锻造豪客", icon:"🔨", cat:"economy", diff:"challenge", hidden:false, reward:"豪客", rewardType:"title", desc:"累计投入2000精华于锻造", cond:s=>(s.totalEssenceSpentOnForge||0)>=2000, prog:s=>p(s.totalEssenceSpentOnForge,2000) },
+  // —— 隐藏/特殊 ——
+  X1:{ name:"手指抽筋", icon:"🖐️", cat:"special", diff:"normal", hidden:true, reward:"铁指", rewardType:"title", desc:"（隐藏）单次游玩点击1000次", cond:s=>s.sessionTaps>=1000 },
+  X2:{ name:"暴击连连", icon:"🎯", cat:"special", diff:"normal", hidden:true, reward:"幸运", rewardType:"badge", desc:"（隐藏）连续3次攻击都是暴击", cond:s=>s.consecutiveCrits>=3 },
+  X3:{ name:"极限反杀", icon:"⏱️", cat:"special", diff:"challenge", hidden:true, reward:"逆行者", rewardType:"title", desc:"（隐藏）Boss倒计时剩1秒内击杀", cond:()=>false },
+  X4:{ name:"佛系玩家", icon:"🧘", cat:"special", diff:"normal", hidden:true, reward:"佛系", rewardType:"title", desc:"（隐藏）离线收益满8小时上限", cond:s=>s.offlineMaxed },
+  X5:{ name:"速通达人", icon:"⚡", cat:"special", diff:"challenge", hidden:true, reward:"速通", rewardType:"title", desc:"（隐藏）转生后5分钟内到100关", cond:s=>speedrun100() },
+  X6:{ name:"满血秒杀", icon:"💥", cat:"special", diff:"challenge", hidden:true, reward:"秒杀", rewardType:"badge", desc:"（隐藏）满血一击击杀Boss", cond:s=>s.oneShotBossKill },
+  X7:{ name:"败而不馁", icon:"💪", cat:"special", diff:"normal", hidden:true, reward:"不屈", rewardType:"title", desc:"（隐藏）Boss失败10次后再次击杀", cond:s=>s.comebackAfter10Fails },
+  X8:{ name:"万法归一", icon:"🌟", cat:"special", diff:"ultimate", hidden:true, ultimate:true, reward:"万法归一", rewardType:"frame", desc:"（隐藏）转生100+全英雄觉醒+全神器+4槽传说", cond:s=>allUltimateCombo() },
+};
+
+// 检测成就解锁（事件触发，不在主循环每帧轮询）
+function checkAchievements(ev){
+  for(const id in ACHIEVEMENTS){
+    if(state.achievements[id]) continue;     // 已解锁跳过（单一数据源，避免重复）
+    const ach = ACHIEVEMENTS[id];
+    try{ if(ach.cond && ach.cond(state)) unlockAch(id); }
+    catch(e){ console.warn("成就检测异常", id, e); }
+  }
+}
+// 直接解锁（事件型成就在钩子里调用，避免依赖 cond 轮询）
+function unlockAch(id){
+  if(state.achievements[id]) return;
+  state.achievements[id] = true;
+  achToastQueue.push(id);
+  if(!achToastShowing) showNextAchToast();
+  if(achPageOpen) renderAchPage();
+  save();
+}
+// 获取成就进度（UI 用）。隐藏成就未解锁返回 null（不显示进度）
+function achProgress(id){
+  const ach = ACHIEVEMENTS[id];
+  if(state.achievements[id]) return { current:1, target:1, done:true };
+  if(ach.hidden) return null;
+  if(!ach.prog) return { current:0, target:1, done:false };
+  return ach.prog(state);
+}
+
+/* —— 成就解锁通知（复用 #diffToast，金色样式，多成就排队） —— */
+let achToastQueue = [];
+let achToastShowing = false;
+function showNextAchToast(){
+  if(achToastQueue.length === 0){ achToastShowing = false; return; }
+  achToastShowing = true;
+  const id = achToastQueue.shift();
+  const ach = ACHIEVEMENTS[id];
+  const t = document.getElementById("diffToast");
+  if(!t){ setTimeout(showNextAchToast, 300); return; }
+  t.innerHTML = "🎉 成就解锁！<br><b>" + ach.icon + " " + ach.name + "</b><br><span style='font-size:11px'>奖励：" + rewardText(ach) + "</span>";
+  t.classList.add("show", "ach-unlock");
+  setTimeout(()=>{ t.classList.remove("show", "ach-unlock"); setTimeout(showNextAchToast, 300); }, 2500);
+}
+
+/* —— 成就页 UI —— */
+let achTab = "all";
+let achPageOpen = false;
+const ACH_CATS = [["all","全部"],["combat","战斗"],["hero","英雄"],["prestige","转生"],["gear","装备"],["artifact","神器"],["skill","技能"],["economy","经济"],["special","特殊"],["collect","收藏"]];
+const ACH_FRAMES = [
+  {id:"default", name:"默认", icon:"⚪"},
+  {id:"conquer", name:"征服之冠", icon:"♾️"},
+  {id:"awaken", name:"觉醒光环", icon:"👑"},
+  {id:"reincarn", name:"轮回之环", icon:"🔄"},
+  {id:"master", name:"宗师之冕", icon:"🎯"},
+  {id:"pantheon", name:"万神之光", icon:"🏛️"},
+  {id:"skill", name:"精通之徽", icon:"📜"},
+  {id:"omnipotent", name:"万法归一", icon:"🌟"},
+];
+function achFrameUnlocked(id){
+  if(id==="default") return true;
+  for(const k in ACHIEVEMENTS){ if(ACHIEVEMENTS[k].rewardType==="frame" && ACHIEVEMENTS[k].reward===frameName(id) && state.achievements[k]) return true; }
+  return false;
+}
+function frameName(id){ const f = ACH_FRAMES.find(x=>x.id===id); return f ? f.name : id; }
+function openAchPage(){
+  achPageOpen = true;
+  document.getElementById("achPage").style.display = "flex";
+  renderAchPage();
+  if(!state._achHintShown){ state._achHintShown = true; diffToast("🏆 成就记录你的成长里程碑，完成可解锁称号和徽章！"); }
+}
+function closeAchPage(){ achPageOpen = false; document.getElementById("achPage").style.display = "none"; }
+
+function renderAchPage(){
+  const total = Object.keys(ACHIEVEMENTS).length;
+  let got = 0; for(const id in ACHIEVEMENTS) if(state.achievements[id]) got++;
+  const prog = document.getElementById("achProgress"); if(prog) prog.textContent = got + "/" + total;
+  renderAchStats();
+  // 分类 Tab（只生成一次）
+  const tabs = document.getElementById("achTabs");
+  if(tabs && !tabs.dataset.built){
+    ACH_CATS.forEach(([key,label])=>{
+      const b = document.createElement("button");
+      b.textContent = label; b.dataset.cat = key;
+      if(key===achTab) b.classList.add("active");
+      b.addEventListener("click", ()=>{ achTab = key; tabs.querySelectorAll("button").forEach(x=>x.classList.remove("active")); b.classList.add("active"); renderAchPage(); });
+      tabs.appendChild(b);
+    });
+    tabs.dataset.built = "1";
+  }
+  renderAchCards();
+}
+function renderAchStats(){
+  const el = document.getElementById("achStats"); if(!el) return;
+  const rows = [
+    ["游玩时长", fmtTime(state.totalPlayTime||0)],
+    ["总点击", fmt(state.totalTaps||0)],
+    ["当前关卡", state.stage],
+    ["最高关卡", state.bestStageEver||state.stage],
+    ["总击杀", fmt(state.totalKills||0)],
+    ["Boss击杀", fmt(state.totalBossKills||0)],
+    ["总金币", fmt(state.totalGoldEarned||0)],
+    ["总精华", fmt(state.totalEssenceEarned||0)],
+    ["转生次数", state.totalPrestiges||0],
+    ["重生点数", state.prestige],
+    ["成就解锁", (Object.keys(state.achievements).length)+"/"+Object.keys(ACHIEVEMENTS).length],
+    ["神器召唤", fmt(state.totalPulls||0)],
+  ];
+  let html = '<div class="ach-avatar '+(state.equippedFrame!=="default"?"f-"+state.equippedFrame:"")+'">🧑‍🎤</div>';
+  html += '<div class="ach-avatar-name">' + (state.equippedFrame!=="default" ? frameName(state.equippedFrame) : "勇者") + '</div>';
+  rows.forEach(([k,v])=> html += '<div class="stat"><span>'+k+'</span><b>'+v+'</b></div>');
+  el.innerHTML = html;
+}
+function achCardHtml(id){
+  const ach = ACHIEVEMENTS[id];
+  const unlocked = !!state.achievements[id];
+  const hiddenLocked = ach.hidden && !unlocked;
+  let cls = "ach-card";
+  if(unlocked) cls += " unlocked";
+  if(ach.ultimate) cls += " ultimate";
+  if(hiddenLocked) cls += " hidden-locked";
+  if(hiddenLocked){
+    return '<div class="'+cls+'" data-cat="special"><div class="ach-top"><span class="ach-icon">🔒</span><span class="ach-name">???</span></div><div class="ach-desc">隐藏成就，继续探索吧</div></div>';
+  }
+  let inner = '<div class="ach-top"><span class="ach-icon">'+ach.icon+'</span><span class="ach-name">'+ach.name+'</span>';
+  inner += '<span class="ach-status '+(unlocked?"done":"progress")+'">'+(unlocked?"✅":"")+'</span></div>';
+  inner += '<div class="ach-desc">'+ach.desc+'</div>';
+  const pr = achProgress(id);
+  if(pr && pr.target>1){
+    const pct = Math.max(0, Math.min(100, Math.floor(pr.current/pr.target*100)));
+    inner += '<div class="ach-progress-bar"><div class="ach-progress-fill" style="width:'+pct+'%"></div></div>';
+    inner += '<div class="ach-progress-text">'+Math.floor(pr.current)+'/'+pr.target+'</div>';
+  }
+  inner += '<div class="ach-reward '+(unlocked?"done":"")+'">奖励：'+rewardText(ach)+'</div>';
+  if(unlocked && ach.rewardType==="title"){
+    inner += '<button class="ach-equip-title'+(state.equippedTitle===ach.reward?" active":"")+'" data-title="'+ach.reward+'">'+(state.equippedTitle===ach.reward?"已装备":"装备称号")+'</button>';
+  }
+  return '<div class="'+cls+'" data-cat="'+ach.cat+'">'+inner+'</div>';
+}
+function renderAchCards(){
+  const list = document.getElementById("achList"); if(!list) return;
+  let html = "";
+  if(achTab === "collect"){
+    // 称号收藏（已解锁可装备）
+    html += '<div class="collect-title">称号收藏（点击装备到 HUD）</div>';
+    let titles = [];
+    for(const id in ACHIEVEMENTS){ const a=ACHIEVEMENTS[id]; if(a.rewardType==="title" && state.achievements[id]) titles.push(a.reward); }
+    if(titles.length===0) html += '<div class="ach-desc">暂无已解锁称号，去完成成就吧！</div>';
+    titles.forEach(t=>{
+      html += '<button class="ach-title-chip'+(state.equippedTitle===t?" active":"")+'" data-title="'+t+'">'+t+'</button>';
+    });
+    // 徽章图鉴
+    html += '<div class="collect-title">徽章图鉴</div><div class="badge-grid">';
+    for(const id in ACHIEVEMENTS){ const a=ACHIEVEMENTS[id]; if(a.rewardType==="badge"){ const got=state.achievements[id]; html += '<div class="badge'+(got?" got":"")+'">'+(got?a.icon:"🔒")+'<span>'+a.reward+'</span></div>'; } }
+    html += '</div>';
+    // 头像框
+    html += '<div class="collect-title">头像框</div><div class="frame-grid">';
+    ACH_FRAMES.forEach(f=>{ const un=achFrameUnlocked(f.id); html += '<button class="frame-chip'+(state.equippedFrame===f.id?" active":"")+(un?"":" locked")+'" data-frame="'+f.id+'">'+(un?f.icon:"🔒")+'<span>'+f.name+'</span></button>'; });
+    html += '</div>';
+  } else {
+    for(const id in ACHIEVEMENTS){
+      const ach = ACHIEVEMENTS[id];
+      if(achTab === "all"){ if(ach.hidden && !state.achievements[id]) continue; }
+      else if(achTab === "special"){ if(!(ach.hidden && state.achievements[id])) continue; }
+      else { if(ach.cat !== achTab) continue; if(ach.hidden && !state.achievements[id]) continue; }
+      html += achCardHtml(id);
+    }
+  }
+  list.innerHTML = html;
+  // 绑定装备交互
+  list.querySelectorAll("[data-title]").forEach(b=> b.addEventListener("click", ()=>{
+    const t = b.dataset.title;
+    state.equippedTitle = (state.equippedTitle===t) ? null : t;   // 再次点击取消装备
+    save(); renderHud(); renderAchPage();
+  }));
+  list.querySelectorAll("[data-frame]").forEach(b=> b.addEventListener("click", ()=>{
+    const f = b.dataset.frame;
+    if(!achFrameUnlocked(f)) return;
+    state.equippedFrame = f; save(); renderAchPage();
+  }));
+}
+
+/* =========================================================================
    6) 购买操作
    ========================================================================= */
 function buyTap(){
@@ -1226,6 +2034,7 @@ function buyHero(h){
   if(bought <= 0) return;
   state.gold -= spent;
   state.heroes[h.id] = lv + bought;
+  checkAchievements("hero");
   renderAll();
 }
 
@@ -1250,6 +2059,7 @@ function awakenHero(h){
   if(state.essence < cost) return;
   state.essence -= cost;
   state.awaken[h.id] = (state.awaken[h.id]||0) + 1;
+  checkAchievements("awaken");
   renderAll();
   diffToast("✦ " + h.name + " 觉醒！军团共鸣 全队伤害 ×" + awakenGlobalMult().toFixed(2));
 }
@@ -1301,10 +2111,56 @@ function doPrestige(){
   const keepPrestige = state.prestige + gain;
   const keepLastSeen = Date.now();
   const keepEssence = state.essence;   // 精华转生后保留，避免“用不完的精华被清零”，鼓励玩家转生
+  // 成就相关字段：全部转生保留（统计/解锁/称号/头像框）
+  const keepAch = {
+    achievements: state.achievements,
+    equippedTitle: state.equippedTitle,
+    equippedFrame: state.equippedFrame,
+    totalTaps: state.totalTaps,
+    totalKills: state.totalKills,
+    totalBossKills: state.totalBossKills,
+    totalBossFails: state.totalBossFails,
+    totalGoldEarned: state.totalGoldEarned,
+    totalEssenceEarned: state.totalEssenceEarned,
+    totalPrestiges: state.totalPrestiges + 1,  // 转生次数 +1
+    totalPulls: state.totalPulls,
+    bestStageEver: Math.max(state.bestStageEver||1, state.bestStage||1),
+    totalPlayTime: state.totalPlayTime,
+    totalEssenceSpentOnForge: state.totalEssenceSpentOnForge,
+    totalForgeCount: state.totalForgeCount,
+    totalSkillUses: state.totalSkillUses,
+    maxComboHit: state.maxComboHit,
+    oneShotBossKill: state.oneShotBossKill,
+    offlineMaxed: state.offlineMaxed,
+    bossFight3Skills: state.bossFight3Skills,
+    comebackAfter10Fails: state.comebackAfter10Fails,
+  };
   state = {
     gold:0, stage:1, tapLevel:1, heroes:{}, essence:keepEssence, awaken:{}, enemyHp:0, monsterIndex:1,
     dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:keepLastSeen,
     prestige: keepPrestige, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery: state.skillMastery,
+    ...keepAch,
+    // 运行时统计重置
+    lastPrestigeTime: Date.now(),
+    consecutiveCrits: 0,
+    sessionTaps: 0,
+    bossFightSkillsUsed: {},
+    gearBuildsCompleted: state.gearBuildsCompleted||{},
+    comboAchievesTriggered: state.comboAchievesTriggered||{},
+    // ===== 神器/装备系统：永久资产，转生保留 =====
+    artifacts: state.artifacts||{},
+    pityCounter: state.pityCounter||0,
+    collectionCounter: state.collectionCounter||0,
+    artifactDust: state.artifactDust||0,
+    artifactGuideSeen: state.artifactGuideSeen||false,
+    gearInventory: state.gearInventory||[],
+    equipped: state.equipped||{weapon:null,armor:null,ring:null,badge:null},
+    gearDust: state.gearDust||0,
+    gearGuideSeen: state.gearGuideSeen||false,
+    gearSwapCd: state.gearSwapCd||{weapon:0,armor:0,ring:0,badge:0},
+    gearPresets: state.gearPresets||[],
+    everSynergy: state.everSynergy||false,
+    synergySet: state.synergySet||{},
   };
   HEROES.forEach(h=>{ state.heroes[h.id]=0; state.awaken[h.id]=0; });
   dynGrowth = state.dynGrowth; oneShotStreak = 0; stuckStreak = 0;
@@ -1312,6 +2168,7 @@ function doPrestige(){
   spawnEnemy();
   onStageBegin();
   renderAll();
+  checkAchievements("prestige");
   diffToast("🌟 转生成功！+ " + gain + " 点 · 伤害 ×" + prestigeMult().toFixed(2));
 }
 
@@ -1323,13 +2180,15 @@ function loop(now){
   const dt = Math.min(0.1, (now - lastT)/1000); // 秒，最多按0.1秒算，防卡顿跳变
   lastT = now;
   // 主动技能：能量回复 + 激活/冷却倒计时
-  state.energy = Math.min(CONFIG.energyMax, state.energy + CONFIG.energyRegen * dt);
-  for(const id in CONFIG.skills){
+  state.energy = Math.min(energyCap(), state.energy + CONFIG.energyRegen * dt);
+  for(const id of GEAR_SKILL_IDS){
     if(state.skillActive[id] > 0) state.skillActive[id] = Math.max(0, state.skillActive[id] - dt);
     if(state.skillCd[id] > 0) state.skillCd[id] = Math.max(0, state.skillCd[id] - dt);
   }
+  // 换装冷却递减（v1.1）
+  for(const slot in state.gearSwapCd){ if(state.gearSwapCd[slot] > 0) state.gearSwapCd[slot] = Math.max(0, state.gearSwapCd[slot] - dt); }
   // 连击衰减：停手超过 comboDecay 秒则清零
-  if(state.combo > 0){
+  if(state.combo > 0 && (state.skillActive.combo_storm||0) <= 0){
     state.comboTimer += dt;
     if(state.comboTimer >= CONFIG.comboDecay){ state.combo = 0; renderCombo(); }
   }
@@ -1340,6 +2199,10 @@ function loop(now){
     bossTimeLeft -= dt;
     if(bossTimeLeft <= 0) bossTimeout();
   }
+  autoShotTick();   // 守护戒指被动：满能量自动释放最低能耗技能（v1.1）
+  // 在线时长统计（成就统计用）
+  state._loopAccum = (state._loopAccum||0) + dt;
+  if(state._loopAccum >= 5){ state.totalPlayTime += 5; state._loopAccum -= 5; }
   renderHud(); renderEnemy(); renderShop(); renderSkills();
   requestAnimationFrame(loop);
 }
@@ -1347,6 +2210,503 @@ function loop(now){
 /* =========================================================================
    8) 启动
    ========================================================================= */
+/* =========================================================================
+   3.6) 神器系统数值（v1.3，21 神器）—— 乘区计算 + 召唤/保底/图鉴
+   ========================================================================= */
+const AFFIX_LABELS = { tapDmg:"点击伤害", dps:"英雄DPS", global:"全局伤害", critChance:"暴击率", critMult:"暴击伤害", comboMax:"连击上限", gold:"金币", essence:"精华", offline:"离线效率", skillDmg:"技能伤害" };
+function affixLabel(t){ return AFFIX_LABELS[t] || t; }
+function pct(x){ return (x*100).toFixed(1) + "%"; }
+function slotName(s){ return {weapon:"武器",armor:"护甲",ring:"戒指",badge:"勋章"}[s] || s; }
+
+function artLevel(id){
+  const a = ARTIFACTS.find(x => x.id === id);
+  if(!a) return 0;
+  return Math.min(a.maxLevel, state.artifacts[id] || 0);
+}
+function artSumByEffect(effectType){
+  let sum = 0;
+  for(const a of ARTIFACTS){
+    if(a.effect === effectType) sum += artLevel(a.id) * a.perLevel;
+  }
+  return sum;
+}
+function artSynergyGlobal(){
+  const level = artLevel("pantheon");
+  if(level === 0) return 1;
+  const ownedCount = Object.keys(state.artifacts).filter(id => id !== "pantheon" && (state.artifacts[id]||0) > 0).length;
+  const pantheon = ARTIFACTS.find(a => a.id === "pantheon");
+  const perArtifact = pantheon.perLevel * level;
+  return 1 + ownedCount * perArtifact;
+}
+function artDropRate(){       return artSumByEffect("dropRate") * artSynergyGlobal(); }
+function artForgeDiscount(){  return artSumByEffect("forgeDiscount") * artSynergyGlobal(); }
+function artBossEssence(){    return 1 + artSumByEffect("bossEssence") * artSynergyGlobal(); }
+function artEssenceMult(){    return 1 + artSumByEffect("essence") * artSynergyGlobal(); }
+function artSynergyMult(){    return artSumByEffect("synergy") * artSynergyGlobal(); }
+function artCritMult(){       return artSumByEffect("critMult") * artSynergyGlobal(); }
+function artComboPerTap(){    return artSumByEffect("comboPerTap") * artSynergyGlobal(); }
+function artSkillDur(){       return 1 + artSumByEffect("skillDur") * artSynergyGlobal(); }
+function artBossDmg(){        return artSumByEffect("bossDmg") * artSynergyGlobal(); }
+function artGlobalMult(){     return 1 + artSumByEffect("global") * artSynergyGlobal(); }
+function artPrestigeMult(){   return 1 + artSumByEffect("prestige") * artSynergyGlobal(); }
+function artOfflineRate(){    return artSumByEffect("offline") * artSynergyGlobal(); }
+function artDiffMin(){        return artSumByEffect("diffMin"); }                       // 不×协同
+function artEnergyMax(){      return artSumByEffect("energyMax") * artSynergyGlobal(); }
+function artMonsterReduce(){  return artSumByEffect("monsterReduce"); }                 // 不×协同
+function artAwakenBonus(){    return artSumByEffect("awakenBonus") * artSynergyGlobal(); }
+function artCritEnergy(){     return artSumByEffect("critEnergy") * artSynergyGlobal(); }
+function artPrestigeDouble(){ return artSumByEffect("prestigeDouble"); }                // 不×协同
+function artOfflinePush(){    return artSumByEffect("offlinePush") * artSynergyGlobal(); }
+function artOverkillTransfer(){ return artSumByEffect("overkillTransfer") * artSynergyGlobal(); }
+function artifactTotalMult(){ return artGlobalMult(); }
+
+// 能量上限（含 #12 创世之心）
+function energyCap(){ return CONFIG.energyMax + artEnergyMax(); }
+// 点击基础伤害（不含技能倍率，供反馈技能换算）
+function tapDamageBase(){
+  const boss = isBoss(state.stage);
+  let m = CONFIG.baseTap * state.tapLevel * prestigeMult() * awakenGlobalMult() * comboMult();
+  m *= gearTapMult() * gearGlobalMult() * artGlobalMult();
+  if(boss) m *= (1 + artBossDmg());
+  return m;
+}
+
+/* —— 神器召唤 / 保底 / 图鉴 —— */
+function artifactPullCost(n){
+  let total = 0;
+  for(let i=0; i<n; i++) total += Math.ceil(ARTIFACT_PULL.baseCost * Math.pow(ARTIFACT_PULL.costGrowth, state.totalPulls + i));
+  return total;
+}
+function rollArtifact(){
+  if(state.pityCounter + 1 >= ARTIFACT_PULL.pityThreshold){
+    const legs = ARTIFACTS.filter(a => a.rarity === "legendary");
+    state.pityCounter = 0; state.collectionCounter++;
+    return legs[Math.floor(Math.random() * legs.length)];
+  }
+  if(state.collectionCounter + 1 >= ARTIFACT_PULL.collectionThreshold){
+    const unowned = ARTIFACTS.filter(a => !state.artifacts[a.id]);
+    if(unowned.length > 0){
+      const order = { common:0, rare:1, epic:2, legendary:3 };
+      unowned.sort((a,b)=> order[a.rarity]-order[b.rarity]);
+      state.collectionCounter = 0; state.pityCounter++;
+      return unowned[0];
+    }
+  }
+  const r = Math.random();
+  let rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common";
+  const pool = ARTIFACTS.filter(a => a.rarity === rarity);
+  const picked = pool[Math.floor(Math.random() * pool.length)];
+  state.pityCounter = (rarity === "legendary") ? 0 : state.pityCounter + 1;
+  state.collectionCounter = (state.artifacts[picked.id] === undefined) ? 0 : state.collectionCounter + 1;
+  return picked;
+}
+function rollFirstArtifact(){
+  const r = Math.random();
+  const rarity = r < 0.5 ? "rare" : (r < 0.85 ? "epic" : "legendary");
+  const pool = ARTIFACTS.filter(a => a.rarity === rarity);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+function rollTenPull(){
+  const results = [];
+  for(let i=0; i<10; i++) results.push(rollArtifact());
+  const hasEpicPlus = results.some(a => a.rarity === "epic" || a.rarity === "legendary");
+  if(!hasEpicPlus){
+    const epics = ARTIFACTS.filter(a => a.rarity === "epic");
+    results[9] = epics[Math.floor(Math.random() * epics.length)];
+  }
+  return results;
+}
+function applyArtifactPull(art){
+  const lv = state.artifacts[art.id] || 0;
+  if(lv === 0){ state.artifacts[art.id] = 1; return { type:"new", art }; }
+  else if(lv < art.maxLevel){ state.artifacts[art.id] = lv + 1; return { type:"upgrade", art, newLevel: lv + 1 }; }
+  else { const dust = ARTIFACT_PULL.dustPerRarity[art.rarity]; state.artifactDust += dust; return { type:"dust", art, dust }; }
+}
+function artifactUpgradeCost(art){
+  const lv = state.artifacts[art.id] || 0;
+  const rarMult = ARTIFACT_RARITY[art.rarity].upgradeMult;
+  return Math.ceil(3 * rarMult * Math.pow(1.12, lv - 1));
+}
+function upgradeArtifactWithDust(artId){
+  const art = ARTIFACTS.find(a => a.id === artId);
+  if(!art) return;
+  const lv = state.artifacts[artId] || 0;
+  if(lv >= art.maxLevel) return;
+  const cost = artifactUpgradeCost(art);
+  if(state.artifactDust < cost) return;
+  state.artifactDust -= cost;
+  state.artifacts[artId] = lv + 1;
+}
+function doUpgradeArtifact(artId){
+  const before = state.artifacts[artId]||0;
+  upgradeArtifactWithDust(artId);
+  if((state.artifacts[artId]||0) > before){ renderArtifactPage(); renderHud(); diffToast("⬆️ 神器升级成功"); }
+  else diffToast("⚠ 粉尘不足或已满级");
+}
+function doArtifactPull(){
+  const cost = artifactPullCost(1);
+  if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
+  state.essence -= cost;
+  const isFirst = state.totalPulls === 0;
+  const art = isFirst ? rollFirstArtifact() : rollArtifact();
+  const res = applyArtifactPull(art);
+  state.totalPulls++;
+  state.artifactGuideSeen = true;
+  checkAchievements("pull");
+  renderArtifactPage(); renderHud();
+  if(res.type==="new") diffToast("✨ 获得神器：" + art.emoji + " " + art.name + "！");
+  else if(res.type==="upgrade") diffToast("⬆️ 神器升级：" + art.emoji + " " + art.name + " → Lv." + res.newLevel);
+  else diffToast("💨 已满级，转粉尘 +" + res.dust);
+}
+function doArtifactTenPull(){
+  const cost = artifactPullCost(10);
+  if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
+  state.essence -= cost;
+  const results = rollTenPull();
+  for(const art of results) applyArtifactPull(art);
+  state.totalPulls += 10;
+  state.artifactGuideSeen = true;
+  checkAchievements("pull");
+  renderArtifactPage(); renderHud();
+  diffToast("🎰 十连完成！");
+}
+// 离线推关（#19 远征令牌）
+function applyOfflineProgression(offlineSeconds){
+  const maxStages = Math.floor(artOfflinePush());
+  if(maxStages <= 0) return null;
+  let pushed = 0, currentStage = state.stage, totalGold = 0, totalEssence = 0, simTime = 0;
+  while(pushed < maxStages && simTime < offlineSeconds * 0.8){
+    const stageHp = enemyMaxHp(currentStage);
+    const estimatedTime = stageHp / Math.max(1, totalDps());
+    if(estimatedTime > OFFLINE_PUSH.stageTimeThreshold) break;
+    currentStage++; pushed++; simTime += estimatedTime;
+    const monsters = isBoss(currentStage) ? 1 : Math.max(MONSTER_REDUCE_MIN, CONFIG.monstersPerStage - Math.floor(artMonsterReduce()));
+    for(let m = 0; m < monsters; m++){
+      totalGold += goldReward(currentStage);
+      if(isBoss(currentStage)) totalEssence += bossEssenceGain(currentStage);
+    }
+  }
+  if(pushed > 0){
+    state.stage = currentStage;
+    state.gold += totalGold;
+    state.essence += Math.floor(totalEssence * artEssenceMult());
+  }
+  return { stagesPushed: pushed, gold: totalGold, essence: totalEssence, simTime };
+}
+
+/* =========================================================================
+   3.7) 装备系统数值（v1.1，12 装备/4槽） + 装备×技能
+   ========================================================================= */
+function equippedGears(){
+  const list = [];
+  for(const slot in state.equipped){ if(state.equipped[slot]) list.push(state.equipped[slot]); }
+  return list;
+}
+function affixValue(gear, affixType){
+  const rar = GEAR_RARITY[gear.rarity];
+  let val = 0;
+  const def = GEARS.find(g => g.id === gear.typeId);
+  if(def && def.mainAffix === affixType){
+    const base = MAIN_AFFIX_BASE[affixType] || 0.15;
+    val += base * rar.mainCoeff * (1 + GEAR_CONFIG.mainPerLevel * (gear.level - 1));
+  }
+  for(const sub of (gear.subAffixes || [])){
+    if(sub.type === affixType) val += sub.baseValue * (1 + GEAR_CONFIG.subPerLevel * (gear.level - 1)) * rarCoeff(gear.rarity);
+  }
+  return val;
+}
+function gearSumByAffix(affixType){
+  let sum = 0;
+  for(const gear of equippedGears()) sum += affixValue(gear, affixType);
+  return sum;
+}
+function gearTapMult(){      return 1 + gearSumByAffix("tapDmg"); }
+function gearDpsMult(){      return 1 + gearSumByAffix("dps"); }
+function gearGlobalMult(){   return 1 + gearSumByAffix("global"); }
+function gearGoldMult(){     return 1 + gearSumByAffix("gold"); }
+function gearEssenceMult(){  return 1 + gearSumByAffix("essence"); }
+function gearCritChance(){   return gearSumByAffix("critChance"); }
+function gearCritMult(){     return gearSumByAffix("critMult"); }
+function gearComboMax(){     return gearSumByAffix("comboMax"); }
+function gearOfflineRate(){  return gearSumByAffix("offline"); }
+function gearSkillMult(){    return 1 + gearSumByAffix("skillDmg"); }
+function gearBossTime(){
+  let bonus = 0;
+  for(const gear of equippedGears()){
+    const def = GEARS.find(g => g.id === gear.typeId);
+    if(def && def.skill && def.skill.bossTimeBonus) bonus += def.skill.bossTimeBonus;
+  }
+  return bonus;
+}
+function hasAutoShot(){
+  for(const gear of equippedGears()){
+    const def = GEARS.find(g => g.id === gear.typeId);
+    if(def && def.skill && def.skill.autoShot) return true;
+  }
+  return false;
+}
+function isSkillEquipped(skillId){
+  for(const gear of equippedGears()){
+    const def = GEARS.find(g => g.id === gear.typeId);
+    if(def && def.skillId === skillId) return true;
+  }
+  return false;
+}
+function activeSynergies(){
+  return SYNERGIES.filter(syn => {
+    if(syn.id === "guard_burst") return isSkillEquipped("guard") && (isSkillEquipped("berserk") || isSkillEquipped("legion_charge") || isSkillEquipped("dual_track"));
+    return syn.skillIds.every(id => isSkillEquipped(id));
+  });
+}
+// 装备掉落 / 锻造 / 升级 / 突破 / 分解 / 装备
+function makeGear(def, rarity){
+  const gear = { typeId: def.id, name: def.name, emoji: def.emoji, type: def.type, school: def.school,
+    rarity, level: 1, skillId: def.skillId, skill: def.skill, subAffixes: [] };
+  const subCount = GEAR_RARITY[rarity].subCount;
+  const pool = SUB_AFFIX_POOL.slice();
+  for(let i=0; i<subCount && pool.length; i++){
+    const k = Math.floor(Math.random()*pool.length);
+    const pick = pool.splice(k,1)[0];
+    const base = pick.baseMin + Math.random()*(pick.baseMax - pick.baseMin);
+    gear.subAffixes.push({ type: pick.type, baseValue: +base.toFixed(4) });
+  }
+  return gear;
+}
+function rollGear(){
+  const r = Math.random();
+  const rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common";
+  const def = GEARS[Math.floor(Math.random()*GEARS.length)];
+  return makeGear(def, rarity);
+}
+function dropEquipment(){
+  if(state.stage < GEAR_CONFIG.gearUnlockStage) return;
+  let rate = GEAR_CONFIG.bossDropRate + artDropRate();
+  if(state.stage % 100 === 0) rate = GEAR_CONFIG.bossCenturyDropRate;   // 世纪 Boss 必掉
+  if(Math.random() > rate) return;
+  const gear = rollGear();
+  state.gearInventory.push(gear);
+  checkAchievements("gear");
+  diffToast("🎁 掉落装备：" + gear.emoji + gear.name + "（" + GEAR_RARITY[gear.rarity].name + "）");
+}
+function currentSchool(){
+  const eq = equippedGears();
+  if(eq.length === 0) return null;
+  const counts = {};
+  for(const g of eq){ const def = GEARS.find(x=>x.id===g.typeId); const sch = def ? def.school : "universal"; if(sch!=="universal") counts[sch] = (counts[sch]||0)+1; }
+  let best=null, bestN=0;
+  for(const s in counts){ if(counts[s] > bestN){ bestN = counts[s]; best = s; } }
+  return best;
+}
+function gearUpgradeCost(gear){
+  const discount = Math.min(0.9, artForgeDiscount());
+  return Math.max(1, Math.ceil(GEAR_CONFIG.upgradeBaseCost * Math.pow(GEAR_CONFIG.upgradeGrowth, gear.level-1) * (1 - discount)));
+}
+function upgradeGearObj(gear){
+  if(!gear) return false;
+  const maxLv = GEAR_RARITY[gear.rarity].maxLevel;
+  if(gear.level >= maxLv){ diffToast("⚠ 已满级"); return false; }
+  const cost = gearUpgradeCost(gear);
+  if(state.gold < cost){ diffToast("⚠ 金币不足（需 "+fmt(cost)+"）"); return false; }
+  state.gold -= cost; gear.level++; return true;
+}
+function breakthroughGearObj(gear){
+  if(!gear) return false;
+  const order = ["common","rare","epic","legendary"];
+  const idx = order.indexOf(gear.rarity);
+  if(idx >= order.length-1){ diffToast("⚠ 已是最高稀有度"); return false; }
+  const next = order[idx+1];
+  const cost = GEAR_CONFIG.breakThroughCost[gear.rarity + "->" + next];
+  if(state.gearDust < cost){ diffToast("⚠ 碎片不足（需 "+cost+"）"); return false; }
+  state.gearDust -= cost; gear.rarity = next; return true;
+}
+function equipGear(invIndex){
+  const gear = state.gearInventory[invIndex];
+  if(!gear) return;
+  const slot = gear.type;
+  if((state.gearSwapCd[slot]||0) > 0){ diffToast("⏳ 该槽位换装冷却中（"+Math.ceil(state.gearSwapCd[slot])+"s）"); return; }
+  if(state.equipped[slot]) state.gearInventory.push(state.equipped[slot]);
+  state.equipped[slot] = gear;
+  state.gearInventory.splice(invIndex, 1);
+  state.gearSwapCd[slot] = GEAR_CONFIG.swapCooldown;
+  buildSkills();
+  checkAchievements("gear");
+  renderGearPage(); renderHud(); renderSkills();
+  diffToast("🛡️ 装备：" + gear.emoji + gear.name);
+}
+function unequipGear(slot){
+  const gear = state.equipped[slot];
+  if(!gear) return;
+  if((state.gearSwapCd[slot]||0) > 0){ diffToast("⏳ 换装冷却中"); return; }
+  state.gearInventory.push(gear);
+  state.equipped[slot] = null;
+  state.gearSwapCd[slot] = GEAR_CONFIG.swapCooldown;
+  buildSkills();
+  renderGearPage(); renderHud(); renderSkills();
+  diffToast("⬇️ 已卸下");
+}
+function upgradeInv(i){ if(upgradeGearObj(state.gearInventory[i])){ checkAchievements("gear"); renderGearPage(); renderHud(); } }
+function upgradeSlot(slot){ if(upgradeGearObj(state.equipped[slot])){ renderGearPage(); renderHud(); } }
+function breakthroughInv(i){ if(breakthroughGearObj(state.gearInventory[i])){ checkAchievements("gear"); renderGearPage(); renderHud(); } }
+function breakthroughSlot(slot){ if(breakthroughGearObj(state.equipped[slot])){ renderGearPage(); renderHud(); } }
+function salvageGear(invIndex){
+  const gear = state.gearInventory[invIndex];
+  if(!gear) return;
+  const dust = GEAR_CONFIG.dustPerRarity[gear.rarity] || 2;
+  state.gearDust += dust;
+  state.gearInventory.splice(invIndex, 1);
+  diffToast("♻️ 分解 +"+dust+" 碎片"); renderGearPage(); renderHud();
+}
+function forgeGear(mode, typeId){
+  let cost, def = null;
+  if(mode === "random") cost = GEAR_CONFIG.forgeRandomCost;
+  else if(mode === "targeted"){ cost = GEAR_CONFIG.forgeTargetedCost; def = GEARS.find(g=>g.id===typeId); if(!def){ diffToast("请选择装备类型"); return; } }
+  else if(mode === "precise"){ cost = GEAR_CONFIG.forgePreciseCost; def = GEARS.find(g=>g.id===typeId); if(!def){ diffToast("请选择装备类型"); return; } }
+  else return;
+  if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
+  state.essence -= cost; state.totalForgeCount++; state.totalEssenceSpentOnForge += cost;
+  let rarity;
+  if(mode === "precise"){ const r = Math.random(); rarity = r < 0.15 ? "legendary" : r < 0.5 ? "epic" : "rare"; }
+  else { const r = Math.random(); rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common"; }
+  const pool = (mode==="targeted"||mode==="precise") ? GEARS.filter(g=>g.id===typeId) : GEARS;
+  const pick = pool[Math.floor(Math.random()*pool.length)];
+  const gear = makeGear(pick, rarity);
+  state.gearInventory.push(gear);
+  checkAchievements("gear");
+  diffToast("🔨 锻造出：" + gear.emoji + gear.name + "（" + GEAR_RARITY[rarity].name + "）");
+  renderGearPage(); renderHud();
+}
+function saveGearPreset(n){
+  state.gearPresets = state.gearPresets || [];
+  const snap = {};
+  for(const slot in state.equipped){ if(state.equipped[slot]) snap[slot] = JSON.parse(JSON.stringify(state.equipped[slot])); }
+  state.gearPresets[n] = snap;
+  diffToast("💾 已保存预设 " + (n+1)); renderGearPage();
+}
+function loadGearPreset(n){
+  const snap = state.gearPresets && state.gearPresets[n];
+  if(!snap){ diffToast("未保存预设"); return; }
+  for(const slot in state.equipped){ if(state.equipped[slot]){ state.gearInventory.push(state.equipped[slot]); state.equipped[slot]=null; } }
+  for(const slot in snap){
+    let found = -1;
+    for(let i=0;i<state.gearInventory.length;i++){ if(state.gearInventory[i].typeId === snap[slot].typeId){ found=i; break; } }
+    const gear = found>=0 ? state.gearInventory.splice(found,1)[0] : JSON.parse(JSON.stringify(snap[slot]));
+    state.equipped[slot] = gear;
+  }
+  buildSkills();
+  checkAchievements("gear");
+  renderGearPage(); renderHud(); renderSkills();
+  diffToast("📦 已载入预设 " + (n+1));
+}
+// 技能倍率（装备绑定版）
+function skillTapMult(){
+  let mult = 1;
+  if((state.skillActive.berserk||0) > 0){ const def = GEARS.find(g=>g.skillId==="berserk"); mult *= def ? def.skill.tapMult : 8; }
+  if((state.skillActive.dual_track||0) > 0){
+    const syn4 = activeSynergies().find(s => s.id === "dual_track_resonance");
+    const syn8 = activeSynergies().find(s => s.id === "triple_resonance");
+    const def = GEARS.find(g=>g.skillId==="dual_track");
+    let bonus = def ? def.skill.tapBonus : 2.0;
+    if(syn8) bonus = syn8.bonus.tapBonus; else if(syn4) bonus = syn4.bonus.tapBonus;
+    mult *= (1 + bonus);
+  }
+  if((state.skillActive.feedback||0) > 0){
+    const syn3 = activeSynergies().find(s => s.id === "dual_resonance");
+    const syn8b = activeSynergies().find(s => s.id === "triple_resonance");
+    const def = GEARS.find(g=>g.skillId==="feedback");
+    let rate = def ? def.skill.feedbackRate : 0.2;
+    if(syn8b) rate = syn8b.bonus.feedbackRate; else if(syn3) rate = syn3.bonus.feedbackRate;
+    mult += totalDps() * rate / Math.max(1, tapDamageBase());
+  }
+  return mult * gearSkillMult();
+}
+function skillGoldMult(){
+  if((state.skillActive.gold_skill||0) > 0){ const def = GEARS.find(g=>g.skillId==="gold_skill"); return (def ? def.skill.goldMult : 5) * gearSkillMult(); }
+  return 1;
+}
+
+/* =========================================================================
+   3.8) 神器页 / 装备页 UI
+   ========================================================================= */
+function openArtifactPage(){ const p = document.getElementById("artPage"); if(p){ p.style.display = "flex"; renderArtifactPage(); } }
+function closeArtifactPage(){ const p = document.getElementById("artPage"); if(p) p.style.display = "none"; }
+function renderArtifactPage(){
+  const page = document.getElementById("artPage"); if(!page) return;
+  const dust = document.getElementById("artDust"); if(dust) dust.textContent = fmt(state.artifactDust);
+  let owned = 0; for(const a of ARTIFACTS) if((state.artifacts[a.id]||0) > 0) owned++;
+  const ow = document.getElementById("artOwned"); if(ow) ow.textContent = owned + "/21";
+  const c1 = document.getElementById("artCost1"); if(c1) c1.textContent = artifactPullCost(1);
+  const c10 = document.getElementById("artCost10"); if(c10) c10.textContent = artifactPullCost(10);
+  const p1 = document.getElementById("artPull"); if(p1) p1.disabled = state.essence < artifactPullCost(1);
+  const p10 = document.getElementById("artPull10"); if(p10) p10.disabled = state.essence < artifactPullCost(10);
+  const list = document.getElementById("artList"); if(!list) return;
+  let html = "";
+  for(const a of ARTIFACTS){
+    const lv = state.artifacts[a.id]||0;
+    const rar = ARTIFACT_RARITY[a.rarity];
+    const got = lv > 0, maxed = lv >= a.maxLevel;
+    const c = artifactUpgradeCost(a);
+    const canUp = got && !maxed && state.artifactDust >= c;
+    html += '<div class="art-card'+(got?" got":"")+'" style="border-left:3px solid '+rar.color+'">';
+    html += '<div class="art-top"><span class="art-icon">'+a.emoji+'</span><span class="art-name">'+a.name+'</span><span class="art-rar" style="color:'+rar.color+'">'+(got?("Lv."+lv+"/"+a.maxLevel):"未获得")+'</span></div>';
+    html += '<div class="art-desc">'+a.desc+'</div>';
+    if(got && !maxed) html += '<button class="art-up'+(canUp?"":" dis")+'" data-up="'+a.id+'" '+(canUp?"":"disabled")+'>升级 ('+c+' 粉尘)</button>';
+    else if(maxed) html += '<div class="art-max">★ 满级</div>';
+    else html += '<div class="art-lock">召唤获得</div>';
+    html += '</div>';
+  }
+  list.innerHTML = html;
+}
+function openGearPage(){ const p = document.getElementById("gearPage"); if(p){ p.style.display = "flex"; renderGearPage(); } }
+function closeGearPage(){ const p = document.getElementById("gearPage"); if(p) p.style.display = "none"; }
+function renderGearPage(){
+  const page = document.getElementById("gearPage"); if(!page) return;
+  const dustEl = document.getElementById("gearDust"); if(dustEl) dustEl.textContent = fmt(state.gearDust);
+  const slots = document.getElementById("gearSlots");
+  if(slots){
+    let h = "";
+    for(const slot of ["weapon","armor","ring","badge"]){
+      const g = state.equipped[slot];
+      const cd = state.gearSwapCd[slot]||0;
+      h += '<div class="slot-card"><div class="slot-name">'+slotName(slot)+'</div>';
+      if(g){
+        h += '<div class="slot-gear" style="border-left:3px solid '+GEAR_RARITY[g.rarity].color+'">';
+        h += '<div class="g-emoji">'+g.emoji+'</div><div class="g-info"><div class="g-name">'+g.name+' <span class="g-rar" style="color:'+GEAR_RARITY[g.rarity].color+'">'+GEAR_RARITY[g.rarity].name+' Lv.'+g.level+'</span></div>';
+        h += '<div class="g-affix">'+affixLabel(g.mainAffix)+' '+pct(affixValue(g,g.mainAffix))+(g.subAffixes&&g.subAffixes.length?(' ｜ '+g.subAffixes.map(s=>affixLabel(s.type)+' '+pct(s.baseValue*(1+GEAR_CONFIG.subPerLevel*(g.level-1))*rarCoeff(g.rarity))).join('、')):'')+'</div></div>';
+        h += '<div class="g-btns"><button data-act="up-slot" data-slot="'+slot+'">升级</button><button data-act="bt-slot" data-slot="'+slot+'">突破</button><button data-act="unequip" data-slot="'+slot+'">卸下</button></div>';
+        h += '</div>';
+      } else {
+        h += '<div class="slot-empty">（空）'+(cd>0?(' 冷却'+Math.ceil(cd)+'s'):'')+'</div>';
+      }
+      h += '</div>';
+    }
+    slots.innerHTML = h;
+  }
+  const inv = document.getElementById("gearInv");
+  if(inv){
+    if(state.gearInventory.length === 0){ inv.innerHTML = '<div class="ach-desc">背包空空如也，去击破 Boss 或锻造吧！</div>'; }
+    else {
+      let h = "";
+      state.gearInventory.forEach((g,i)=>{
+        h += '<div class="gear-card" style="border-left:3px solid '+GEAR_RARITY[g.rarity].color+'">';
+        h += '<div class="g-emoji">'+g.emoji+'</div><div class="g-info"><div class="g-name">'+g.name+' <span class="g-rar" style="color:'+GEAR_RARITY[g.rarity].color+'">'+GEAR_RARITY[g.rarity].name+' Lv.'+g.level+'</span></div>';
+        h += '<div class="g-affix">'+affixLabel(g.mainAffix)+' '+pct(affixValue(g,g.mainAffix))+(g.subAffixes&&g.subAffixes.length?(' ｜ '+g.subAffixes.map(s=>affixLabel(s.type)+' '+pct(s.baseValue*(1+GEAR_CONFIG.subPerLevel*(g.level-1))*rarCoeff(g.rarity))).join('、')):'')+'</div></div>';
+        h += '<div class="g-btns"><button data-act="equip" data-i="'+i+'">装备</button><button data-act="up" data-i="'+i+'">升级</button><button data-act="bt" data-i="'+i+'">突破</button><button data-act="salvage" data-i="'+i+'">分解</button></div>';
+        h += '</div>';
+      });
+      inv.innerHTML = h;
+    }
+  }
+  const fc1 = document.getElementById("forgeCost1"); if(fc1) fc1.textContent = GEAR_CONFIG.forgeRandomCost;
+  const fc2 = document.getElementById("forgeCost2"); if(fc2) fc2.textContent = GEAR_CONFIG.forgeTargetedCost;
+  const fc3 = document.getElementById("forgeCost3"); if(fc3) fc3.textContent = GEAR_CONFIG.forgePreciseCost;
+  const pr = document.getElementById("presetRow");
+  if(pr){
+    let h = "";
+    for(let n=0;n<3;n++){ const has = state.gearPresets && state.gearPresets[n]; h += '<button data-act="psave" data-n="'+n+'">存'+(n+1)+'</button><button data-act="pload" data-n="'+n+'"'+(has?"":" disabled")+'>载'+(n+1)+'</button>'; }
+    pr.innerHTML = h;
+  }
+}
+
 function init(){
   load();
   // 确保英雄等级字段齐全
@@ -1388,6 +2748,39 @@ function init(){
   document.getElementById("prestigeOk").addEventListener("click", closePrestigeModal);
   document.getElementById("confirmOk").addEventListener("click", ()=>{ if(_confirmCb) _confirmCb(); closeConfirm(); });
   document.getElementById("confirmCancel").addEventListener("click", closeConfirm);
+
+  // 新系统：神器 / 装备 / 成就 入口与交互
+  document.getElementById("artifactBtn").addEventListener("click", openArtifactPage);
+  document.getElementById("artClose").addEventListener("click", closeArtifactPage);
+  document.getElementById("gearBtn").addEventListener("click", openGearPage);
+  document.getElementById("gearClose").addEventListener("click", closeGearPage);
+  document.getElementById("achBtn").addEventListener("click", openAchPage);
+  document.getElementById("achClose").addEventListener("click", closeAchPage);
+  document.getElementById("artPull").addEventListener("click", doArtifactPull);
+  document.getElementById("artPull10").addEventListener("click", doArtifactTenPull);
+  document.getElementById("artList").addEventListener("click", e=>{ const b = e.target.closest("[data-up]"); if(b) doUpgradeArtifact(b.dataset.up); });
+  document.getElementById("gearPage").addEventListener("click", e=>{
+    const b = e.target.closest("[data-act]"); if(!b) return;
+    const act = b.dataset.act;
+    if(act==="equip") equipGear(parseInt(b.dataset.i,10));
+    else if(act==="up") upgradeInv(parseInt(b.dataset.i,10));
+    else if(act==="bt") breakthroughInv(parseInt(b.dataset.i,10));
+    else if(act==="salvage") salvageGear(parseInt(b.dataset.i,10));
+    else if(act==="up-slot") upgradeSlot(b.dataset.slot);
+    else if(act==="bt-slot") breakthroughSlot(b.dataset.slot);
+    else if(act==="unequip") unequipGear(b.dataset.slot);
+    else if(act==="psave") saveGearPreset(parseInt(b.dataset.n,10));
+    else if(act==="pload") loadGearPreset(parseInt(b.dataset.n,10));
+  });
+  // 锻造类型下拉
+  const ft = document.getElementById("forgeType");
+  if(ft){ GEARS.forEach(g=>{ const o=document.createElement("option"); o.value=g.id; o.textContent=g.emoji+" "+g.name; ft.appendChild(o); }); }
+  document.getElementById("forgeRandom").addEventListener("click", ()=>forgeGear("random"));
+  document.getElementById("forgeTargeted").addEventListener("click", ()=>forgeGear("targeted", document.getElementById("forgeType").value));
+  document.getElementById("forgePrecise").addEventListener("click", ()=>forgeGear("precise", document.getElementById("forgeType").value));
+
+  // 加载后补评成就（已有进度者一次性解锁已达标成就）
+  checkAchievements("load");
 
   // 自动存档：每 5 秒存一次
   setInterval(save, 5000);

@@ -44,11 +44,11 @@
   }
   /* 顶部状态栏 */
   .hud{
-    display:flex; flex-wrap:wrap; gap:8px; margin-bottom:8px;
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; margin-bottom:8px;
   }
   .hud .box{
-    flex:1; min-width:62px; background:var(--panel); border-radius:14px;
-    padding:8px 10px; text-align:center;
+    background:var(--panel); border-radius:12px;
+    padding:7px 6px; text-align:center;
   }
   .hud .box .k{font-size:11px; color:var(--muted);}
   .hud .box .v{font-size:17px; font-weight:700; margin-top:2px; line-height:1.1;}
@@ -231,6 +231,7 @@
   }
   .footer button:active{transform:scale(.97);}
   .tip{font-size:11px; color:var(--muted); text-align:center; margin-top:10px; line-height:1.6;}
+  .tip summary{ font-size:12px; }
 
   /* 批量购买数量选择器 */
   .buy-amount{
@@ -398,9 +399,8 @@
   .frame-chip.active{ box-shadow:0 0 0 2px var(--gold); }
   .frame-chip span, .badge span{ display:block; font-size:9px; color:var(--muted); margin-top:2px; }
   #diffToast.ach-unlock{ background:rgba(40,25,70,.95); border:1px solid var(--gold); }
-  /* 音效开关 */
-  #sfxToggle{ position:fixed; bottom:10px; right:10px; z-index:30; background:var(--panel); border:1px solid #ffffff18; border-radius:20px; padding:6px 12px; font-size:13px; color:var(--text); cursor:pointer; }
-  #notifToggle{ position:fixed; bottom:10px; right:54px; z-index:30; background:var(--panel); border:1px solid #ffffff18; border-radius:20px; padding:6px 12px; font-size:13px; color:var(--text); cursor:pointer; }
+  /* 小开关按钮（行内） */
+  .mini-toggle{ background:var(--panel); border:1px solid #ffffff18; border-radius:18px; padding:5px 14px; font-size:13px; color:var(--text); cursor:pointer; }
   /* 点击波纹动画 */
   @keyframes tapRipple{ from{opacity:1;transform:translate(-50%,-50%) scale(0);} to{opacity:0;transform:translate(-50%,-50%) scale(2.5);} }
   .tap-ripple{ position:absolute; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.25); pointer-events:none; animation:tapRipple .5s ease-out forwards; }
@@ -569,8 +569,9 @@
     <button id="achBtn">🏆 成就</button>
     <button id="shareBtn">📋 分享</button>
   </div>
-  <button id="sfxToggle">🔊</button>
-  <button id="notifToggle">📢</button>
+  <div style="display:flex;justify-content:center;gap:8px;margin-top:6px;">
+    <button id="sfxToggle" class="mini-toggle">🔊</button>
+    <button id="notifToggle" class="mini-toggle">📢</button>
   </div>
   <details class="tip" id="tipBox" style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6;">
     <summary style="cursor:pointer;color:var(--text);font-weight:700;">📖 新手提示 (首次可展开)</summary>
@@ -1174,7 +1175,7 @@ function totalDps(){
   let dps = 0;
   for(const h of HEROES){
     const lv = state.heroes[h.id] || 0;
-    if(lv>0) dps += h.baseDps * lv * awakenGlobalMult() * prestigeMult();
+    if(lv>0) dps += h.baseDps * lv * Math.pow(1.20, Math.floor(lv/10)) * awakenGlobalMult() * prestigeMult();
   }
   let mult = gearDpsMult() * gearGlobalMult() * artGlobalMult();
   // 军团冲锋（DPS流）：英雄DPS ×N
@@ -1622,6 +1623,10 @@ function killEnemy(){
     state.essence += eg;
     state.totalBossKills++;           // 成就统计：Boss 击杀
     state.totalEssenceEarned += eg;   // 成就统计：累计精华
+    // Boss 击杀金币爆发 = 当前 DPS × 10 秒
+    const bossBurst = Math.floor(totalDps() * 10);
+    state.gold += bossBurst;
+    if(bossBurst > 0) diffToast("💥 Boss击破 +" + fmt(bossBurst) + " 金！");
     if(bossTimeLeft > 0 && bossTimeLeft <= 1) unlockAch("X3");   // X3 极限反杀（隐藏）
     if(state.totalBossFails >= 10) unlockAch("X7");              // X7 败而不馁（隐藏）
   }
@@ -1877,7 +1882,7 @@ function renderShop(){
     const aw = state.awaken[h.id]||0;
     ref.lv.textContent = lv>0 ? ("Lv."+lv) : "";
     // 该英雄当前每秒贡献（受共鸣倍率影响）
-    const heroDpsNow = h.baseDps * lv * mult;
+    const heroDpsNow = h.baseDps * lv * Math.pow(1.20, Math.floor(lv/10)) * mult;
     // 本次购买/升级的数量与花费（受批量购买数量影响）
     let buyN, buyCost, buyAfford;
     if(buyAmount === "max"){
@@ -1893,7 +1898,7 @@ function renderShop(){
       buyAfford = state.gold >= buyCost;   // 固定数量：买满才点亮，点一下必得 n 级
     }
     // 本次购买/升级可提升的每秒战力（设计点：明确显示单位购买/升级所能提高的战力）
-    const gain = h.baseDps * buyN * mult;
+    const gain = h.baseDps * buyN * Math.pow(1.20, Math.floor((lv+buyN)/10)) * mult;
     ref.sub.textContent = lv>0
       ? ("当前每秒 +"+fmt(heroDpsNow)+" 伤害" + (aw>0 ? " · 已觉醒×"+aw : ""))
       : ("雇佣后每秒 +"+fmt(h.baseDps*mult)+" 伤害");
@@ -2488,7 +2493,7 @@ function artMonsterReduce(){  return artSumByEffect("monsterReduce"); }         
 function artAwakenBonus(){    return artSumByEffect("awakenBonus") * artSynergyGlobal(); }
 function artCritEnergy(){     return artSumByEffect("critEnergy") * artSynergyGlobal(); }
 function artPrestigeDouble(){ return artSumByEffect("prestigeDouble"); }                // 不×协同
-function artOfflinePush(){    return artSumByEffect("offlinePush") * artSynergyGlobal(); }
+function artOfflinePush(){    return Math.max(5, artSumByEffect("offlinePush") * artSynergyGlobal()); }
 function artOverkillTransfer(){ return artSumByEffect("overkillTransfer") * artSynergyGlobal(); }
 function artifactTotalMult(){ return artGlobalMult(); }
 
@@ -3078,25 +3083,39 @@ function checkDailySignin(){
   document.getElementById("signinModal").style.display = "flex";
 }
 function openHall(){
-  const owned = ARTIFACTS.filter(a=>(state.artifacts[a.id]||0)>0).length;
+  const owned = ARTIFACTS.filter(a=>(state.artifacts[a.id]||0)>0);
   const achCount = Object.keys(state.achievements||{}).length;
   const rows = [
     ["最高关卡", state.bestStageEver || state.bestStage || 1],
     ["转生点数", state.prestige || 0],
     ["转生倍率", "×"+prestigeMult().toFixed(2)],
-    ["神器图鉴", owned+"/21"],
+    ["神器图鉴", owned.length+"/21"],
     ["成就解锁", achCount+"/50"],
     ["连续签到", state.dailyStreak||0],
     ["总点击", fmt(state.totalTaps||0)],
     ["总击杀", fmt(state.totalKills||0)],
   ];
-  document.getElementById("hallStats").innerHTML = rows.map(([k,v])=>'<div style="color:var(--muted)">'+k+'</div><div style="font-weight:700">'+v+'</div>').join("");
+  let html = rows.map(([k,v])=>'<div style="color:var(--muted)">'+k+'</div><div style="font-weight:700">'+v+'</div>').join("");
+  if(owned.length > 0) html += '<div style="grid-column:1/3;margin-top:4px;font-size:11px;color:var(--muted)"> </div><div style="grid-column:1/3;font-size:11px;color:var(--muted)"><b style="color:var(--gold)">神器：</b>'+owned.map(a=>a.emoji+" Lv."+(state.artifacts[a.id]||0)).join(" ") +'</div>';
+  const eqGears = [];
+  for(const slot of ["weapon","armor","ring","badge"]){
+    const g = state.equipped[slot]; if(g) eqGears.push(g.emoji+g.name+" Lv."+g.level+" "+GEAR_RARITY[g.rarity].name);
+  }
+  if(eqGears.length > 0) html += '<div style="grid-column:1/3;font-size:11px;color:var(--muted);margin-top:2px"><b style="color:var(--gold)">装备：</b>'+eqGears.join(" ｜ ")+'</div>';
+  html += '<div style="grid-column:1/3;margin-top:2px;font-size:10px;color:var(--muted)">✂️ 点击下方按钮一键分享</div>';
+  document.getElementById("hallStats").innerHTML = html;
   document.getElementById("hallModal").style.display = "flex";
 }
 function shareStats(){
-  const owned = ARTIFACTS.filter(a=>(state.artifacts[a.id]||0)>0).length;
+  const owned = ARTIFACTS.filter(a=>(state.artifacts[a.id]||0)>0);
   const achCount = Object.keys(state.achievements||{}).length;
-  const text = "🎮 Tap Hero · 最高第"+ (state.bestStageEver||state.bestStage||1) +"关 · 转生×"+ prestigeMult().toFixed(2) +" · 神器"+owned+"/21 · 成就"+achCount+"/50 · https://hanekiba.github.io/tap-hero/";
+  const artLine = owned.length > 0 ? " · 神器：" + owned.map(a=>a.emoji+"Lv."+(state.artifacts[a.id]||0)).join(" ") : "";
+  const eqGears = [];
+  for(const slot of ["weapon","armor","ring","badge"]){
+    const g = state.equipped[slot]; if(g) eqGears.push(g.emoji+g.name+" Lv."+g.level+" "+GEAR_RARITY[g.rarity].name);
+  }
+  const gearLine = eqGears.length > 0 ? " · 装备：" + eqGears.join(" ｜ ") : "";
+  const text = "🎮 Tap Hero · 最高第"+ (state.bestStageEver||state.bestStage||1) +"关 · 转生×"+ prestigeMult().toFixed(2) +" · 成就"+achCount+"/50"+artLine+gearLine+" · https://hanekiba.github.io/tap-hero/";
   navigator.clipboard.writeText(text).then(()=>diffToast("📋 已复制战绩！"));
 }
 function init(){
@@ -3112,12 +3131,12 @@ function init(){
   buildShop();
   buildSkills();
   renderAll();
-  // 新手提示：已读后永久折叠，只剩一个"📖 提示"链接
+  // 新手提示：已读后默认折叠，随时可点开
   const tipBox = document.getElementById("tipBox");
   if(tipBox){
-    if(state.tipSeen) tipBox.remove();
-    else tipBox.querySelector("summary").onclick = ()=>{
-      setTimeout(()=>{ if(!tipBox.open){ state.tipSeen=true; save(); tipBox.remove(); } }, 0);
+    if(state.tipSeen) tipBox.removeAttribute("open");
+    tipBox.querySelector("summary").onclick = ()=>{
+      setTimeout(()=>{ if(!tipBox.open){ state.tipSeen=true; save(); } }, 0);
     };
   }
 

@@ -346,6 +346,13 @@
   .preset-row button:disabled{ color:#8d7db5; cursor:not-allowed; }
   .preset-row button.as-active{ background:var(--gold); color:#1b1033; border-color:var(--gold); }
   .synergy-hint{ background:linear-gradient(135deg,#3a2a5e,#2a3a6e); }
+  .syn-card{ background:var(--panel); border-radius:12px; padding:10px 12px; margin-bottom:6px; }
+  .syn-card.active{ box-shadow:0 0 0 1px var(--gold); }
+  .syn-head{ display:flex; align-items:center; gap:6px; margin-bottom:4px; }
+  .syn-status{ font-size:14px; }
+  .syn-name{ font-size:14px; font-weight:700; color:var(--text); }
+  .syn-req{ font-size:11px; color:var(--muted); }
+  .syn-desc{ font-size:11px; color:var(--muted); margin-top:3px; }
   /* 成就页（复用已有 class 名，补全样式） */
   .ach-topbar{ font-size:12px; color:var(--muted); margin-bottom:8px; }
   .ach-topbar b{ color:var(--gold); font-size:14px; }
@@ -391,6 +398,23 @@
   .frame-chip.active{ box-shadow:0 0 0 2px var(--gold); }
   .frame-chip span, .badge span{ display:block; font-size:9px; color:var(--muted); margin-top:2px; }
   #diffToast.ach-unlock{ background:rgba(40,25,70,.95); border:1px solid var(--gold); }
+  /* 自适应分辨率 */
+  @media(max-width:480px){
+    .app{ max-width:100vw; padding:0 6px; }
+    .hud{ grid-template-columns:repeat(3,1fr); gap:4px; }
+    .hud .box{ padding:6px 4px; }
+    .hud .box .v{ font-size:14px; }
+    .stage{ padding:14px 10px; }
+    .enemy-name{ font-size:14px; }
+    .list{ grid-template-columns:1fr; }
+    .skills{ grid-template-columns:1fr; }
+    .buy-amount{ flex-wrap:wrap; }
+    .overlay-box{ padding:10px 8px 16px; }
+    .gear-slots{ grid-template-columns:1fr; }
+  }
+  @media(min-width:800px){
+    .app{ max-width:520px; }
+  }
 </style>
 </head>
 <body>
@@ -432,7 +456,7 @@
       <div class="box gold"><div class="k">金币</div><div class="v" id="gold">0</div></div>
       <div class="box"><div class="k">关卡</div><div class="v" id="stage">1</div></div>
       <div class="box"><div class="k">每秒伤害</div><div class="v" id="dps">0</div></div>
-      <div class="box"><div class="k">难度成长</div><div class="v" id="growth">1.18</div></div>
+      <div class="box dust"><div class="k">神器粉尘</div><div class="v" id="hudArtDust">0</div></div>
       <div class="box essence"><div class="k">精华</div><div class="v" id="essence">0</div></div>
       <div class="box prestige"><div class="k">重生加成</div><div class="v" id="prestige">×1.00</div></div>
     </div>
@@ -461,6 +485,7 @@
   <div class="title"><h2>⚡ 主动技能</h2><span class="hint">能量 <span id="energyVal">100</span>/<span id="energyMax">100</span></span></div>
   <div class="skills" id="skillList"></div>
   <button id="skillMastery" class="skill-mastery">📘 技能精通 Lv.0 · 冷却 -0% · 升级 <span class="c">0 精</span></button>
+  <button id="synergyBtn" class="skill-mastery" style="margin-top:6px;">🔗 连携技能</button>
 
   <!-- 英雄商店 -->
   <div class="title"><h2 id="heroTitle">🦸 英雄（自动输出）</h2><span class="hint">觉醒=全队共鸣</span></div>
@@ -535,6 +560,14 @@
     <div class="overlay-head"><h2 id="pullModalTitle">✨ 抽取结果</h2><button id="artPullClose" class="ov-close">✕</button></div>
     <div id="pullModalContent"></div>
     <button id="artPullConfirm" class="buy" style="width:100%; margin-top:12px; padding:12px; font-size:15px; border-radius:12px;">确定</button>
+  </div>
+</div>
+
+<!-- 连携技能弹窗 -->
+<div id="synPage" class="overlay" style="display:none">
+  <div class="overlay-box">
+    <div class="overlay-head"><h2>🔗 连携技能</h2><button id="synClose" class="ov-close">✕</button></div>
+    <div id="synList"></div>
   </div>
 </div>
 
@@ -1194,15 +1227,29 @@ function buildSkills(){
     wrap.appendChild(el);
     skillRefs[skillId] = { el, state: el.querySelector("[data-state]"), sub: el.querySelector("[data-sub]"), btn: el.querySelector("[data-use]") };
   }
-  // 连携提示
-  const syns = activeSynergies();
-  if(syns.length > 0){
-    const hint = document.createElement("div");
-    hint.className = "skill synergy-hint";
-    hint.innerHTML = `<div class="sk-info"><div class="sk-name">🔗 连携激活 ×${syns.length}</div><div class="sk-desc">${syns.map(s=>s.name).join("、")}</div></div>`;
-    wrap.appendChild(hint);
-  }
+  // 连携按钮由 #synergyBtn 触发弹窗查看，不再在此处内联提示
   renderBuffBar();
+}
+function openSynPage(){
+  const p = document.getElementById("synPage"); if(!p) return;
+  p.style.display = "flex";
+  const list = document.getElementById("synList"); if(!list) return;
+  const active = activeSynergies();
+  const activeIds = new Set(active.map(s=>s.id));
+  let h = "";
+  for(const syn of SYNERGIES){
+    const isActive = activeIds.has(syn.id);
+    const reqSkills = syn.skillIds.map(sid=>{ const g=GEARS.find(x=>x.skillId===sid); return g?g.emoji+g.skill.name:sid; }).join(" + ");
+    h += '<div class="syn-card'+(isActive?' active':'')+'" style="border-left:3px solid '+(isActive?'var(--gold)':'#ffffff20')+'">';
+    h += '<div class="syn-head"><span class="syn-status">'+(isActive?'✅ ':'⬜ ')+'</span><span class="syn-name">'+syn.name+'</span></div>';
+    h += '<div class="syn-req">需求：'+reqSkills+'</div>';
+    h += '<div class="syn-desc">'+syn.desc+'</div>';
+    h += '</div>';
+  }
+  list.innerHTML = h;
+}
+function closeSynPage(){
+  const p = document.getElementById("synPage"); if(p) p.style.display = "none";
 }
 function renderSkills(){
   const ev = document.getElementById("energyVal");
@@ -1569,6 +1616,7 @@ function floatDamage(dmg, crit, x, y){
 function renderHud(){
   document.getElementById("gold").textContent  = fmt(state.gold);
   document.getElementById("essence").textContent = fmt(state.essence);
+  document.getElementById("hudArtDust").textContent = fmt(state.artifactDust||0);
   document.getElementById("stage").textContent = state.stage;
   document.getElementById("stage2").textContent= state.stage;
   document.getElementById("dps").textContent   = fmt(totalDps());
@@ -1597,7 +1645,7 @@ function renderHud(){
   document.getElementById("tapPower").textContent = tapN>=1
     ? ("本次升级 +"+fmt(CONFIG.baseTap * tapN * tapMult)+" 伤害")
     : "金币不足，无法升级";
-  document.getElementById("growth").textContent = dynGrowth.toFixed(2) + (state.bossLoop ? " 🔒" : "");
+  document.getElementById("hudArtDust").textContent = fmt(state.artifactDust||0);
   // 转生加成显示 + 转生按钮状态（未解锁/可获点数）
   document.getElementById("prestige").textContent = "×" + prestigeMult().toFixed(2);
   const tt = document.getElementById("titleTag");
@@ -2195,7 +2243,7 @@ function doPrestige(){
     comebackAfter10Fails: state.comebackAfter10Fails,
   };
   state = {
-    gold:0, stage:1, tapLevel:1, heroes:{}, essence:keepEssence, awaken:{}, enemyHp:0, monsterIndex:1,
+    gold:0, stage:1, tapLevel:1, heroes:{}, essence:keepEssence, awaken: structuredClone(state.awaken||{}), enemyHp:0, monsterIndex:1,
     dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:keepLastSeen,
     prestige: keepPrestige, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery: state.skillMastery,
     ...keepAch,
@@ -2222,7 +2270,7 @@ function doPrestige(){
     everSynergy: state.everSynergy||false,
     synergySet: state.synergySet||{},
   };
-  HEROES.forEach(h=>{ state.heroes[h.id]=0; state.awaken[h.id]=0; });
+  HEROES.forEach(h=>{ state.heroes[h.id]=0; });
   dynGrowth = state.dynGrowth; oneShotStreak = 0; stuckStreak = 0;
   save();
   spawnEnemy();
@@ -2876,6 +2924,8 @@ function init(){
 
   document.getElementById("buyTap").addEventListener("click", buyTap);
   document.getElementById("skillMastery").addEventListener("click", buyMastery);
+  document.getElementById("synergyBtn").addEventListener("click", openSynPage);
+  document.getElementById("synClose").addEventListener("click", closeSynPage);
   document.getElementById("resetBtn").addEventListener("click", reset);
   document.getElementById("bossContinue").addEventListener("click", continueBoss);
   // 批量购买数量选择器：切换 buyAmount 并刷新商店/升级面板的花费与按钮状态

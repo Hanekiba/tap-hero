@@ -400,6 +400,7 @@
   #diffToast.ach-unlock{ background:rgba(40,25,70,.95); border:1px solid var(--gold); }
   /* 音效开关 */
   #sfxToggle{ position:fixed; bottom:10px; right:10px; z-index:30; background:var(--panel); border:1px solid #ffffff18; border-radius:20px; padding:6px 12px; font-size:13px; color:var(--text); cursor:pointer; }
+  #notifToggle{ position:fixed; bottom:10px; right:54px; z-index:30; background:var(--panel); border:1px solid #ffffff18; border-radius:20px; padding:6px 12px; font-size:13px; color:var(--text); cursor:pointer; }
   /* 点击波纹动画 */
   @keyframes tapRipple{ from{opacity:1;transform:translate(-50%,-50%) scale(0);} to{opacity:0;transform:translate(-50%,-50%) scale(2.5);} }
   .tap-ripple{ position:absolute; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.25); pointer-events:none; animation:tapRipple .5s ease-out forwards; }
@@ -569,6 +570,7 @@
     <button id="shareBtn">📋 分享</button>
   </div>
   <button id="sfxToggle">🔊</button>
+  <button id="notifToggle">📢</button>
   </div>
   <div class="tip">提示：英雄会自动打怪（放置收益）；<b>快速连点</b>可累积「连击」倍率（停手约 2 秒清零），活跃手点比纯放置更强。<br>商店显示<b>已拥有的全部英雄</b> + 末尾一张<b>即将可购买</b>的下一个单位，并标出本次可提升的战力。<br>击破 BOSS 得「灵魂精华」，<b>觉醒</b>任意英雄为<b>全队</b>永久加伤（军团共鸣）；<b>精华转生后保留</b>，放心转生。转生需第 100 关。<br>⚡ <b>技能</b>来自已装备的装备：消耗「能量」释放，各有冷却；<b>守护戒指</b>被动让 Boss 关 +5s 且满能量自动射击；用精华买<b>技能精通</b>可永久减冷却；合理配装可触发<b>连携</b>。<br>进度自动存于本机浏览器。</div>
 </div>
@@ -594,6 +596,17 @@
       <button id="artPull" class="buy">单抽(<span id="artCost1"></span>精)</button>
       <button id="artPull10" class="buy">十连(<span id="artCost10"></span>精)</button>
     </div>
+    <details class="art-info" style="margin-bottom:6px;font-size:11px;color:var(--muted);">
+      <summary style="cursor:pointer;color:var(--text);">📖 粉尘如何获取 / 如何使用</summary>
+      <div style="padding:8px;line-height:1.6;">
+        <b style="color:var(--gold)">粉尘获取方式：</b><br>
+        · 抽到已满级的神器，自动转化为粉尘（普通=5，稀有=15，史诗=50，传说=200）<br>
+        · 离线推关时按时间自动累积（每分钟 1 粉尘 + 神器加成）<br>
+        · 每日签到奖励（连续天数越高，粉尘越多）<br><br>
+        <b style="color:var(--gold)">粉尘用途：</b><br>
+        · 在神器列表点「升级」按钮，把粉尘喂给已获得的神器，提升其等级与效果
+      </div>
+    </details>
     <div id="artList" class="art-list"></div>
   </div>
 </div>
@@ -855,6 +868,7 @@ const GEAR_SKILL_IDS = GEARS.map(g=>g.skillId);
    1.6) 音效系统（Web Audio API 合成，无外部文件）
    ========================================================================= */
 let sfxOn = true;
+let notifOn = true;
 let _audioCtx = null;
 function _getAudioCtx(){ if(!_audioCtx) try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} return _audioCtx; }
 function playSfx(freq, dur, type){
@@ -1513,6 +1527,7 @@ function adaptDifficulty(){
 
 // 难度变化时的轻提示（右上角短暂出现）
 function diffToast(msg){
+  if(!notifOn) return;  // 用户关闭了通知
   const t = document.getElementById("diffToast");
   if(!t) return;
   t.textContent = msg;
@@ -2049,6 +2064,7 @@ function showNextAchToast(){
   if(achToastQueue.length === 0){ achToastShowing = false; return; }
   achToastShowing = true;
   const id = achToastQueue.shift();
+  if(!notifOn){ setTimeout(showNextAchToast, 50); return; }  // 通知关闭时直接跳过显示
   const ach = ACHIEVEMENTS[id];
   const t = document.getElementById("diffToast");
   if(!t){ setTimeout(showNextAchToast, 300); return; }
@@ -3128,6 +3144,7 @@ function init(){
   document.getElementById("achBtn").addEventListener("click", openAchPage);
   document.getElementById("achClose").addEventListener("click", closeAchPage);
   document.getElementById("sfxToggle").addEventListener("click", ()=>{ sfxOn=!sfxOn; document.getElementById("sfxToggle").textContent=sfxOn?"🔊":"🔇"; });
+  document.getElementById("notifToggle").addEventListener("click", ()=>{ notifOn=!notifOn; document.getElementById("notifToggle").textContent=notifOn?"📢":"🔕"; });
   document.getElementById("shareBtn").addEventListener("click", openHall);
   document.getElementById("hallClose").addEventListener("click", ()=>document.getElementById("hallModal").style.display="none");
   document.getElementById("hallShareBtn").addEventListener("click", shareStats);

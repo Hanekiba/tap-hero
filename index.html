@@ -572,7 +572,12 @@
   <button id="sfxToggle">🔊</button>
   <button id="notifToggle">📢</button>
   </div>
-  <div class="tip">提示：英雄会自动打怪（放置收益）；<b>快速连点</b>可累积「连击」倍率（停手约 2 秒清零），活跃手点比纯放置更强。<br>商店显示<b>已拥有的全部英雄</b> + 末尾一张<b>即将可购买</b>的下一个单位，并标出本次可提升的战力。<br>击破 BOSS 得「灵魂精华」，<b>觉醒</b>任意英雄为<b>全队</b>永久加伤（军团共鸣）；<b>精华转生后保留</b>，放心转生。转生需第 100 关。<br>⚡ <b>技能</b>来自已装备的装备：消耗「能量」释放，各有冷却；<b>守护戒指</b>被动让 Boss 关 +5s 且满能量自动射击；用精华买<b>技能精通</b>可永久减冷却；合理配装可触发<b>连携</b>。<br>进度自动存于本机浏览器。</div>
+  <details class="tip" id="tipBox" style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6;">
+    <summary style="cursor:pointer;color:var(--text);font-weight:700;">📖 新手提示 (首次可展开)</summary>
+    <div style="padding:8px;">
+      提示：英雄会自动打怪（放置收益）；<b>快速连点</b>可累积「连击」倍率（停手约 2 秒清零），活跃手点比纯放置更强。<br>商店显示<b>已拥有的全部英雄</b> + 末尾一张<b>即将可购买</b>的下一个单位，并标出本次可提升的战力。<br>击破 BOSS 得「灵魂精华」，<b>觉醒</b>任意英雄为<b>全队</b>永久加伤（军团共鸣）；<b>精华转生后保留</b>，放心转生。转生需第 100 关。<br>⚡ <b>技能</b>来自已装备的装备：消耗「能量」释放，各有冷却；<b>守护戒指</b>被动让 Boss 关 +5s 且满能量自动射击；用精华买<b>技能精通</b>可永久减冷却；合理配装可触发<b>连携</b>。<br>进度自动存于本机浏览器。
+    </div>
+  </details>
 </div>
 
 <!-- 成就页 -->
@@ -964,6 +969,7 @@ let state = {
   gearSwapCd: { weapon:0, armor:0, ring:0, badge:0 },
   gearPresets: [],
   autoSalvageRarity: 0,  // 0=关, 1=普通, 2=稀有, 3=史诗, 4=传说
+  tipSeen: false,       // 新手提示是否已读
   // ===== 连携/流派追踪（转生保留）=====
   everSynergy: false,
   synergySet: {},
@@ -1046,6 +1052,7 @@ function load(){
       if(state.gearSwapCd===undefined) state.gearSwapCd={weapon:0,armor:0,ring:0,badge:0};
       if(state.gearPresets===undefined) state.gearPresets=[];
       if(state.autoSalvageRarity===undefined) state.autoSalvageRarity=0;
+      if(state.tipSeen===undefined) state.tipSeen=false;
       if(state.lastSigninDate===undefined) state.lastSigninDate="";
       if(state.dailyStreak===undefined) state.dailyStreak=0;
       if(state.everSynergy===undefined) state.everSynergy=false;
@@ -2375,6 +2382,7 @@ function doPrestige(){
     gearSwapCd: state.gearSwapCd||{weapon:0,armor:0,ring:0,badge:0},
     gearPresets: state.gearPresets||[],
     autoSalvageRarity: state.autoSalvageRarity||0,
+    tipSeen: state.tipSeen||false,
     lastSigninDate: state.lastSigninDate||"",
     dailyStreak: state.dailyStreak||0,
     everSynergy: state.everSynergy||false,
@@ -3104,6 +3112,14 @@ function init(){
   buildShop();
   buildSkills();
   renderAll();
+  // 新手提示：已读后永久折叠，只剩一个"📖 提示"链接
+  const tipBox = document.getElementById("tipBox");
+  if(tipBox){
+    if(state.tipSeen) tipBox.remove();
+    else tipBox.querySelector("summary").onclick = ()=>{
+      setTimeout(()=>{ if(!tipBox.open){ state.tipSeen=true; save(); tipBox.remove(); } }, 0);
+    };
+  }
 
   // 点击敌人 = 攻击
   const zone = document.getElementById("tapZone");

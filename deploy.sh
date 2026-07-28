@@ -1,48 +1,61 @@
 #!/usr/bin/env bash
 # ============================================================
-#  游戏部署脚本 —— 把 site/ 目录推送到 GitHub Pages
-#  适用：Windows 用户请用「Git Bash」运行（不要用 cmd/PowerShell）
-#  用法：cd 到本文件所在目录后运行  bash deploy.sh
+#  自动部署到 GitHub Pages — https://hanekiba.github.io/tap-hero/
+#  用法：在 Git Bash 中运行  bash site/deploy.sh
+#  无需任何交互，一键推送。
 # ============================================================
 set -e
 
-echo "========================================="
-echo "  游戏部署到 GitHub Pages"
-echo "========================================="
+REPO_URL="https://github.com/Hanekiba/tap-hero.git"
+BRANCH="main"
 
-# ---------- 方式一：预设仓库地址（不想每次粘贴就填这里）----------
-# 例：REPO_URL="https://github.com/你的用户名/你的仓库名.git"
-#     REPO_URL="git@github.com:你的用户名/你的仓库名.git"
-REPO_URL=""
+# 进入 site/ 目录（无论从哪个目录运行此脚本都能正确工作）
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR"
 
-# 没预设就运行时手动粘贴
-if [ -z "$REPO_URL" ]; then
-  read -p "粘贴你的 GitHub 仓库地址 (HTTPS 或 SSH): " REPO_URL
+echo "🚀 部署 tap-hero → GitHub Pages"
+echo "   仓库：${REPO_URL}"
+echo "   分支：${BRANCH}"
+echo ""
+
+# 确保是 git 仓库（首次运行或 .git 被误删时自动初始化）
+if [ ! -d .git ]; then
+  echo "📦 初始化 git 仓库…"
+  git init
+  git branch -M "$BRANCH"
+  git remote add origin "$REPO_URL"
 fi
-if [ -z "$REPO_URL" ]; then
-  echo "没给仓库地址，已退出。"
-  exit 1
+
+# 尝试拉取远程（首次推送时远程分支可能还不存在，忽略错误）
+echo "📥 同步远程…"
+if git ls-remote origin "$BRANCH" | grep -q "$BRANCH"; then
+  # 远程分支存在：拉取后做 soft reset，保留本地改动
+  git fetch origin "$BRANCH" 2>/dev/null || {
+    echo "⚠️ 无法连接远程仓库（请确认已配置 GitHub 凭据）"
+    exit 1
+  }
+  git reset --soft "origin/$BRANCH" 2>/dev/null || true
+else
+  echo "   远程分支尚不存在，将创建首次提交。"
 fi
 
-# 进入脚本所在目录（site/），只推送部署包，不碰项目里的临时文件
-cd "$(dirname "$0")"
-
-# 初始化仓库（已有则忽略报错）
-git init 2>/dev/null || true
-git branch -M main 2>/dev/null || true
-
-# 设置远程（重复运行也不报错）
-git remote remove origin 2>/dev/null || true
-git remote add origin "$REPO_URL"
-
-# 提交全部部署文件
+# 暂存所有部署文件
 git add -A
-git commit -m "deploy: $(date +%Y-%m-%d_%H%M%S)" || { echo "没有需要提交的改动，跳过。"; }
 
-# 推送
-git push -u origin main
+# 如果没有改动就跳过
+COMMIT_MSG="deploy: $(date '+%Y-%m-%d %H:%M:%S')"
+if git diff --cached --quiet 2>/dev/null; then
+  echo "✅ 没有新改动，已是最新。"
+  exit 0
+fi
+
+git commit -m "$COMMIT_MSG"
+echo "📤 推送到 GitHub…"
+git push -u origin "$BRANCH"
 
 echo ""
-echo "✅ 推送完成！"
-echo "下一步：GitHub 仓库 → Settings → Pages → Source 选 'main' 分支 / root 目录 → Save"
-echo "等 1~2 分钟后访问：https://你的用户名.github.io/你的仓库名/"
+echo "🎉 推送完成！等 1~2 分钟后访问："
+echo "   https://hanekiba.github.io/tap-hero/"
+echo ""
+echo "💡 如果没有自动生效，检查 GitHub 仓库 Settings → Pages："
+echo "   Source 选 'Deploy from a branch' → main 分支 / root 目录"

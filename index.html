@@ -291,25 +291,56 @@
   .art-up.dis{ background:#4a3a6e; color:#8d7db5; cursor:not-allowed; }
   .art-max{ margin-top:6px; font-size:12px; color:var(--gold); font-weight:700; }
   .art-lock{ margin-top:6px; font-size:11px; color:var(--muted); }
+  /* 神器抽取弹窗 */
+  .pull-grid{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:8px 0; }
+  .pull-card{ background:var(--panel); border-radius:14px; padding:12px 10px; min-width:70px; text-align:center; animation:fadeSlide .35s ease-out both; box-shadow:0 0 18px rgba(0,0,0,.35); }
+  .pull-card .pc-emoji{ font-size:36px; display:block; margin-bottom:4px; }
+  .pull-card .pc-name{ font-size:13px; font-weight:700; margin-bottom:2px; }
+  .pull-card .pc-rar{ font-size:10px; font-weight:700; }
+  .pull-card .pc-badge{ margin-top:6px; font-size:11px; font-weight:700; padding:3px 8px; border-radius:8px; display:inline-block; }
+  .pull-card .pc-badge.new{ background:linear-gradient(135deg,#7c5cff,#b06bff); color:#fff; }
+  .pull-card .pc-badge.up{ background:linear-gradient(135deg,#ffcb3d,#ff9d3d); color:#1b1033; }
+  .pull-card .pc-badge.dust{ background:#4a3a6e; color:#bdb0ff; }
+  .pull-single{ display:flex; justify-content:center; }
+  .pull-single .pull-card{ min-width:200px; padding:20px; }
+  .pull-single .pc-emoji{ font-size:56px; }
+  .pull-single .pc-name{ font-size:18px; }
+  @keyframes fadeSlide{ from{opacity:0;transform:translateY(16px);} to{opacity:1;transform:translateY(0);} }
   /* 装备槽 / 背包 */
   .gear-slots{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:6px; }
   .slot-card{ background:var(--panel); border-radius:12px; padding:8px; }
   .slot-name{ font-size:11px; color:var(--muted); margin-bottom:4px; }
-  .slot-gear{ display:flex; gap:8px; align-items:center; background:var(--panel2); border-radius:10px; padding:6px; }
+  .slot-gear{ display:flex; flex-direction:column; gap:5px; background:var(--panel2); border-radius:10px; padding:8px; }
   .slot-empty{ font-size:12px; color:var(--muted); padding:10px 4px; text-align:center; }
-  .g-emoji{ font-size:26px; }
-  .g-info{ flex:1; min-width:0; }
-  .g-name{ font-size:13px; font-weight:700; }
-  .g-rar{ font-size:10px; }
-  .g-affix{ font-size:10px; color:var(--muted); margin-top:2px; line-height:1.35; }
-  .g-btns{ display:flex; gap:4px; margin-top:6px; flex-wrap:wrap; }
-  .g-btns button{ border:none; border-radius:8px; padding:5px 8px; font-size:11px; font-weight:700; background:var(--panel2); color:var(--text); cursor:pointer; }
-  .g-btns button:active{ transform:scale(.95); }
   .gear-inv{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
-  .gear-card{ display:flex; gap:8px; align-items:center; background:var(--panel); border-radius:12px; padding:8px; }
+  .gear-card{ display:flex; flex-direction:column; gap:5px; background:var(--panel); border-radius:12px; padding:8px; }
+  /* 装备头部：emoji + 名称 + 稀有度 */
+  .g-head{ display:flex; align-items:center; gap:8px; }
+  .g-emoji{ font-size:26px; flex-shrink:0; }
+  .g-name{ font-size:14px; font-weight:700; }
+  .g-rar{ font-size:10px; margin-left:auto; flex-shrink:0; }
+  /* 属性行 */
+  .g-main-affix, .g-sub-affix{ display:flex; align-items:center; gap:6px; font-size:11px; }
+  .ga-label{ color:var(--muted); min-width:40px; flex-shrink:0; }
+  .ga-val{ color:var(--text); font-weight:500; }
+  .ga-val b{ color:var(--gold); }
+  .g-sub-affix .ga-val{ color:var(--muted); font-size:10px; }
+  /* 技能展示 */
+  .g-skill{ display:flex; gap:8px; align-items:flex-start; background:#ffffff08; border-radius:10px; padding:6px 8px; }
+  .gs-icon{ font-size:20px; flex-shrink:0; margin-top:1px; }
+  .gs-info{ display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .gs-name{ font-size:12px; font-weight:700; color:var(--text); }
+  .gs-tag{ font-size:10px; font-weight:700; padding:1px 6px; border-radius:6px; display:inline-block; }
+  .gs-tag.passive{ background:#3a5e3a; color:#90ff90; }
+  .gs-cost{ font-size:10px; color:var(--muted); }
+  .gs-desc{ font-size:10px; color:var(--muted); line-height:1.3; }
+  /* 按钮 */
+  .g-btns{ display:flex; gap:4px; flex-wrap:wrap; }
+  .g-btns button{ border:none; border-radius:8px; padding:5px 8px; font-size:11px; font-weight:700; background:var(--panel); color:var(--text); cursor:pointer; }
+  .g-btns button:active{ transform:scale(.95); }
+  /* 锻造 / 预设 */
   .forge-row{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
   .forge-row .buy{ flex:1; min-width:90px; padding:9px; }
-  .forge-row select{ flex:1; min-width:100px; border-radius:10px; padding:8px; background:var(--panel); color:var(--text); border:1px solid #ffffff20; }
   .preset-row{ display:flex; gap:6px; flex-wrap:wrap; }
   .preset-row button{ border:none; border-radius:9px; padding:7px 10px; font-size:12px; font-weight:700; background:var(--panel); color:var(--text); cursor:pointer; }
   .preset-row button:disabled{ color:#8d7db5; cursor:not-allowed; }
@@ -496,6 +527,15 @@
   </div>
 </div>
 
+<!-- 神器抽取结果弹窗 -->
+<div id="artPullModal" class="overlay" style="display:none">
+  <div class="overlay-box" style="max-width:380px; text-align:center;">
+    <div class="overlay-head"><h2 id="pullModalTitle">✨ 抽取结果</h2><button id="artPullClose" class="ov-close">✕</button></div>
+    <div id="pullModalContent"></div>
+    <button id="artPullConfirm" class="buy" style="width:100%; margin-top:12px; padding:12px; font-size:15px; border-radius:12px;">确定</button>
+  </div>
+</div>
+
 <!-- 装备页 -->
 <div id="gearPage" class="overlay" style="display:none">
   <div class="overlay-box">
@@ -506,10 +546,7 @@
     <div id="gearInv" class="gear-inv"></div>
     <div class="title"><h2>锻造（消耗精华）</h2></div>
     <div class="forge-row">
-      <button id="forgeRandom" class="buy">随机(<span id="forgeCost1"></span>精)</button>
-      <button id="forgeTargeted" class="buy">定向(<span id="forgeCost2"></span>精)</button>
-      <select id="forgeType"></select>
-      <button id="forgePrecise" class="buy">精准(<span id="forgeCost3"></span>精)</button>
+      <button id="forgeRandom" class="buy">随机锻造(<span id="forgeCost1"></span>精)</button>
     </div>
     <div class="title"><h2>预设配装</h2></div>
     <div id="presetRow" class="preset-row"></div>
@@ -696,7 +733,7 @@ const GEAR_CONFIG = {
   gearUnlockStage: 5,
   upgradeBaseCost: 500, upgradeGrowth: 1.20, mainPerLevel: 0.15, subPerLevel: 0.10,
   subValueRange: { min:0.02, max:0.08 },
-  forgeRandomCost: 30, forgeTargetedCost: 80, forgePreciseCost: 200,
+  forgeRandomCost: 30,
   dustPerRarity: { common:2, rare:6, epic:20, legendary:60 },
   breakThroughCost: { "common->rare":10, "rare->epic":30, "epic->legendary":100 },
   swapCooldown: 30, bossDropRate: 0.25, bossCenturyDropRate: 1.0, gearSlotCount: 4,
@@ -2217,6 +2254,12 @@ const AFFIX_LABELS = { tapDmg:"点击伤害", dps:"英雄DPS", global:"全局伤
 function affixLabel(t){ return AFFIX_LABELS[t] || t; }
 function pct(x){ return (x*100).toFixed(1) + "%"; }
 function slotName(s){ return {weapon:"武器",armor:"护甲",ring:"戒指",badge:"勋章"}[s] || s; }
+function gearSkillInfo(g){
+  const def = GEARS.find(d=>d.id===g.id);
+  if(!def||!def.skill) return null;
+  const sk = def.skill;
+  return { emoji:sk.icon||"", name:sk.name, desc:sk.desc||"", passive:!!sk.passive, energyCost:sk.energyCost||0, cooldown:sk.cooldown||0 };
+}
 
 function artLevel(id){
   const a = ARTIFACTS.find(x => x.id === id);
@@ -2343,6 +2386,37 @@ function doUpgradeArtifact(artId){
   if((state.artifacts[artId]||0) > before){ renderArtifactPage(); renderHud(); diffToast("⬆️ 神器升级成功"); }
   else diffToast("⚠ 粉尘不足或已满级");
 }
+function showArtPullModal(results){
+  const modal = document.getElementById("artPullModal"); if(!modal) return;
+  const title = document.getElementById("pullModalTitle");
+  const content = document.getElementById("pullModalContent");
+  if(results.length === 1){
+    if(title) title.textContent = "✨ 神器召唤";
+    const res = results[0], art = res.art, rar = ARTIFACT_RARITY[art.rarity];
+    let badge = "";
+    if(res.type==="new") badge = '<span class="pc-badge new">NEW</span>';
+    else if(res.type==="upgrade") badge = '<span class="pc-badge up">↑ Lv.'+res.newLevel+'</span>';
+    else badge = '<span class="pc-badge dust">粉尘 +'+res.dust+'</span>';
+    if(content) content.innerHTML = '<div class="pull-single"><div class="pull-card" style="border:2px solid '+rar.color+'"><span class="pc-emoji">'+art.emoji+'</span><span class="pc-name">'+art.name+'</span><span class="pc-rar" style="color:'+rar.color+'">'+rar.name+'</span>'+badge+'<div style="font-size:11px;color:var(--muted);margin-top:6px">'+art.desc+'</div></div></div>';
+  } else {
+    if(title) title.textContent = "🎰 十连结果";
+    let h = '<div class="pull-grid">';
+    results.forEach((res,i)=>{
+      const art = res.art, rar = ARTIFACT_RARITY[art.rarity];
+      let badge = "";
+      if(res.type==="new") badge = '<span class="pc-badge new">NEW</span>';
+      else if(res.type==="upgrade") badge = '<span class="pc-badge up">↑ Lv.'+res.newLevel+'</span>';
+      else badge = '<span class="pc-badge dust">粉尘 +'+res.dust+'</span>';
+      h += '<div class="pull-card" style="animation-delay:'+(i*0.06)+'s;border:1px solid '+rar.color+'30"><span class="pc-emoji">'+art.emoji+'</span><span class="pc-name">'+art.name+'</span><span class="pc-rar" style="color:'+rar.color+'">'+rar.name+'</span>'+badge+'</div>';
+    });
+    h += '</div>';
+    if(content) content.innerHTML = h;
+  }
+  modal.style.display = "flex";
+}
+function closeArtPullModal(){
+  const modal = document.getElementById("artPullModal"); if(modal) modal.style.display = "none";
+}
 function doArtifactPull(){
   const cost = artifactPullCost(1);
   if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
@@ -2354,21 +2428,19 @@ function doArtifactPull(){
   state.artifactGuideSeen = true;
   checkAchievements("pull");
   renderArtifactPage(); renderHud();
-  if(res.type==="new") diffToast("✨ 获得神器：" + art.emoji + " " + art.name + "！");
-  else if(res.type==="upgrade") diffToast("⬆️ 神器升级：" + art.emoji + " " + art.name + " → Lv." + res.newLevel);
-  else diffToast("💨 已满级，转粉尘 +" + res.dust);
+  showArtPullModal([res]);
 }
 function doArtifactTenPull(){
   const cost = artifactPullCost(10);
   if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
   state.essence -= cost;
   const results = rollTenPull();
-  for(const art of results) applyArtifactPull(art);
+  const applied = results.map(art=>applyArtifactPull(art));
   state.totalPulls += 10;
   state.artifactGuideSeen = true;
   checkAchievements("pull");
   renderArtifactPage(); renderHud();
-  diffToast("🎰 十连完成！");
+  showArtPullModal(applied);
 }
 // 离线推关（#19 远征令牌）
 function applyOfflineProgression(offlineSeconds){
@@ -2556,19 +2628,13 @@ function salvageGear(invIndex){
   state.gearInventory.splice(invIndex, 1);
   diffToast("♻️ 分解 +"+dust+" 碎片"); renderGearPage(); renderHud();
 }
-function forgeGear(mode, typeId){
-  let cost, def = null;
-  if(mode === "random") cost = GEAR_CONFIG.forgeRandomCost;
-  else if(mode === "targeted"){ cost = GEAR_CONFIG.forgeTargetedCost; def = GEARS.find(g=>g.id===typeId); if(!def){ diffToast("请选择装备类型"); return; } }
-  else if(mode === "precise"){ cost = GEAR_CONFIG.forgePreciseCost; def = GEARS.find(g=>g.id===typeId); if(!def){ diffToast("请选择装备类型"); return; } }
-  else return;
+function forgeGear(){
+  const cost = GEAR_CONFIG.forgeRandomCost;
   if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
   state.essence -= cost; state.totalForgeCount++; state.totalEssenceSpentOnForge += cost;
-  let rarity;
-  if(mode === "precise"){ const r = Math.random(); rarity = r < 0.15 ? "legendary" : r < 0.5 ? "epic" : "rare"; }
-  else { const r = Math.random(); rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common"; }
-  const pool = (mode==="targeted"||mode==="precise") ? GEARS.filter(g=>g.id===typeId) : GEARS;
-  const pick = pool[Math.floor(Math.random()*pool.length)];
+  const r = Math.random();
+  const rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common";
+  const pick = GEARS[Math.floor(Math.random()*GEARS.length)];
   const gear = makeGear(pick, rarity);
   state.gearInventory.push(gear);
   checkAchievements("gear");
@@ -2661,6 +2727,37 @@ function closeGearPage(){ const p = document.getElementById("gearPage"); if(p) p
 function renderGearPage(){
   const page = document.getElementById("gearPage"); if(!page) return;
   const dustEl = document.getElementById("gearDust"); if(dustEl) dustEl.textContent = fmt(state.gearDust);
+  // helper: render a single gear card block (used for both slots and inventory)
+  function gearCardHTML(g, isSlot, slotOrIdx){
+    const rar = GEAR_RARITY[g.rarity];
+    const si = gearSkillInfo(g);
+    let h = '<div class="g-head"><span class="g-emoji">'+g.emoji+'</span><span class="g-name">'+g.name+'</span><span class="g-rar" style="color:'+rar.color+'">'+rar.name+' Lv.'+g.level+'</span></div>';
+    // main affix
+    h += '<div class="g-main-affix"><span class="ga-label">主属性</span><span class="ga-val">'+affixLabel(g.mainAffix)+' <b>+'+pct(affixValue(g,g.mainAffix))+'</b></span></div>';
+    // sub affixes
+    if(g.subAffixes && g.subAffixes.length>0){
+      h += '<div class="g-sub-affix"><span class="ga-label">副属性</span><span class="ga-val">';
+      h += g.subAffixes.map(s=>affixLabel(s.type)+' +'+pct(s.baseValue*(1+GEAR_CONFIG.subPerLevel*(g.level-1))*rarCoeff(g.rarity))).join(' ｜ ');
+      h += '</span></div>';
+    }
+    // skill
+    if(si){
+      h += '<div class="g-skill"><span class="gs-icon">'+si.emoji+'</span><span class="gs-info"><span class="gs-name">'+si.name+'</span>';
+      if(si.passive) h += '<span class="gs-tag passive">被动</span>';
+      else h += '<span class="gs-cost">消耗 '+si.energyCost+' 能 · CD '+si.cooldown+'s</span>';
+      h += '<span class="gs-desc">'+si.desc+'</span></span></div>';
+    }
+    // buttons
+    h += '<div class="g-btns">';
+    if(isSlot){
+      h += '<button data-act="up-slot" data-slot="'+slotOrIdx+'">升级</button><button data-act="bt-slot" data-slot="'+slotOrIdx+'">突破</button><button data-act="unequip" data-slot="'+slotOrIdx+'">卸下</button>';
+    } else {
+      h += '<button data-act="equip" data-i="'+slotOrIdx+'">装备</button><button data-act="up" data-i="'+slotOrIdx+'">升级</button><button data-act="bt" data-i="'+slotOrIdx+'">突破</button><button data-act="salvage" data-i="'+slotOrIdx+'">分解</button>';
+    }
+    h += '</div>';
+    return h;
+  }
+  // equipped slots
   const slots = document.getElementById("gearSlots");
   if(slots){
     let h = "";
@@ -2670,9 +2767,7 @@ function renderGearPage(){
       h += '<div class="slot-card"><div class="slot-name">'+slotName(slot)+'</div>';
       if(g){
         h += '<div class="slot-gear" style="border-left:3px solid '+GEAR_RARITY[g.rarity].color+'">';
-        h += '<div class="g-emoji">'+g.emoji+'</div><div class="g-info"><div class="g-name">'+g.name+' <span class="g-rar" style="color:'+GEAR_RARITY[g.rarity].color+'">'+GEAR_RARITY[g.rarity].name+' Lv.'+g.level+'</span></div>';
-        h += '<div class="g-affix">'+affixLabel(g.mainAffix)+' '+pct(affixValue(g,g.mainAffix))+(g.subAffixes&&g.subAffixes.length?(' ｜ '+g.subAffixes.map(s=>affixLabel(s.type)+' '+pct(s.baseValue*(1+GEAR_CONFIG.subPerLevel*(g.level-1))*rarCoeff(g.rarity))).join('、')):'')+'</div></div>';
-        h += '<div class="g-btns"><button data-act="up-slot" data-slot="'+slot+'">升级</button><button data-act="bt-slot" data-slot="'+slot+'">突破</button><button data-act="unequip" data-slot="'+slot+'">卸下</button></div>';
+        h += gearCardHTML(g, true, slot);
         h += '</div>';
       } else {
         h += '<div class="slot-empty">（空）'+(cd>0?(' 冷却'+Math.ceil(cd)+'s'):'')+'</div>';
@@ -2681,6 +2776,7 @@ function renderGearPage(){
     }
     slots.innerHTML = h;
   }
+  // inventory
   const inv = document.getElementById("gearInv");
   if(inv){
     if(state.gearInventory.length === 0){ inv.innerHTML = '<div class="ach-desc">背包空空如也，去击破 Boss 或锻造吧！</div>'; }
@@ -2688,17 +2784,13 @@ function renderGearPage(){
       let h = "";
       state.gearInventory.forEach((g,i)=>{
         h += '<div class="gear-card" style="border-left:3px solid '+GEAR_RARITY[g.rarity].color+'">';
-        h += '<div class="g-emoji">'+g.emoji+'</div><div class="g-info"><div class="g-name">'+g.name+' <span class="g-rar" style="color:'+GEAR_RARITY[g.rarity].color+'">'+GEAR_RARITY[g.rarity].name+' Lv.'+g.level+'</span></div>';
-        h += '<div class="g-affix">'+affixLabel(g.mainAffix)+' '+pct(affixValue(g,g.mainAffix))+(g.subAffixes&&g.subAffixes.length?(' ｜ '+g.subAffixes.map(s=>affixLabel(s.type)+' '+pct(s.baseValue*(1+GEAR_CONFIG.subPerLevel*(g.level-1))*rarCoeff(g.rarity))).join('、')):'')+'</div></div>';
-        h += '<div class="g-btns"><button data-act="equip" data-i="'+i+'">装备</button><button data-act="up" data-i="'+i+'">升级</button><button data-act="bt" data-i="'+i+'">突破</button><button data-act="salvage" data-i="'+i+'">分解</button></div>';
+        h += gearCardHTML(g, false, i);
         h += '</div>';
       });
       inv.innerHTML = h;
     }
   }
   const fc1 = document.getElementById("forgeCost1"); if(fc1) fc1.textContent = GEAR_CONFIG.forgeRandomCost;
-  const fc2 = document.getElementById("forgeCost2"); if(fc2) fc2.textContent = GEAR_CONFIG.forgeTargetedCost;
-  const fc3 = document.getElementById("forgeCost3"); if(fc3) fc3.textContent = GEAR_CONFIG.forgePreciseCost;
   const pr = document.getElementById("presetRow");
   if(pr){
     let h = "";
@@ -2758,6 +2850,8 @@ function init(){
   document.getElementById("achClose").addEventListener("click", closeAchPage);
   document.getElementById("artPull").addEventListener("click", doArtifactPull);
   document.getElementById("artPull10").addEventListener("click", doArtifactTenPull);
+  document.getElementById("artPullClose").addEventListener("click", closeArtPullModal);
+  document.getElementById("artPullConfirm").addEventListener("click", closeArtPullModal);
   document.getElementById("artList").addEventListener("click", e=>{ const b = e.target.closest("[data-up]"); if(b) doUpgradeArtifact(b.dataset.up); });
   document.getElementById("gearPage").addEventListener("click", e=>{
     const b = e.target.closest("[data-act]"); if(!b) return;
@@ -2772,12 +2866,8 @@ function init(){
     else if(act==="psave") saveGearPreset(parseInt(b.dataset.n,10));
     else if(act==="pload") loadGearPreset(parseInt(b.dataset.n,10));
   });
-  // 锻造类型下拉
-  const ft = document.getElementById("forgeType");
-  if(ft){ GEARS.forEach(g=>{ const o=document.createElement("option"); o.value=g.id; o.textContent=g.emoji+" "+g.name; ft.appendChild(o); }); }
-  document.getElementById("forgeRandom").addEventListener("click", ()=>forgeGear("random"));
-  document.getElementById("forgeTargeted").addEventListener("click", ()=>forgeGear("targeted", document.getElementById("forgeType").value));
-  document.getElementById("forgePrecise").addEventListener("click", ()=>forgeGear("precise", document.getElementById("forgeType").value));
+  // 随机锻造
+  document.getElementById("forgeRandom").addEventListener("click", ()=>forgeGear());
 
   // 加载后补评成就（已有进度者一次性解锁已达标成就）
   checkAchievements("load");

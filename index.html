@@ -400,7 +400,8 @@
   .frame-chip span, .badge span{ display:block; font-size:9px; color:var(--muted); margin-top:2px; }
   #diffToast.ach-unlock{ background:rgba(40,25,70,.95); border:1px solid var(--gold); }
   /* 小开关按钮（行内） */
-  .mini-toggle{ background:var(--panel); border:1px solid #ffffff18; border-radius:18px; padding:5px 14px; font-size:13px; color:var(--text); cursor:pointer; }
+  .mini-toggle{ background:var(--panel); border:1px solid #ffffff18; border-radius:18px; padding:5px 14px; font-size:13px; color:var(--text); cursor:pointer; user-select:none; touch-action:manipulation; position:relative; z-index:5; }
+  .mini-toggle:active{ filter:brightness(.8); }
   /* 点击波纹动画 */
   @keyframes tapRipple{ from{opacity:1;transform:translate(-50%,-50%) scale(0);} to{opacity:0;transform:translate(-50%,-50%) scale(2.5);} }
   .tap-ripple{ position:absolute; width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,.25); pointer-events:none; animation:tapRipple .5s ease-out forwards; }
@@ -490,6 +491,16 @@
     <button id="confirmCancel" class="buy secondary">取消</button>
   </div>
 </div>
+<!-- 错误兜底面板 -->
+<div id="errFallback" class="modal-mask" style="display:none;z-index:99;">
+  <div class="modal" style="text-align:center;">
+    <h3>⚠️ 游戏出错了</h3>
+    <p class="err-msg" style="font-size:12px;color:var(--muted);word-break:break-all;"></p>
+    <p style="font-size:11px;color:var(--muted);margin-top:8px;">游戏已尝试自动恢复。如果仍异常，请刷新页面。<br>存档已自动保存，不会丢失。</p>
+    <button class="buy" style="width:100%;margin-top:8px;" onclick="location.reload()">刷新页面</button>
+    <button class="buy" style="width:100%;margin-top:4px;background:var(--panel);" onclick="document.getElementById('errFallback').style.display='none'">忽略继续</button>
+  </div>
+</div>
 <div class="app">
   <!-- 顶部固定区：数据栏 + 打怪区（滚动时吸顶，方便边升级边打怪） -->
   <div class="topbar">
@@ -572,6 +583,8 @@
   <div style="display:flex;justify-content:center;gap:8px;margin-top:6px;">
     <button id="sfxToggle" class="mini-toggle">🔊</button>
     <button id="notifToggle" class="mini-toggle">📢</button>
+    <button id="exportBtn" class="mini-toggle">📤</button>
+    <button id="importBtn" class="mini-toggle">📥</button>
   </div>
   <details class="tip" id="tipBox" style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.6;">
     <summary style="cursor:pointer;color:var(--text);font-weight:700;">📖 新手提示 (首次可展开)</summary>
@@ -878,7 +891,7 @@ let notifOn = true;
 let _audioCtx = null;
 function _getAudioCtx(){ if(!_audioCtx) try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} return _audioCtx; }
 function playSfx(freq, dur, type){
-  if(!sfxOn) return;
+  if(!sfxOn || state.sfxOn === false) return;
   const ctx = _getAudioCtx(); if(!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -904,7 +917,10 @@ function tapRipple(x,y){
    2) 存档（游戏进度就存在浏览器的 localStorage 里）
    ========================================================================= */
 const SAVE_KEY = "tapHeroSave_v1";
-let state = {
+const SAVE_VERSION = 2;
+function defaultState(){
+  return {
+  version: SAVE_VERSION,
   gold: 0,
   stage: 1,
   tapLevel: 1,
@@ -931,6 +947,8 @@ let state = {
   equippedFrame: "default",// 当前装备头像框ID
   lastSigninDate: "",      // 最后签到日期 YYYY-MM-DD
   dailyStreak: 0,          // 连续签到天数
+  sfxOn: true,
+  notifOn: true,
   // 统计字段（成就检测数据源，只增不减，转生保留）
   totalTaps: 0,
   totalKills: 0,
@@ -975,7 +993,9 @@ let state = {
   everSynergy: false,
   synergySet: {},
   comboAchievesTriggered: {},
-};
+  };
+}
+let state = defaultState();
 
 // 难度自适应相关“运行时”变量（不存档，每次开局重新算）
 let dynGrowth = CONFIG.enemyHpGrowth; // 实际使用的成长系数，会上下浮动
@@ -991,6 +1011,10 @@ function load(){
     if(raw){
       const s = JSON.parse(raw);
       Object.assign(state, s);
+      // 存档版本迁移：用 defaultState 补齐缺失字段
+      const def = defaultState();
+      for(const k in def){ if(state[k]===undefined) state[k] = def[k]; }
+      state.version = SAVE_VERSION;
       for(const h of HEROES){
         if(state.heroes[h.id]===undefined) state.heroes[h.id]=0;
         if(state.awaken[h.id]===undefined) state.awaken[h.id]=0;
@@ -1054,6 +1078,8 @@ function load(){
       if(state.gearPresets===undefined) state.gearPresets=[];
       if(state.autoSalvageRarity===undefined) state.autoSalvageRarity=0;
       if(state.tipSeen===undefined) state.tipSeen=false;
+      if(state.sfxOn===undefined) state.sfxOn=true;
+      if(state.notifOn===undefined) state.notifOn=true;
       if(state.lastSigninDate===undefined) state.lastSigninDate="";
       if(state.dailyStreak===undefined) state.dailyStreak=0;
       if(state.everSynergy===undefined) state.everSynergy=false;
@@ -1083,9 +1109,8 @@ function closeConfirm(){ document.getElementById("confirmModal").style.display =
 function reset(){
   showConfirm("重置存档", "确定清空<b>所有进度</b>吗？此操作<b>不可恢复</b>。", ()=>{
     localStorage.removeItem(SAVE_KEY);
-    state = { gold:0, stage:1, tapLevel:1, heroes:{}, essence:0, awaken:{}, enemyHp:0, monsterIndex:1, dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:Date.now(), prestige:0, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery:0,
-      achievements:{}, equippedTitle:null, equippedFrame:"default", totalTaps:0, totalKills:0, totalBossKills:0, totalBossFails:0, totalGoldEarned:0, totalEssenceEarned:0, totalPrestiges:0, totalPulls:0, bestStageEver:1, totalPlayTime:0, totalEssenceSpentOnForge:0, totalForgeCount:0, totalSkillUses:0, maxComboHit:false, oneShotBossKill:false, offlineMaxed:false, bossFight3Skills:false, comebackAfter10Fails:false, lastPrestigeTime:0, consecutiveCrits:0, sessionTaps:0, bossFightSkillsUsed:{}, gearBuildsCompleted:{}, comboAchievesTriggered:{},
-      artifacts:{}, pityCounter:0, collectionCounter:0, artifactDust:0, artifactGuideSeen:false, gearInventory:[], equipped:{weapon:null,armor:null,ring:null,badge:null}, gearDust:0, gearGuideSeen:false, gearSwapCd:{weapon:0,armor:0,ring:0,badge:0}, gearPresets:[], everSynergy:false, synergySet:{} };
+    state = defaultState();
+    state.lastSeen = Date.now();
     HEROES.forEach(h=>{ state.heroes[h.id]=0; state.awaken[h.id]=0; });
     dynGrowth = state.dynGrowth; oneShotStreak = 0; stuckStreak = 0;
     save(); spawnEnemy(); onStageBegin(); renderAll();
@@ -1535,7 +1560,7 @@ function adaptDifficulty(){
 
 // 难度变化时的轻提示（右上角短暂出现）
 function diffToast(msg){
-  if(!notifOn) return;  // 用户关闭了通知
+  if(!notifOn || state.notifOn === false) return;  // 用户关闭了通知
   const t = document.getElementById("diffToast");
   if(!t) return;
   t.textContent = msg;
@@ -2388,6 +2413,8 @@ function doPrestige(){
     gearPresets: state.gearPresets||[],
     autoSalvageRarity: state.autoSalvageRarity||0,
     tipSeen: state.tipSeen||false,
+    sfxOn: state.sfxOn!==false,
+    notifOn: state.notifOn!==false,
     lastSigninDate: state.lastSigninDate||"",
     dailyStreak: state.dailyStreak||0,
     everSynergy: state.everSynergy||false,
@@ -2408,35 +2435,39 @@ function doPrestige(){
    ========================================================================= */
 let lastT = performance.now();
 function loop(now){
-  const dt = Math.min(0.1, (now - lastT)/1000); // 秒，最多按0.1秒算，防卡顿跳变
+  try{
+  const dt = Math.min(0.1, (now - lastT)/1000);
   lastT = now;
-  // 主动技能：能量回复 + 激活/冷却倒计时
   state.energy = Math.min(energyCap(), state.energy + CONFIG.energyRegen * dt);
   for(const id of GEAR_SKILL_IDS){
     if(state.skillActive[id] > 0) state.skillActive[id] = Math.max(0, state.skillActive[id] - dt);
     if(state.skillCd[id] > 0) state.skillCd[id] = Math.max(0, state.skillCd[id] - dt);
   }
-  // 换装冷却递减（v1.1）
   for(const slot in state.gearSwapCd){ if(state.gearSwapCd[slot] > 0) state.gearSwapCd[slot] = Math.max(0, state.gearSwapCd[slot] - dt); }
-  // 连击衰减：停手超过 comboDecay 秒则清零
   if(state.combo > 0 && (state.skillActive.combo_storm||0) <= 0){
     state.comboTimer += dt;
     if(state.comboTimer >= CONFIG.comboDecay){ state.combo = 0; renderCombo(); }
   }
   const dps = totalDps();
-  if(dps > 0) dealDamage(dps * dt);   // 英雄DPS持续打；本帧若击杀Boss会直接进下一关
-  // Boss 限时：仅 Boss 关倒计时；若本帧已击杀Boss则 state.stage 已不是Boss，不触发超时
+  if(dps > 0) dealDamage(dps * dt);
   if(isBoss(state.stage)){
     bossTimeLeft -= dt;
     if(bossTimeLeft <= 0) bossTimeout();
   }
-  autoShotTick();   // 守护戒指被动：满能量自动释放最低能耗技能（v1.1）
-  // 在线时长统计（成就统计用）
+  autoShotTick();
   state._loopAccum = (state._loopAccum||0) + dt;
   if(state._loopAccum >= 5){ state.totalPlayTime += 5; state._loopAccum -= 5; }
   renderHud(); renderEnemy(); renderShop(); renderSkills();
+  }catch(e){ console.error("游戏循环出错:", e); }
   requestAnimationFrame(loop);
 }
+// 全局错误兜底
+window.onerror = function(msg, url, line, col, err){
+  console.error("全局错误:", msg, "行:", line);
+  const f = document.getElementById("errFallback");
+  if(f){ f.style.display = "flex"; f.querySelector(".err-msg").textContent = msg; }
+  return false;
+};
 
 /* =========================================================================
    8) 启动
@@ -3118,8 +3149,33 @@ function shareStats(){
   const text = "🎮 Tap Hero · 最高第"+ (state.bestStageEver||state.bestStage||1) +"关 · 转生×"+ prestigeMult().toFixed(2) +" · 成就"+achCount+"/50"+artLine+gearLine+" · https://hanekiba.github.io/tap-hero/";
   navigator.clipboard.writeText(text).then(()=>diffToast("📋 已复制战绩！"));
 }
+function exportSave(){
+  try{
+    const data = btoa(unescape(encodeURIComponent(JSON.stringify(state))));
+    navigator.clipboard.writeText(data).then(()=>diffToast("📤 存档已复制到剪贴板！"));
+  }catch(e){ diffToast("导出失败：" + e.message); }
+}
+function importSave(){
+  showConfirm("导入存档", '请在下方粘贴存档码：<br><textarea id="importArea" style="width:100%;height:80px;font-size:10px;background:#160c2b;color:#fff;border:1px solid #ffffff20;border-radius:8px;padding:6px;" placeholder="粘贴存档码..."></textarea>', ()=>{
+    const area = document.getElementById("importArea");
+    if(!area || !area.value.trim()){ diffToast("⚠ 未输入存档码"); return; }
+    try{
+      const s = JSON.parse(decodeURIComponent(escape(atob(area.value.trim()))));
+      state = Object.assign(defaultState(), s);
+      state.version = SAVE_VERSION;
+      HEROES.forEach(h=>{ if(state.heroes[h.id]===undefined) state.heroes[h.id]=0; if(state.awaken[h.id]===undefined) state.awaken[h.id]=0; });
+      dynGrowth = state.dynGrowth || CONFIG.enemyHpGrowth;
+      save(); spawnEnemy(); onStageBegin(); renderAll();
+      diffToast("📥 存档导入成功！");
+    }catch(e){ diffToast("⚠ 存档码无效：" + e.message); }
+  });
+}
 function init(){
   load();
+  // 恢复开关状态
+  sfxOn = (state.sfxOn !== false); notifOn = (state.notifOn !== false);
+  const sfxBtn = document.getElementById("sfxToggle"); if(sfxBtn) sfxBtn.textContent = sfxOn ? "🔊" : "🔇";
+  const nfBtn = document.getElementById("notifToggle"); if(nfBtn) nfBtn.textContent = notifOn ? "📢" : "🔕";
   // 确保英雄等级字段齐全
   HEROES.forEach(h=>{ if(state.heroes[h.id]===undefined) state.heroes[h.id]=0; if(state.awaken[h.id]===undefined) state.awaken[h.id]=0; });
   dynGrowth = state.dynGrowth !== undefined ? state.dynGrowth : CONFIG.enemyHpGrowth;
@@ -3178,8 +3234,10 @@ function init(){
   document.getElementById("gearClose").addEventListener("click", closeGearPage);
   document.getElementById("achBtn").addEventListener("click", openAchPage);
   document.getElementById("achClose").addEventListener("click", closeAchPage);
-  document.getElementById("sfxToggle").addEventListener("click", ()=>{ sfxOn=!sfxOn; document.getElementById("sfxToggle").textContent=sfxOn?"🔊":"🔇"; });
-  document.getElementById("notifToggle").addEventListener("click", ()=>{ notifOn=!notifOn; document.getElementById("notifToggle").textContent=notifOn?"📢":"🔕"; });
+  document.getElementById("sfxToggle").addEventListener("click", ()=>{ sfxOn=!sfxOn; state.sfxOn=sfxOn; document.getElementById("sfxToggle").textContent=sfxOn?"🔊":"🔇"; save(); });
+  document.getElementById("notifToggle").addEventListener("click", ()=>{ notifOn=!notifOn; state.notifOn=notifOn; document.getElementById("notifToggle").textContent=notifOn?"📢":"🔕"; save(); });
+  document.getElementById("exportBtn").addEventListener("click", exportSave);
+  document.getElementById("importBtn").addEventListener("click", importSave);
   document.getElementById("shareBtn").addEventListener("click", openHall);
   document.getElementById("hallClose").addEventListener("click", ()=>document.getElementById("hallModal").style.display="none");
   document.getElementById("hallShareBtn").addEventListener("click", shareStats);

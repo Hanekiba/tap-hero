@@ -400,20 +400,27 @@
   #diffToast.ach-unlock{ background:rgba(40,25,70,.95); border:1px solid var(--gold); }
   /* 自适应分辨率 */
   @media(max-width:480px){
-    .app{ max-width:100vw; padding:0 6px; }
-    .hud{ grid-template-columns:repeat(3,1fr); gap:4px; }
-    .hud .box{ padding:6px 4px; }
-    .hud .box .v{ font-size:14px; }
-    .stage{ padding:14px 10px; }
-    .enemy-name{ font-size:14px; }
+    .app{ max-width:100vw; padding:0 4px; }
+    .hud{ gap:3px; }
+    .hud .box{ padding:5px 3px; }
+    .hud .box .k{ font-size:9px; }
+    .hud .box .v{ font-size:13px; }
+    .stage{ padding:8px; margin-bottom:6px; border-radius:14px; }
+    .tap-zone{ height:120px; }
+    .enemy{ font-size:60px; }
+    .hpbar{ height:12px; margin-top:4px; }
+    .hptext{ font-size:10px; margin-top:2px; }
+    .enemy-name{ font-size:12px; margin-bottom:3px; }
+    .pips{ margin:2px 0; }
+    .pips .pip{ width:7px; height:7px; }
+    .boss-timer{ height:16px; margin-top:4px; }
+    .boss-timer-text{ font-size:10px; }
     .list{ grid-template-columns:1fr; }
-    .skills{ grid-template-columns:1fr; }
+    .skills{ grid-template-columns:1fr 1fr; }
     .buy-amount{ flex-wrap:wrap; }
     .overlay-box{ padding:10px 8px 16px; }
     .gear-slots{ grid-template-columns:1fr; }
-  }
-  @media(min-width:800px){
-    .app{ max-width:520px; }
+    .ach-list{ grid-template-columns:1fr; }
   }
 </style>
 </head>

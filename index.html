@@ -344,6 +344,7 @@
   .preset-row{ display:flex; gap:6px; flex-wrap:wrap; }
   .preset-row button{ border:none; border-radius:9px; padding:7px 10px; font-size:12px; font-weight:700; background:var(--panel); color:var(--text); cursor:pointer; }
   .preset-row button:disabled{ color:#8d7db5; cursor:not-allowed; }
+  .preset-row button.as-active{ background:var(--gold); color:#1b1033; border-color:var(--gold); }
   .synergy-hint{ background:linear-gradient(135deg,#3a2a5e,#2a3a6e); }
   /* 成就页（复用已有 class 名，补全样式） */
   .ach-topbar{ font-size:12px; color:var(--muted); margin-bottom:8px; }
@@ -470,6 +471,7 @@
       <button data-amt="1" class="active">×1</button>
       <button data-amt="10">×10</button>
       <button data-amt="100">×100</button>
+      <button data-amt="round">×取整</button>
       <button data-amt="max">最大</button>
     </div>
   </div>
@@ -547,6 +549,14 @@
     <div class="title"><h2>锻造（消耗精华）</h2></div>
     <div class="forge-row">
       <button id="forgeRandom" class="buy">随机锻造(<span id="forgeCost1"></span>精)</button>
+    </div>
+    <div class="title"><h2>自动分解</h2></div>
+    <div id="autoSalvageBar" class="preset-row" style="margin-bottom:6px;">
+      <button data-as="0" class="as-active">关</button>
+      <button data-as="1">普通</button>
+      <button data-as="2">稀有</button>
+      <button data-as="3">史诗</button>
+      <button data-as="4">传说</button>
     </div>
     <div class="title"><h2>预设配装</h2></div>
     <div id="presetRow" class="preset-row"></div>
@@ -724,10 +734,10 @@ const GEARS = [
     mainAffix:"global", skill:{name:"连击风暴",icon:"🌪️",energyCost:35,duration:6,cooldown:45, desc:"连击锁满且不衰减，持续6秒"}, school:"tap" },
 ];
 const GEAR_RARITY = {
-  common:    { name:"普通", color:"#9aa0b5", dropRate:0.45, mainCoeff:1.0, subCount:0, upgradeMult:1, maxLevel:10 },
-  rare:      { name:"稀有", color:"#4a9eff", dropRate:0.35, mainCoeff:1.5, subCount:1, upgradeMult:2, maxLevel:15 },
-  epic:      { name:"史诗", color:"#b06bff", dropRate:0.15, mainCoeff:2.2, subCount:2, upgradeMult:4, maxLevel:20 },
-  legendary: { name:"传说", color:"#ffcb3d", dropRate:0.05, mainCoeff:3.5, subCount:2, upgradeMult:8, maxLevel:25 },
+  common:    { name:"普通", color:"#9aa0b5", dropRate:0.45, mainCoeff:1.0, subCount:0, upgradeMult:1, maxLevel:10, rank:1 },
+  rare:      { name:"稀有", color:"#4a9eff", dropRate:0.35, mainCoeff:1.5, subCount:1, upgradeMult:2, maxLevel:15, rank:2 },
+  epic:      { name:"史诗", color:"#b06bff", dropRate:0.15, mainCoeff:2.2, subCount:2, upgradeMult:4, maxLevel:20, rank:3 },
+  legendary: { name:"传说", color:"#ffcb3d", dropRate:0.05, mainCoeff:3.5, subCount:2, upgradeMult:8, maxLevel:25, rank:4 },
 };
 const GEAR_CONFIG = {
   gearUnlockStage: 5,
@@ -831,6 +841,7 @@ let state = {
   gearGuideSeen: false,
   gearSwapCd: { weapon:0, armor:0, ring:0, badge:0 },
   gearPresets: [],
+  autoSalvageRarity: 0,  // 0=关, 1=普通, 2=稀有, 3=史诗, 4=传说
   // ===== 连携/流派追踪（转生保留）=====
   everSynergy: false,
   synergySet: {},
@@ -912,6 +923,7 @@ function load(){
       if(state.gearGuideSeen===undefined) state.gearGuideSeen=false;
       if(state.gearSwapCd===undefined) state.gearSwapCd={weapon:0,armor:0,ring:0,badge:0};
       if(state.gearPresets===undefined) state.gearPresets=[];
+      if(state.autoSalvageRarity===undefined) state.autoSalvageRarity=0;
       if(state.everSynergy===undefined) state.everSynergy=false;
       if(state.synergySet===undefined) state.synergySet={};
       // bestStageEver 不低于当前 bestStage
@@ -1568,6 +1580,10 @@ function renderHud(){
   if(buyAmount === "max"){
     const m = maxAffordable(CONFIG.tapCostBase, CONFIG.tapCostGrowth, tapLv, state.gold);
     tapN = m.count; tapCost = m.cost; tapAfford = tapN >= 1;
+  } else if(buyAmount === "round"){
+    tapN = Math.ceil((state.tapLevel+1)/10)*10 - state.tapLevel;
+    tapCost = costForN(CONFIG.tapCostBase, CONFIG.tapCostGrowth, tapLv, tapN);
+    tapAfford = state.gold >= tapCost;
   } else {
     tapN = buyAmount;
     tapCost = costForN(CONFIG.tapCostBase, CONFIG.tapCostGrowth, tapLv, tapN);
@@ -1575,7 +1591,7 @@ function renderHud(){
   }
   document.getElementById("tapCost").textContent = fmt(tapCost) + " 金";
   document.getElementById("buyTap").disabled = !tapAfford;
-  document.getElementById("buyTap").firstChild.textContent = "升级" + (buyAmount===1 ? "" : (buyAmount==="max" ? " ×最大" : " ×"+tapN));
+  document.getElementById("buyTap").firstChild.textContent = "升级" + (buyAmount===1 ? "" : (buyAmount==="max" ? " ×最大" : buyAmount==="round" ? " ×取整" : " ×"+tapN));
   // 本次升级可提升的每次点击战力（含转生与军团共鸣倍率）——设计点：与英雄卡一致，明确显示可提升的战力
   const tapMult = prestigeMult() * awakenGlobalMult();
   document.getElementById("tapPower").textContent = tapN>=1
@@ -1706,6 +1722,10 @@ function renderShop(){
     if(buyAmount === "max"){
       const m = maxAffordable(h.baseCost, h.growth, lv, state.gold);
       buyN = m.count; buyCost = m.cost; buyAfford = buyN >= 1;
+    } else if(buyAmount === "round"){
+      buyN = Math.ceil((lv+1)/10)*10 - lv;
+      buyCost = costForN(h.baseCost, h.growth, lv, buyN);
+      buyAfford = state.gold >= buyCost;
     } else {
       buyN = buyAmount;
       buyCost = costForN(h.baseCost, h.growth, lv, buyN);
@@ -1721,7 +1741,7 @@ function renderShop(){
       : "金币不足，无法购买";
     ref.cost.textContent = fmt(buyCost) + " 金";
     ref.btn.disabled = !buyAfford;
-    ref.btn.firstChild.textContent = (lv>0 ? "升级" : "雇佣") + (buyAmount===1 ? "" : (buyAmount==="max" ? " ×最大" : " ×"+buyN));
+    ref.btn.firstChild.textContent = (lv>0 ? "升级" : "雇佣") + (buyAmount===1 ? "" : (buyAmount==="max" ? " ×最大" : buyAmount==="round" ? " ×取整" : " ×"+buyN));
     // 觉醒按钮：需先雇佣；消耗精华，为【全队】永久加伤（军团共鸣）
     const aCost = awakenCost(h);
     ref.essence.textContent = fmt(aCost) + " 精";
@@ -2039,9 +2059,10 @@ function renderAchCards(){
    ========================================================================= */
 function buyTap(){
   const lv = state.tapLevel - 1;   // 点击升级的成本基准（与 tapUpgradeCost 对齐）
-  const n = buyAmount === "max"
-    ? maxAffordable(CONFIG.tapCostBase, CONFIG.tapCostGrowth, lv, state.gold).count
-    : buyAmount;
+  let n;
+  if(buyAmount === "max") n = maxAffordable(CONFIG.tapCostBase, CONFIG.tapCostGrowth, lv, state.gold).count;
+  else if(buyAmount === "round"){ const target = Math.ceil((state.tapLevel+1)/10)*10; n = target - state.tapLevel; }
+  else n = buyAmount;
   if(n <= 0) return;
   // 逐级扣费，避免批量时金币计算偏差
   let spent = 0, bought = 0;
@@ -2057,9 +2078,10 @@ function buyTap(){
 }
 function buyHero(h){
   const lv = state.heroes[h.id] || 0;
-  const n = buyAmount === "max"
-    ? maxAffordable(h.baseCost, h.growth, lv, state.gold).count
-    : buyAmount;
+  let n;
+  if(buyAmount === "max") n = maxAffordable(h.baseCost, h.growth, lv, state.gold).count;
+  else if(buyAmount === "round"){ const target = Math.ceil((lv+1)/10)*10; n = target - lv; }
+  else n = buyAmount;
   if(n <= 0) return;
   // 逐级扣费，避免批量时金币计算偏差
   let spent = 0, bought = 0;
@@ -2196,6 +2218,7 @@ function doPrestige(){
     gearGuideSeen: state.gearGuideSeen||false,
     gearSwapCd: state.gearSwapCd||{weapon:0,armor:0,ring:0,badge:0},
     gearPresets: state.gearPresets||[],
+    autoSalvageRarity: state.autoSalvageRarity||0,
     everSynergy: state.everSynergy||false,
     synergySet: state.synergySet||{},
   };
@@ -2556,6 +2579,10 @@ function dropEquipment(){
   if(state.stage % 100 === 0) rate = GEAR_CONFIG.bossCenturyDropRate;   // 世纪 Boss 必掉
   if(Math.random() > rate) return;
   const gear = rollGear();
+  if(autoSalvageGear(gear)){
+    diffToast("♻️ 自动分解：" + gear.emoji + gear.name + "（" + GEAR_RARITY[gear.rarity].name + "）");
+    return;
+  }
   state.gearInventory.push(gear);
   checkAchievements("gear");
   diffToast("🎁 掉落装备：" + gear.emoji + gear.name + "（" + GEAR_RARITY[gear.rarity].name + "）");
@@ -2628,6 +2655,18 @@ function salvageGear(invIndex){
   state.gearInventory.splice(invIndex, 1);
   diffToast("♻️ 分解 +"+dust+" 碎片"); renderGearPage(); renderHud();
 }
+function autoSalvageGear(gear){
+  // 根据 autoSalvageRarity 自动分解。rank: common=1, rare=2, epic=3, legendary=4
+  const th = state.autoSalvageRarity || 0;
+  if(th <= 0) return false;
+  const rank = GEAR_RARITY[gear.rarity] ? GEAR_RARITY[gear.rarity].rank : 0;
+  if(rank <= th){
+    const dust = GEAR_CONFIG.dustPerRarity[gear.rarity] || 2;
+    state.gearDust += dust;
+    return true;  // 调用方决定是否 toast
+  }
+  return false;
+}
 function forgeGear(){
   const cost = GEAR_CONFIG.forgeRandomCost;
   if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
@@ -2636,6 +2675,11 @@ function forgeGear(){
   const rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common";
   const pick = GEARS[Math.floor(Math.random()*GEARS.length)];
   const gear = makeGear(pick, rarity);
+  if(autoSalvageGear(gear)){
+    diffToast("♻️ 自动分解：" + gear.emoji + gear.name + "（" + GEAR_RARITY[rarity].name + "）");
+    renderGearPage(); renderHud();
+    return;
+  }
   state.gearInventory.push(gear);
   checkAchievements("gear");
   diffToast("🔨 锻造出：" + gear.emoji + gear.name + "（" + GEAR_RARITY[rarity].name + "）");
@@ -2791,6 +2835,9 @@ function renderGearPage(){
     }
   }
   const fc1 = document.getElementById("forgeCost1"); if(fc1) fc1.textContent = GEAR_CONFIG.forgeRandomCost;
+  // 刷新自动分解品阶高亮
+  const asBar = document.getElementById("autoSalvageBar");
+  if(asBar){ asBar.querySelectorAll("button").forEach(b=>{ const v=parseInt(b.dataset.as,10); b.classList.toggle("as-active", v===state.autoSalvageRarity); }); }
   const pr = document.getElementById("presetRow");
   if(pr){
     let h = "";
@@ -2824,7 +2871,7 @@ function init(){
   const opts = document.getElementById("buyAmountOpts");
   opts.querySelectorAll("button").forEach(b=>{
     b.addEventListener("click", ()=>{
-      buyAmount = b.dataset.amt === "max" ? "max" : parseInt(b.dataset.amt, 10);
+      buyAmount = b.dataset.amt === "max" ? "max" : b.dataset.amt === "round" ? "round" : parseInt(b.dataset.amt, 10);
       opts.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
       b.classList.add("active");
       renderShop(); renderHud();   // 立即按新数量刷新花费显示
@@ -2868,6 +2915,13 @@ function init(){
   });
   // 随机锻造
   document.getElementById("forgeRandom").addEventListener("click", ()=>forgeGear());
+  // 自动分解品阶选择
+  document.getElementById("autoSalvageBar").addEventListener("click", e=>{
+    const b = e.target.closest("[data-as]"); if(!b) return;
+    const val = parseInt(b.dataset.as, 10);
+    state.autoSalvageRarity = val;
+    renderGearPage();
+  });
 
   // 加载后补评成就（已有进度者一次性解锁已达标成就）
   checkAchievements("load");

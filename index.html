@@ -552,12 +552,12 @@
     </div>
     <div class="title"><h2>自动分解</h2></div>
     <div id="autoSalvageBar" class="preset-row" style="margin-bottom:6px;">
-      <button data-as="0" class="as-active">关</button>
       <button data-as="1">普通</button>
       <button data-as="2">稀有</button>
       <button data-as="3">史诗</button>
       <button data-as="4">传说</button>
     </div>
+    <button id="salvageNowBtn" class="buy" style="width:100%;padding:9px;margin-bottom:6px;border-radius:10px;">⚡ 立即分解选中品阶</button>
     <div class="title"><h2>预设配装</h2></div>
     <div id="presetRow" class="preset-row"></div>
   </div>
@@ -2656,16 +2656,27 @@ function salvageGear(invIndex){
   diffToast("♻️ 分解 +"+dust+" 碎片"); renderGearPage(); renderHud();
 }
 function autoSalvageGear(gear){
-  // 根据 autoSalvageRarity 自动分解。rank: common=1, rare=2, epic=3, legendary=4
-  const th = state.autoSalvageRarity || 0;
-  if(th <= 0) return false;
+  // 位掩码：bit 1=普通, bit 2=稀有, bit 3=史诗, bit 4=传说
+  const mask = state.autoSalvageRarity || 0;
+  if(mask <= 0) return false;
   const rank = GEAR_RARITY[gear.rarity] ? GEAR_RARITY[gear.rarity].rank : 0;
-  if(rank <= th){
+  if(rank > 0 && (mask & (1 << (rank-1)))){
     const dust = GEAR_CONFIG.dustPerRarity[gear.rarity] || 2;
     state.gearDust += dust;
-    return true;  // 调用方决定是否 toast
+    return true;
   }
   return false;
+}
+function salvageNow(){
+  // 遍历背包，分解所有匹配品阶的装备
+  let total = 0;
+  for(let i = state.gearInventory.length-1; i >= 0; i--){
+    const gear = state.gearInventory[i];
+    if(autoSalvageGear(gear)){ state.gearInventory.splice(i, 1); total++; }
+  }
+  if(total > 0) diffToast("♻️ 批量分解 "+total+" 件装备");
+  else diffToast("ℹ️ 没有匹配品阶的装备");
+  renderGearPage(); renderHud();
 }
 function forgeGear(){
   const cost = GEAR_CONFIG.forgeRandomCost;
@@ -2837,7 +2848,7 @@ function renderGearPage(){
   const fc1 = document.getElementById("forgeCost1"); if(fc1) fc1.textContent = GEAR_CONFIG.forgeRandomCost;
   // 刷新自动分解品阶高亮
   const asBar = document.getElementById("autoSalvageBar");
-  if(asBar){ asBar.querySelectorAll("button").forEach(b=>{ const v=parseInt(b.dataset.as,10); b.classList.toggle("as-active", v===state.autoSalvageRarity); }); }
+  if(asBar){ asBar.querySelectorAll("button").forEach(b=>{ const rank=parseInt(b.dataset.as,10); const bit=1<<(rank-1); b.classList.toggle("as-active", !!( (state.autoSalvageRarity||0) & bit )); }); }
   const pr = document.getElementById("presetRow");
   if(pr){
     let h = "";
@@ -2915,13 +2926,15 @@ function init(){
   });
   // 随机锻造
   document.getElementById("forgeRandom").addEventListener("click", ()=>forgeGear());
-  // 自动分解品阶选择
+  // 自动分解品阶选择（复选，位掩码）
   document.getElementById("autoSalvageBar").addEventListener("click", e=>{
     const b = e.target.closest("[data-as]"); if(!b) return;
-    const val = parseInt(b.dataset.as, 10);
-    state.autoSalvageRarity = val;
+    const rank = parseInt(b.dataset.as, 10);
+    const bit = 1 << (rank-1);
+    state.autoSalvageRarity = (state.autoSalvageRarity||0) ^ bit;  // toggle
     renderGearPage();
   });
+  document.getElementById("salvageNowBtn").addEventListener("click", salvageNow);
 
   // 加载后补评成就（已有进度者一次性解锁已达标成就）
   checkAchievements("load");

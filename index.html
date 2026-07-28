@@ -85,7 +85,7 @@
   .hptext{font-size:12px; color:var(--muted); margin-top:4px;}
 
   /* 难度自适应提示（右上角短暂出现） */
-  #diffToast{position:fixed; top:12px; right:12px; z-index:50;
+  #diffToast{position:fixed; top:12px; right:12px; z-index:70;
     background:rgba(20,12,35,.9); color:#fff; padding:8px 14px; border-radius:10px;
     font-size:13px; box-shadow:0 4px 14px rgba(0,0,0,.35);
     opacity:0; transform:translateY(-8px); transition:opacity .25s, transform .25s;
@@ -633,7 +633,7 @@ const CONFIG = {
 
   // 转生/重生（Prestige）：后期纵向目标——重置本局换取永久伤害加成，打破难度天花板
   prestigeUnlockStage: 100,  // 达到(本局最高)第几关才解锁转生（50→100，拉长前期、避免过早转生）
-  prestigeDivisor: 5,        // 点数公式分母：floor((bestStage/5)^1.5)
+  prestigeDivisor: 3,        // 点数公式分母：floor((bestStage/3)^1.5)
   prestigePerPoint: 0.1,     // 每点重生点数 +10% 永久伤害（tap 与英雄 DPS 都乘）
 
   // 英雄觉醒 · 军团共鸣（重新设计，替代旧版套利觉醒）
@@ -1441,7 +1441,7 @@ function diffToast(msg){
   t.textContent = msg;
   t.classList.add("show");
   clearTimeout(diffToast._t);
-  diffToast._t = setTimeout(()=>t.classList.remove("show"), 1600);
+  diffToast._t = setTimeout(()=>t.classList.remove("show"), 2500);
 }
 
 // Boss 限时失败：不调低成长难度，退回上一小怪关卡重新练级再来（不丢金币/英雄）
@@ -2735,7 +2735,7 @@ function salvageNow(){
 }
 function forgeGear(){
   const cost = GEAR_CONFIG.forgeRandomCost;
-  if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); return; }
+  if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); const fb=document.getElementById("forgeRandom"); if(fb){ fb.style.transition="none"; fb.style.background="#5a1a2a"; setTimeout(()=>{ fb.style.transition="background .5s"; fb.style.background=""; }, 50); } return; }
   state.essence -= cost; state.totalForgeCount++; state.totalEssenceSpentOnForge += cost;
   const r = Math.random();
   const rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common";

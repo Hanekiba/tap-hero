@@ -462,6 +462,15 @@
     <button id="signinClaim" class="buy" style="width:100%;margin-top:8px;">签到领取</button>
   </div>
 </div>
+<!-- 名人堂 + 分享 -->
+<div id="hallModal" class="modal-mask" style="display:none">
+  <div class="modal" style="text-align:center;">
+    <h3>🏅 个人名人堂</h3>
+    <div id="hallStats" style="display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;text-align:left;font-size:13px;margin:8px 0;"></div>
+    <button id="hallShareBtn" class="buy" style="width:100%;margin-top:8px;">📋 复制战绩到剪贴板</button>
+    <button id="hallClose" class="buy" style="width:100%;margin-top:4px;background:var(--panel);">关闭</button>
+  </div>
+</div>
 <div id="prestigeModal" class="modal-mask" style="display:none">
   <div class="modal">
     <h3 id="prestigeTitle">🌟 转生</h3>
@@ -557,6 +566,7 @@
     <button id="artifactBtn">✨ 神器</button>
     <button id="gearBtn">🛡️ 装备</button>
     <button id="achBtn">🏆 成就</button>
+    <button id="shareBtn">📋 分享</button>
   </div>
   <button id="sfxToggle">🔊</button>
   </div>
@@ -3043,6 +3053,28 @@ function checkDailySignin(){
   };
   document.getElementById("signinModal").style.display = "flex";
 }
+function openHall(){
+  const owned = ARTIFACTS.filter(a=>(state.artifacts[a.id]||0)>0).length;
+  const achCount = Object.keys(state.achievements||{}).length;
+  const rows = [
+    ["最高关卡", state.bestStageEver || state.bestStage || 1],
+    ["转生点数", state.prestige || 0],
+    ["转生倍率", "×"+prestigeMult().toFixed(2)],
+    ["神器图鉴", owned+"/21"],
+    ["成就解锁", achCount+"/50"],
+    ["连续签到", state.dailyStreak||0],
+    ["总点击", fmt(state.totalTaps||0)],
+    ["总击杀", fmt(state.totalKills||0)],
+  ];
+  document.getElementById("hallStats").innerHTML = rows.map(([k,v])=>'<div style="color:var(--muted)">'+k+'</div><div style="font-weight:700">'+v+'</div>').join("");
+  document.getElementById("hallModal").style.display = "flex";
+}
+function shareStats(){
+  const owned = ARTIFACTS.filter(a=>(state.artifacts[a.id]||0)>0).length;
+  const achCount = Object.keys(state.achievements||{}).length;
+  const text = "🎮 Tap Hero · 最高第"+ (state.bestStageEver||state.bestStage||1) +"关 · 转生×"+ prestigeMult().toFixed(2) +" · 神器"+owned+"/21 · 成就"+achCount+"/50 · https://hanekiba.github.io/tap-hero/";
+  navigator.clipboard.writeText(text).then(()=>diffToast("📋 已复制战绩！"));
+}
 function init(){
   load();
   // 确保英雄等级字段齐全
@@ -3096,6 +3128,9 @@ function init(){
   document.getElementById("achBtn").addEventListener("click", openAchPage);
   document.getElementById("achClose").addEventListener("click", closeAchPage);
   document.getElementById("sfxToggle").addEventListener("click", ()=>{ sfxOn=!sfxOn; document.getElementById("sfxToggle").textContent=sfxOn?"🔊":"🔇"; });
+  document.getElementById("shareBtn").addEventListener("click", openHall);
+  document.getElementById("hallClose").addEventListener("click", ()=>document.getElementById("hallModal").style.display="none");
+  document.getElementById("hallShareBtn").addEventListener("click", shareStats);
   document.getElementById("artPull").addEventListener("click", doArtifactPull);
   document.getElementById("artPull10").addEventListener("click", doArtifactTenPull);
   document.getElementById("artPullClose").addEventListener("click", closeArtPullModal);

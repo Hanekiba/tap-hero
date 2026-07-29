@@ -1543,10 +1543,7 @@ function bossEssenceGain(stage){ return Math.max(1, Math.floor(stage / CONFIG.bo
 /* 数字美化：1234 -> 1.2K，1234567 -> 1.2M */
 function fmt(n){
   if(n < 1000) return Math.floor(n).toString();
-  const units = ["K","M","B","T","aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am","an","ao","ap","aq","ar","as","at","au","av","aw"];
-  let u = -1;
-  while(n >= 1000 && u < units.length-1){ n/=1000; u++; }
-  return n.toFixed(2).replace(/\.?0+$/,"") + units[u];
+  return n.toExponential(2);
 }
 
 /* =========================================================================

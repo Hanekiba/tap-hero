@@ -2481,22 +2481,29 @@ function loop(now){
   }
   const dps = totalDps();
   if(dps > 0) dealDamage(dps * dt);
-  // 暴怒连打：持续期间每秒自动点击 tapSpeed 次（含连击累积 + 暴击抢杀）
+  // 暴怒连打：每帧批量模拟真实点击——走 tapDamage() 同公式，合并伤害，逐帧累连击
   if((state.skillActive.rage_combo||0) > 0){
     const def = GEARS.find(g => g.skillId === "rage_combo");
     const speed = def && def.skill.tapSpeed ? def.skill.tapSpeed : 8;
-    const taps = speed * dt; // 连续值，每帧可能 <1 次
+    const taps = speed * dt;
     if(taps > 0){
-      const critActive = (state.skillActive.deadly_crit||0) > 0;
-      const critExecute = activeSynergies().find(s => s.id === "crit_execute");
-      const dmg = tapDamage();
+      // 伤害：同 onTap 公式（含暴击判定）
+      let dmg = tapDamage();
+      const cc = CONFIG.critChance + gearCritChance();
       const cm = CONFIG.critMult + gearCritMult() + artCritMult();
-      dealDamage((critActive && critExecute) ? (dmg * cm * taps) : (dmg * taps));
+      const critExecute = activeSynergies().find(s => s.id === "crit_execute");
+      let crit = (critExecute && (state.skillActive.deadly_crit||0) > 0) || Math.random() < cc;
+      if(crit) dmg *= cm;
+      dealDamage(dmg * taps);
+      // 连击累加：同 onTap 公式
       state.combo = Math.min((CONFIG.comboMax + gearComboMax()) - 1, state.combo + (CONFIG.comboPerTap + artComboPerTap()) * taps);
       state.comboTimer = 0;
+      if(comboMult() >= CONFIG.comboMax + gearComboMax()) state.maxComboHit = true;
+      // 点击统计
       state._rageTapAccum = (state._rageTapAccum||0) + taps;
       const whole = Math.floor(state._rageTapAccum);
       state.totalTaps += whole; state.sessionTaps += whole; state._rageTapAccum -= whole;
+      if(state.sessionTaps >= 1000) unlockAch("X1");
     }
   }
   if(isBoss(state.stage)){

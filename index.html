@@ -2299,7 +2299,7 @@ function buyTap(){
   const lv = state.tapLevel - 1;   // 点击升级的成本基准（与 tapUpgradeCost 对齐）
   let n;
   if(buyAmount === "max") n = maxAffordable(CONFIG.tapCostBase, CONFIG.tapCostGrowth, lv, state.gold).count;
-  else if(buyAmount === "round"){ const target = Math.ceil((state.tapLevel+1)/10)*10; n = target - state.tapLevel; }
+  else if(buyAmount === "round"){ const max = maxAffordable(CONFIG.tapCostBase, CONFIG.tapCostGrowth, lv, state.gold); n = Math.max(1, Math.floor((lv + max.count) / 10) * 10 - lv); }
   else n = buyAmount;
   if(n <= 0) return;
   // 逐级扣费，避免批量时金币计算偏差
@@ -2318,7 +2318,7 @@ function buyHero(h){
   const lv = state.heroes[h.id] || 0;
   let n;
   if(buyAmount === "max") n = maxAffordable(h.baseCost, h.growth, lv, state.gold).count;
-  else if(buyAmount === "round"){ const target = Math.ceil((lv+1)/10)*10; n = target - lv; }
+  else if(buyAmount === "round"){ const max = maxAffordable(h.baseCost, h.growth, lv, state.gold); n = Math.max(1, Math.floor((lv + max.count) / 10) * 10 - lv); }
   else n = buyAmount;
   if(n <= 0) return;
   // 逐级扣费，避免批量时金币计算偏差

@@ -874,7 +874,7 @@ const GEARS = [
   { id:"resonance_badge",name:"共鸣勋章",emoji:"🎖️", type:"badge", skillId:"resonance",
     mainAffix:"global", skill:{name:"共鸣",icon:"🔗",energyCost:35,duration:8,cooldown:50,dpsMult:3,needCombo:0.5, desc:"连击≥50%时DPS×3，持续8秒"}, school:"hybrid" },
   { id:"berserker_badge",name:"战狂勋章",emoji:"🏅", type:"badge", skillId:"rage_combo",
-    mainAffix:"comboMax", skill:{name:"暴怒连打",icon:"👊",energyCost:35,duration:5,cooldown:30,tapSpeed:8, desc:"以最快速度自动连点，持续5秒"}, school:"tap" },
+    mainAffix:"comboMax", skill:{name:"暴怒连打",icon:"👊",energyCost:35,duration:15,cooldown:30,tapSpeed:8, desc:"以最快速度自动连点，持续15秒"}, school:"tap" },
   { id:"gale_badge",    name:"疾风勋章", emoji:"🎗️", type:"badge", skillId:"combo_storm",
     mainAffix:"global", skill:{name:"连击风暴",icon:"🌪️",energyCost:35,duration:6,cooldown:45, desc:"连击锁满且不衰减，持续6秒"}, school:"tap" },
 ];
@@ -2817,7 +2817,7 @@ function activeSynergies(){
 }
 // 装备掉落 / 锻造 / 升级 / 突破 / 分解 / 装备
 function makeGear(def, rarity){
-  const gear = { typeId: def.id, name: def.name, emoji: def.emoji, type: def.type, school: def.school,
+  const gear = { typeId: def.id, name: def.name, emoji: def.emoji, type: def.type, school: def.school, mainAffix: def.mainAffix,
     rarity, level: 1, skillId: def.skillId, skill: def.skill, subAffixes: [] };
   const subCount = GEAR_RARITY[rarity].subCount;
   const pool = SUB_AFFIX_POOL.slice();

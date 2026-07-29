@@ -788,23 +788,25 @@ function getEnemyName(boss){
 
 // 英雄列表：加新英雄只要在这里加一行
 const HEROES = [
-  {id:"knight",  name:"剑士",   emoji:"⚔️", baseCost:25,    baseDps:1,    growth:1.07},
-  {id:"archer",  name:"弓箭手", emoji:"🏹", baseCost:120,   baseDps:8,    growth:1.07},
-  {id:"mage",    name:"法师",   emoji:"🧙", baseCost:600,   baseDps:47,   growth:1.07},
-  {id:"priest",  name:"牧师",   emoji:"✨", baseCost:2500,  baseDps:260,  growth:1.07},
-  {id:"dragon",  name:"龙骑士", emoji:"🐉", baseCost:12000, baseDps:1500, growth:1.07},
-  {id:"angel",   name:"天使",   emoji:"😇", baseCost:60000, baseDps:9000, growth:1.07},
-  {id:"demon",   name:"恶魔",   emoji:"😈", baseCost:300000,    baseDps:55000,    growth:1.07},
-  {id:"titan",   name:"泰坦",   emoji:"🗿", baseCost:15000000,   baseDps:2000000,   growth:1.08},
-  {id:"phoenix", name:"凤凰",   emoji:"🔥", baseCost:300000000,  baseDps:30000000,  growth:1.09},
-  {id:"reaper",  name:"死神",   emoji:"💀", baseCost:9000000000, baseDps:600000000, growth:1.09},
-  {id:"goddess", name:"女神",   emoji:"👸", baseCost:270000000000,   baseDps:15000000000,   growth:1.10},
-  {id:"void",    name:"虚空行者", emoji:"🌌", baseCost:8000000000000,  baseDps:400000000000,  growth:1.10},
-  {id:"overlord",name:"霸主",   emoji:"👑", baseCost:240000000000000, baseDps:10000000000000, growth:1.11},
-  {id:"celest",  name:"天启",   emoji:"⚡", baseCost:7.2e15, baseDps:2.5e14, growth:1.12},
-  {id:"abyss",   name:"深渊",   emoji:"🕳️", baseCost:2.5e17, baseDps:7.0e15, growth:1.12},
-  {id:"eternal", name:"永恒",   emoji:"♾️", baseCost:1.5e19, baseDps:3.0e17, growth:1.14},
-  {id:"omni",    name:"主宰",   emoji:"🌟", baseCost:1.2e21, baseDps:1.5e19, growth:1.15},
+  // 英雄费用公式：baseCost = 25 × 100,000^(i-1)，目标均匀分布在2000关
+  // DPS ≈ cost/100，growth 梯度上升让后期升级更有价值
+  {id:"knight",  name:"剑士",   emoji:"⚔️", baseCost:25,        baseDps:1,       growth:1.07},
+  {id:"archer",  name:"弓箭手", emoji:"🏹", baseCost:2500000,   baseDps:25000,   growth:1.07},
+  {id:"mage",    name:"法师",   emoji:"🧙", baseCost:2.5e11,    baseDps:2.5e9,   growth:1.07},
+  {id:"priest",  name:"牧师",   emoji:"✨", baseCost:2.5e16,    baseDps:2.5e14,  growth:1.08},
+  {id:"dragon",  name:"龙骑士", emoji:"🐉", baseCost:2.5e21,    baseDps:2.5e19,  growth:1.08},
+  {id:"angel",   name:"天使",   emoji:"😇", baseCost:2.5e26,    baseDps:2.5e24,  growth:1.08},
+  {id:"demon",   name:"恶魔",   emoji:"😈", baseCost:2.5e31,    baseDps:2.5e29,  growth:1.09},
+  {id:"titan",   name:"泰坦",   emoji:"🗿", baseCost:2.5e36,    baseDps:2.5e34,  growth:1.09},
+  {id:"phoenix", name:"凤凰",   emoji:"🔥", baseCost:2.5e41,    baseDps:2.5e39,  growth:1.09},
+  {id:"reaper",  name:"死神",   emoji:"💀", baseCost:2.5e46,    baseDps:2.5e44,  growth:1.10},
+  {id:"goddess", name:"女神",   emoji:"👸", baseCost:2.5e51,    baseDps:2.5e49,  growth:1.10},
+  {id:"void",    name:"虚空行者", emoji:"🌌", baseCost:2.5e56,  baseDps:2.5e54,  growth:1.11},
+  {id:"overlord",name:"霸主",   emoji:"👑", baseCost:2.5e61,    baseDps:2.5e59,  growth:1.11},
+  {id:"celest",  name:"天启",   emoji:"⚡", baseCost:2.5e66,    baseDps:2.5e64,  growth:1.12},
+  {id:"abyss",   name:"深渊",   emoji:"🕳️", baseCost:2.5e71,    baseDps:2.5e69,  growth:1.12},
+  {id:"eternal", name:"永恒",   emoji:"♾️", baseCost:2.5e76,    baseDps:2.5e74,  growth:1.14},
+  {id:"omni",    name:"主宰",   emoji:"🌟", baseCost:2.5e81,    baseDps:2.5e79,  growth:1.15},
 ];
 
 /* =========================================================================
@@ -1533,7 +1535,7 @@ function bossEssenceGain(stage){ return Math.max(1, Math.floor(stage / CONFIG.bo
 /* 数字美化：1234 -> 1.2K，1234567 -> 1.2M */
 function fmt(n){
   if(n < 1000) return Math.floor(n).toString();
-  const units = ["K","M","B","T","aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am","an","ao","ap","aq"];
+  const units = ["K","M","B","T","aa","ab","ac","ad","ae","af","ag","ah","ai","aj","ak","al","am","an","ao","ap","aq","ar","as","at","au","av","aw"];
   let u = -1;
   while(n >= 1000 && u < units.length-1){ n/=1000; u++; }
   return n.toFixed(2).replace(/\.?0+$/,"") + units[u];

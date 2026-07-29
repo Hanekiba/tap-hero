@@ -2420,8 +2420,10 @@ function doPrestige(){
     bossFight3Skills: state.bossFight3Skills,
     comebackAfter10Fails: state.comebackAfter10Fails,
   };
-  state = {
-    gold:0, stage: 1 + artStartStage(), tapLevel:1, heroes:{}, essence:keepEssence, awaken: structuredClone(state.awaken||{}), enemyHp:0, monsterIndex:1,
+    const startStage = 1 + artStartStage();
+    const startGold = (startStage > 1) ? goldReward(startStage) * 50 : 0; // 转生基石补偿：够买前几个英雄
+    state = {
+    gold: startGold, stage: startStage, tapLevel:1, heroes:{}, essence:keepEssence, awaken: structuredClone(state.awaken||{}), enemyHp:0, monsterIndex:1,
     dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:keepLastSeen,
     prestige: keepPrestige, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery: state.skillMastery,
     ...keepAch,

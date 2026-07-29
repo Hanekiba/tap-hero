@@ -2492,7 +2492,7 @@ function loop(now){
       const dmg = tapDamage();
       const cm = CONFIG.critMult + gearCritMult() + artCritMult();
       dealDamage((critActive && critExecute) ? (dmg * cm * taps) : (dmg * taps));
-      state.combo = Math.min((CONFIG.comboMax + gearComboMax()) - 1, state.combo + CONFIG.comboPerTap * taps);
+      state.combo = Math.min((CONFIG.comboMax + gearComboMax()) - 1, state.combo + (CONFIG.comboPerTap + artComboPerTap()) * taps);
       state.comboTimer = 0;
       state._rageTapAccum = (state._rageTapAccum||0) + taps;
       const whole = Math.floor(state._rageTapAccum);
@@ -2506,7 +2506,7 @@ function loop(now){
   autoShotTick();
   state._loopAccum = (state._loopAccum||0) + dt;
   if(state._loopAccum >= 5){ state.totalPlayTime += 5; state._loopAccum -= 5; }
-  renderHud(); renderEnemy(); renderShop(); renderSkills();
+  renderHud(); renderEnemy(); renderShop(); renderSkills(); renderCombo();
   }catch(e){ console.error("游戏循环出错:", e); }
   requestAnimationFrame(loop);
 }

@@ -1069,9 +1069,7 @@ function load(){
       for(const h of HEROES){
         if(state.heroes[h.id]===undefined) state.heroes[h.id]=0;
         if(state.awaken[h.id]===undefined) state.awaken[h.id]=0;
-        if(state.ascend&&state.ascend[h.id]===undefined) state.ascend[h.id]=0;
       }
-      if(!state.ascend) state.ascend = {}; // 补丁：英雄转生系统
       // 补丁：清理老守护戒指残留的 autoShot（已移至守护圣杯神器）
       if(!(state.artifacts.guardGoblet||0) && state.equipped){
         for(const slot of ["weapon","armor","ring","badge"]){
@@ -1260,7 +1258,7 @@ function totalDps(){
   let dps = 0;
   for(const h of HEROES){
     const lv = state.heroes[h.id] || 0;
-    if(lv>0) dps += h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * awakenGlobalMult() * prestigeMult() * ascendMult(h);
+    if(lv>0) dps += h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * awakenGlobalMult() * prestigeMult();
   }
   let mult = gearDpsMult() * gearGlobalMult() * artGlobalMult();
   // 军团冲锋（DPS流）：英雄DPS ×N
@@ -1300,7 +1298,6 @@ function prestigeGain(){
 // 军团共鸣：所有英雄觉醒次数之和 → 全队英雄永久加伤倍率
 function totalAwakenLevels(){ let t = 0; for(const h of HEROES) t += (state.awaken[h.id]||0); return t; }
 function awakenGlobalMult(){ return 1 + (CONFIG.awakenGlobalBonus + artAwakenBonus()) * totalAwakenLevels(); }
-function ascendMult(h){ return Math.pow(1.5, state.ascend && state.ascend[h.id] || 0); } // 英雄转生：每转 +50% DPS
 
 /* =========================================================================
    3.5) 主动技能（能量+冷却模型）—— v1.1 重构为「装备绑定技能」
@@ -1919,15 +1916,12 @@ function buildShop(){
       </div>
       <div class="actions">
         <button class="buy" data-buy>雇佣<span class="c" data-cost></span></button>
-        <button class="buy ascend" data-ascend>转生</button>
         <button class="buy awaken" data-awaken>觉醒<span class="c" data-essence></span></button>
       </div>`;
     const btn = card.querySelector("[data-buy]");
     btn.addEventListener("click", ()=>buyHero(h));
     const aBtn = card.querySelector("[data-awaken]");
     aBtn.addEventListener("click", ()=>awakenHero(h));
-    const asBtn = card.querySelector("[data-ascend]");
-    asBtn.addEventListener("click", ()=>ascendHero(h));
     wrap.appendChild(card);
     heroCardRefs[h.id] = {
       card,
@@ -1936,7 +1930,7 @@ function buildShop(){
       power: card.querySelector("[data-power]"),
       cost: card.querySelector("[data-cost]"),
       essence: card.querySelector("[data-essence]"),
-      btn, aBtn, asBtn,
+      btn, aBtn,
     };
   }
 }
@@ -1958,7 +1952,7 @@ function renderShop(){
     const aw = state.awaken[h.id]||0;
     ref.lv.textContent = lv>0 ? ("Lv."+lv) : "";
     // 该英雄当前每秒贡献（受共鸣倍率影响）
-    const heroDpsNow = h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * mult * ascendMult(h);
+    const heroDpsNow = h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * mult;
     // 本次购买/升级的数量与花费（受批量购买数量影响）
     let buyN, buyCost, buyAfford;
     if(buyAmount === "max"){
@@ -1985,9 +1979,8 @@ function renderShop(){
     const milestoneMult = Math.pow(1.35, Math.floor(lv/10));
     const milleMult = Math.pow(10, Math.floor(lv/1000));
     const milestoneStr = lv >= 10 ? " · 每10级×1.35(已×"+milestoneMult.toFixed(1)+")" + (lv>=1000?" 每千级×10(已×"+milleMult.toFixed(0)+")":"") : (lv>0?"":"");
-    const ascStr = (state.ascend && state.ascend[h.id] || 0) > 0 ? " · 转生×"+ascendMult(h).toFixed(1) : "";
     ref.sub.textContent = lv>0
-      ? ("当前每秒 +"+fmt(heroDpsNow)+" 伤害" + (aw>0 ? " · 已觉醒×"+aw : "") + ascStr + milestoneStr)
+      ? ("当前每秒 +"+fmt(heroDpsNow)+" 伤害" + (aw>0 ? " · 已觉醒×"+aw : "") + milestoneStr)
       : ("雇佣后每秒 +"+fmt(h.baseDps*mult)+" 伤害");
     ref.power.textContent = buyN>=1
       ? ("本次"+(lv>0?"升级":"购买")+" +"+fmt(gain)+"/秒")
@@ -2011,15 +2004,6 @@ function renderShop(){
         ref.aBtn.disabled = state.essence < aCost;
         ref.aBtn.firstChild.textContent = (aw>0 ? "再觉醒×"+aw : "觉醒");
       }
-    }
-    // 英雄转生按钮
-    const asc = state.ascend && state.ascend[h.id] || 0;
-    if(lv >= 1000){
-      ref.asBtn.disabled = false;
-      ref.asBtn.textContent = asc > 0 ? ("转生 ×"+asc) : "转生";
-    } else {
-      ref.asBtn.disabled = true;
-      ref.asBtn.textContent = "Lv.1000 可转生";
     }
   });
 }
@@ -2387,17 +2371,6 @@ function awakenHero(h){
   diffToast("✦ " + h.name + " 觉醒！军团共鸣 全队伤害 ×" + awakenGlobalMult().toFixed(2));
 }
 
-// 英雄转生：满100级可重置为1级，获得永久+50% DPS
-function ascendHero(h){
-  const lv = state.heroes[h.id] || 0;
-  if(lv < 1000) return;
-  if(!state.ascend) state.ascend = {};
-  state.ascend[h.id] = (state.ascend[h.id] || 0) + 1;
-  state.heroes[h.id] = 1;
-  renderAll();
-  diffToast(h.emoji + " " + h.name + " 转生 ×" + state.ascend[h.id] + "！DPS 永久 ×1.5");
-}
-
 /* =========================================================================
    10) 转生 / 重生（Prestige）—— 后期纵向目标
    设计：达到解锁关后，主动重置本局（金币/英雄/关卡/难度/bossLoop/bestStage），
@@ -2472,7 +2445,7 @@ function doPrestige(){
     const startStage = 1 + artStartStage();
     const startGold = (startStage > 1) ? goldReward(startStage) * 50 : 0; // 转生基石补偿：够买前几个英雄
     state = {
-    gold: startGold, stage: startStage, tapLevel:1, heroes:{}, essence:keepEssence, awaken: structuredClone(state.awaken||{}), ascend: structuredClone(state.ascend||{}), enemyHp:0, monsterIndex:1,
+    gold: startGold, stage: startStage, tapLevel:1, heroes:{}, essence:keepEssence, awaken: structuredClone(state.awaken||{}), enemyHp:0, monsterIndex:1,
     dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:keepLastSeen,
     prestige: keepPrestige, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery: state.skillMastery,
     ...keepAch,

@@ -1064,6 +1064,13 @@ function load(){
         if(state.heroes[h.id]===undefined) state.heroes[h.id]=0;
         if(state.awaken[h.id]===undefined) state.awaken[h.id]=0;
       }
+      // 补丁：清理老守护戒指残留的 autoShot（已移至守护圣杯神器）
+      if(!(state.artifacts.guardGoblet||0) && state.equipped){
+        for(const slot of ["weapon","armor","ring","badge"]){
+          const g = state.equipped[slot];
+          if(g && g.skill && g.skill.autoShot) delete g.skill.autoShot;
+        }
+      }
       if(state.essence===undefined) state.essence=0;
       if(state.monsterIndex===undefined) state.monsterIndex=1;
       if(state.dynGrowth===undefined) state.dynGrowth=CONFIG.enemyHpGrowth;
@@ -2814,8 +2821,7 @@ function gearComboMax(){     return gearSumByAffix("comboMax"); }
 function gearOfflineRate(){  return gearSumByAffix("offline"); }
 function gearSkillMult(){    return 1 + gearSumByAffix("skillDmg"); }
 function gearBossTime(){   return artBossTime(); } // 旧装备被动→神器
-function hasAutoShot(){ return artHasAutoShot(); } // 旧装备被动→神器
-function artHasAutoShot(){ return (state.artifacts.guardGoblet || 0) > 0; }
+function hasAutoShot(){ return (state.artifacts && state.artifacts.guardGoblet || 0) > 0; }
 function isSkillEquipped(skillId){
   for(const gear of equippedGears()){
     const def = GEARS.find(g => g.id === gear.typeId);

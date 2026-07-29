@@ -889,10 +889,10 @@ const GEARS = [
     mainAffix:"global", skill:{name:"连击风暴",icon:"🌪️",energyCost:35,duration:6,cooldown:45, desc:"连击锁满且不衰减，持续6秒"}, school:"tap" },
 ];
 const GEAR_RARITY = {
-  common:    { name:"普通", color:"#9aa0b5", dropRate:0.45, mainCoeff:1.0, subCount:0, upgradeMult:1, maxLevel:10, rank:1 },
-  rare:      { name:"稀有", color:"#4a9eff", dropRate:0.35, mainCoeff:1.5, subCount:1, upgradeMult:2, maxLevel:15, rank:2 },
-  epic:      { name:"史诗", color:"#b06bff", dropRate:0.15, mainCoeff:2.2, subCount:2, upgradeMult:4, maxLevel:20, rank:3 },
-  legendary: { name:"传说", color:"#ffcb3d", dropRate:0.05, mainCoeff:3.5, subCount:2, upgradeMult:8, maxLevel:25, rank:4 },
+  common:    { name:"普通", color:"#9aa0b5", dropRate:0.45, mainCoeff:1.0, subCount:0, upgradeMult:1, rank:1 },
+  rare:      { name:"稀有", color:"#4a9eff", dropRate:0.35, mainCoeff:1.5, subCount:1, upgradeMult:2, rank:2 },
+  epic:      { name:"史诗", color:"#b06bff", dropRate:0.15, mainCoeff:2.2, subCount:2, upgradeMult:4, rank:3 },
+  legendary: { name:"传说", color:"#ffcb3d", dropRate:0.05, mainCoeff:3.5, subCount:2, upgradeMult:8, rank:4 },
 };
 const GEAR_CONFIG = {
   gearUnlockStage: 5,
@@ -2897,8 +2897,6 @@ function gearUpgradeCost(gear){
 }
 function upgradeGearObj(gear){
   if(!gear) return false;
-  const maxLv = GEAR_RARITY[gear.rarity].maxLevel;
-  if(gear.level >= maxLv){ diffToast("⚠ 已满级"); return false; }
   const cost = gearUpgradeCost(gear);
   if(state.gold < cost){ diffToast("⚠ 金币不足（需 "+fmt(cost)+"）"); return false; }
   state.gold -= cost; gear.level++; return true;

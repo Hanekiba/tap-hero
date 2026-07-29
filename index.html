@@ -911,7 +911,7 @@ const SYNERGIES = [
   { id:"dual_resonance", name:"双轨共振", skillIds:["resonance","feedback"], desc:"共鸣DPS×3→×4，反哺转化率20%→30%", bonus:{ target:"resonance", dpsMult:4, target2:"feedback", feedbackRate:0.30 } },
   { id:"dual_track_resonance", name:"双轨共鸣", skillIds:["dual_track","resonance"], desc:"双轨生效时，共鸣DPS×3→×4，双轨点击增益+200%→+250%", bonus:{ target:"resonance", dpsMult:4, target2:"dual_track", tapBonus:2.5 } },
   { id:"gold_legion", name:"黄金军团", skillIds:["gold_skill","legion_charge"], desc:"军团冲锋生效时，金币获取额外+100%", bonus:{ target:"gold_skill", goldMult:10 } },
-  { id:"crit_execute", name:"暴击抢杀", skillIds:["deadly_crit","rage_combo"], desc:"致命暴击生效时，暴怒连打每次点击必定暴击", bonus:{ target:"rage_combo", alwaysCrit:true } },
+  { id:"crit_execute", name:"暴击抢杀", skillIds:["deadly_crit","rage_combo"], desc:"致命暴击生效时，暴怒连打每秒8次自动点击全部暴击", bonus:{ target:"rage_combo", alwaysCrit:true } },
   { id:"storm_offline", name:"风暴清场", skillIds:["aoe_storm","offline_boost"], desc:"离线加速生效时，AOE风暴3秒→4秒DPS，离线加速20s→25s", bonus:{ target:"aoe_storm", aoeSeconds:4, target2:"offline_boost", duration:25 } },
   { id:"triple_resonance", name:"共振双轨", skillIds:["resonance","dual_track","feedback"], desc:"三件齐配：共鸣×3→×5，反哺20%→35%，双轨+200%→+300%", bonus:{ target:"resonance", dpsMult:5, target2:"feedback", feedbackRate:0.35, target3:"dual_track", tapBonus:3.0, dpsBonus:3.0 } },
   { id:"gold_resonance", name:"黄金共鸣", skillIds:["gold_skill","resonance"], desc:"共鸣触发期间，击杀金币额外×2（叠加黄金×5即×10）", bonus:{ target:"gold_skill", resonanceGoldMult:2 } },

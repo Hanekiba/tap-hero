@@ -754,8 +754,37 @@ const DIFF = {
 };
 
 // 敌人外观：普通怪 + Boss，按关卡循环取用
-const NORMAL_ENEMIES = ["🟢","👹","👻","🐍","🦂","🦇","🕷️","💀"];
-const BOSS_ENEMIES   = ["🐲","👺","🧟","👿","🦖"];
+// 敌方外观：普通怪按关卡段分主题，Boss 也有专属 list
+// 四段主题：绿色史莱姆系(1-199) → 暗黑不死系(200-599) → 元素精灵系(600-1199) → 深渊系(1200+)
+const NORMAL_TIERS = [
+  { from:1,   enemies:["🟢","🐗","🦊","🐺","🐻"] },
+  { from:200, enemies:["👹","👻","🐍","🦂","🦇","🕷️","🧟","🦾"] },
+  { from:600, enemies:["⚡","🔥","🧊","🌀","🌪️","⭐","💎","🔮"] },
+  { from:1200,enemies:["💀","👽","🕳️","🦅","🗡️","🌑","🔱","👑"] },
+];
+function getEnemyEmoji(boss){
+  const stage = state.stage;
+  if(boss){
+    const bossArr = ["🐲","👺","🧟","👿","🦖","🐉","⚰️","🌋","🔮","👁️"];
+    return bossArr[(Math.floor(stage/5)) % bossArr.length];
+  }
+  let tier = NORMAL_TIERS[0];
+  for(const t of NORMAL_TIERS){ if(stage >= t.from) tier = t; }
+  return tier.enemies[(stage + state.monsterIndex) % tier.enemies.length];
+}
+function getEnemyName(boss){
+  const stage = state.stage;
+  if(boss){
+    const n = Math.floor(stage/5);
+    const names = ["巨龙","赤鬼","尸王","炎魔","暴龙","古龙","幽魂","熔岩","巫师","魔眼"];
+    return names[n % names.length];
+  }
+  let names = ["史莱姆","野猪","狐狸","饿狼","棕熊"];
+  if(stage>=1200) names = ["死神","外星体","虚空","鹰身","剑灵","暗月","海神","帝皇"];
+  else if(stage>=600) names = ["雷灵","火灵","冰灵","风灵","旋风","星灵","晶灵","法灵"];
+  else if(stage>=200) names = ["赤鬼","幽灵","毒蛇","蝎子","蝙蝠","蜘蛛","僵尸","铁魔"];
+  return names[(stage + state.monsterIndex) % names.length];
+}
 
 // 英雄列表：加新英雄只要在这里加一行
 const HEROES = [
@@ -770,6 +799,12 @@ const HEROES = [
   {id:"phoenix", name:"凤凰",   emoji:"🔥", baseCost:7500000,   baseDps:2000000,  growth:1.07},
   {id:"reaper",  name:"死神",   emoji:"💀", baseCost:38000000,  baseDps:12000000, growth:1.07},
   {id:"goddess", name:"女神",   emoji:"👸", baseCost:190000000, baseDps:75000000, growth:1.07},
+  {id:"void",    name:"虚空行者", emoji:"🌌", baseCost:950000000, baseDps:450000000, growth:1.07},
+  {id:"overlord",name:"霸主",   emoji:"👑", baseCost:5700000000, baseDps:2700000000, growth:1.07},
+  {id:"celest",  name:"天启",   emoji:"⚡", baseCost:35000000000, baseDps:16000000000, growth:1.07},
+  {id:"abyss",   name:"深渊",   emoji:"🕳️", baseCost:210000000000, baseDps:100000000000, growth:1.07},
+  {id:"eternal", name:"永恒",   emoji:"♾️", baseCost:1300000000000, baseDps:600000000000, growth:1.07},
+  {id:"omni",    name:"主宰",   emoji:"🌟", baseCost:8000000000000, baseDps:3600000000000, growth:1.07},
 ];
 
 /* =========================================================================
@@ -1806,12 +1841,9 @@ function renderHud(){
 function renderEnemy(){
   const boss = isBoss(state.stage);
   const total = monstersInStage(state.stage);
-  // 外观：Boss 按关卡取；普通怪按 (stage+monsterIndex) 取，同关每只长相略有变化
-  const e = boss
-    ? BOSS_ENEMIES[(Math.floor(state.stage/CONFIG.bossEvery)) % BOSS_ENEMIES.length]
-    : NORMAL_ENEMIES[(state.stage + state.monsterIndex) % NORMAL_ENEMIES.length];
+  const e = getEnemyEmoji(boss);
   document.getElementById("enemy").textContent = e;
-  document.getElementById("enemyName").textContent = boss ? "BOSS ⏱ 限时" : ("怪物 " + state.monsterIndex + "/" + total);
+  document.getElementById("enemyName").textContent = boss ? ("BOSS " + getEnemyName(true) + " ⏱ 限时") : (getEnemyName(false) + " " + state.monsterIndex + "/" + total);
   const max = enemyMaxHp(state.stage);
   const pct = Math.max(0, Math.min(100, state.enemyHp / max * 100));
   document.getElementById("hpfill").style.width = pct + "%";
@@ -2013,11 +2045,11 @@ const ACHIEVEMENTS = {
   // —— 英雄 ——
   H1:{ name:"第一个伙伴", icon:"🤝", cat:"hero", diff:"easy", hidden:false, reward:"队长", rewardType:"title", desc:"雇佣第1个英雄", cond:s=>ownedHeroCount()>=1, prog:s=>p(ownedHeroCount(),1) },
   H2:{ name:"军团初成", icon:"⚔️", cat:"hero", diff:"normal", hidden:false, reward:"小队长", rewardType:"title", desc:"雇佣5个不同英雄", cond:s=>ownedHeroCount()>=5, prog:s=>p(ownedHeroCount(),5) },
-  H3:{ name:"全员集结", icon:"🦸", cat:"hero", diff:"challenge", hidden:false, reward:"军团长", rewardType:"title", desc:"雇佣全部11个英雄", cond:s=>ownedHeroCount()>=11, prog:s=>p(ownedHeroCount(),11) },
+  H3:{ name:"全员集结", icon:"🦸", cat:"hero", diff:"challenge", hidden:false, reward:"军团长", rewardType:"title", desc:"雇佣全部17个英雄", cond:s=>ownedHeroCount()>=17, prog:s=>p(ownedHeroCount(),17) },
   H4:{ name:"精锐之师", icon:"💪", cat:"hero", diff:"normal", hidden:false, reward:"精锐", rewardType:"badge", desc:"任一英雄达到Lv.100", cond:s=>anyHeroLv(100) },
   H5:{ name:"觉醒先锋", icon:"✦", cat:"hero", diff:"normal", hidden:false, reward:"觉醒者", rewardType:"title", desc:"完成第1次觉醒", cond:s=>totalAwaken()>=1, prog:s=>p(totalAwaken(),1) },
   H6:{ name:"共鸣大师", icon:"🌀", cat:"hero", diff:"challenge", hidden:false, reward:"共鸣大师", rewardType:"title", desc:"累计觉醒50次", cond:s=>totalAwaken()>=50, prog:s=>p(totalAwaken(),50) },
-  H7:{ name:"全员觉醒", icon:"👑", cat:"hero", diff:"ultimate", hidden:false, ultimate:true, reward:"觉醒光环", rewardType:"frame", desc:"全部11英雄各觉醒≥1次", cond:s=>allHeroesAwakened() },
+  H7:{ name:"全员觉醒", icon:"👑", cat:"hero", diff:"ultimate", hidden:false, ultimate:true, reward:"觉醒光环", rewardType:"frame", desc:"全部17英雄各觉醒≥1次", cond:s=>allHeroesAwakened() },
   // —— 转生 ——
   P1:{ name:"涅槃重生", icon:"🌟", cat:"prestige", diff:"easy", hidden:false, reward:"重生者", rewardType:"title", desc:"完成第1次转生", cond:s=>s.totalPrestiges>=1, prog:s=>p(s.totalPrestiges,1) },
   P2:{ name:"轮回行者", icon:"🔄", cat:"prestige", diff:"normal", hidden:false, reward:"轮回者", rewardType:"title", desc:"累计转生10次", cond:s=>s.totalPrestiges>=10, prog:s=>p(s.totalPrestiges,10) },

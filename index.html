@@ -873,8 +873,8 @@ const GEARS = [
     mainAffix:"critChance", skill:{name:"致命暴击",icon:"🎯",energyCost:30,duration:10,cooldown:40,critChanceBonus:0.4,critMultBonus:2.0, desc:"暴击率+40%，暴击伤害+200%，持续10秒"}, school:"tap" },
   { id:"greed_ring",    name:"贪婪戒指", emoji:"💍", type:"ring", skillId:"gold_skill",
     mainAffix:"gold", skill:{name:"黄金",icon:"💰",energyCost:50,duration:20,cooldown:100,goldMult:5, desc:"金币获取×5，持续20秒"}, school:"universal" },
-  { id:"guard_ring",    name:"守护戒指", emoji:"💍", type:"ring", skillId:"drain",
-    mainAffix:"global", skill:{name:"汲取",icon:"🩸",energyCost:40,cooldown:40,pct:0.15, desc:"造成当前怪物15%最大HP伤害"}, school:"universal" },
+  { id:"guard_ring",    name:"守护戒指", emoji:"💍", type:"ring", skillId:"harvest",
+    mainAffix:"global", skill:{name:"精华收割",icon:"💎",energyCost:40,duration:20,cooldown:60,essenceMult:3, desc:"击杀怪物精华×3，持续20秒"}, school:"universal" },
   { id:"resonance_badge",name:"共鸣勋章",emoji:"🎖️", type:"badge", skillId:"resonance",
     mainAffix:"global", skill:{name:"共鸣",icon:"🔗",energyCost:35,duration:8,cooldown:50,dpsMult:3,needCombo:0.5, desc:"连击≥50%时DPS×3，持续8秒"}, school:"hybrid" },
   { id:"berserker_badge",name:"战狂勋章",emoji:"🏅", type:"badge", skillId:"rage_combo",
@@ -918,7 +918,7 @@ const SYNERGIES = [
   { id:"crit_execute", name:"暴击抢杀", skillIds:["deadly_crit","rage_combo"], desc:"致命暴击生效时，暴怒连打每秒8次自动点击全部暴击", bonus:{ target:"rage_combo", alwaysCrit:true } },
   { id:"triple_resonance", name:"共振双轨", skillIds:["resonance","dual_track","feedback"], desc:"三件齐配：共鸣×3→×5，反哺20%→35%，双轨+200%→+300%", bonus:{ target:"resonance", dpsMult:5, target2:"feedback", feedbackRate:0.35, target3:"dual_track", tapBonus:3.0, dpsBonus:3.0 } },
   { id:"gold_resonance", name:"黄金共鸣", skillIds:["gold_skill","resonance"], desc:"共鸣触发期间，击杀金币额外×2（叠加黄金×5即×10）", bonus:{ target:"gold_skill", resonanceGoldMult:2 } },
-  { id:"guard_burst", name:"守护爆发", skillIds:["drain","berserk"], desc:"汲取+爆发装备：爆发技能持续+3s", bonus:{ target:"berserk", durationBonus:3, targetAlt:["legion_charge","dual_track"], durationBonusAlt:3 } },
+  { id:"guard_burst", name:"守护爆发", skillIds:["harvest","berserk"], desc:"精华收割+爆发装备：爆发技能持续+3s", bonus:{ target:"berserk", durationBonus:3, targetAlt:["legion_charge","dual_track"], durationBonusAlt:3 } },
 ];
 const GEAR_SKILL_IDS = GEARS.map(g=>g.skillId);
 
@@ -1194,7 +1194,7 @@ function applyOfflineEarnings(){
   state.gold += earned;
   // 离线期间英雄也会击杀 Boss，按比例发放「灵魂精华」（觉醒系统资源）
   const bossesOffline = Math.floor((killsPerSec * capped) / Math.max(1, monstersInStage(state.stage)));
-  const essenceGained = bossesOffline * bossEssenceGain(state.stage);
+  const essenceGained = bossesOffline * bossEssenceGain(state.stage) * skillHarvestMult();
   if(essenceGained > 0) state.essence += essenceGained;
   // v1.3 #19 远征令牌：离线自动推关（受卡关阈值+时长约束，不触发装备掉落）
   const prog = applyOfflineProgression(capped);
@@ -1347,10 +1347,7 @@ function applySkillEffect(skillId, sk, durBonus){
       dealDamage(totalDps() * spent * sk.dpsPerEnergy);
       break;
     }
-    case "drain": { // 即时：造成当前怪物最大HP的 pct 伤害
-      dealDamage(enemyMaxHp(state.stage) * sk.pct);
-      break;
-    }
+    case "harvest":     state.skillActive.harvest = dur; break; // 精华收割
     case "resonance":    state.skillActive.resonance = dur; break;
     case "feedback":     state.skillActive.feedback = dur; break;
     case "dual_track":   state.skillActive.dual_track = dur + durBonus; break;
@@ -1684,8 +1681,8 @@ function killEnemy(){
   state.totalKills++;                 // 成就统计：累计击杀
   state.totalGoldEarned += g;         // 成就统计：累计金币
   if(finishedBoss){
-    const eg = bossEssenceGain(state.stage);
-    state.essence += eg;
+    const eg = bossEssenceGain(state.stage) * skillHarvestMult();
+    state.essence += Math.floor(eg);
     state.totalBossKills++;           // 成就统计：Boss 击杀
     state.totalEssenceEarned += eg;   // 成就统计：累计精华
     // Boss 击杀金币爆发 = 当前 DPS × 10 秒
@@ -3020,6 +3017,10 @@ function skillTapMult(){
 }
 function skillGoldMult(){
   if((state.skillActive.gold_skill||0) > 0){ const def = GEARS.find(g=>g.skillId==="gold_skill"); return (def ? def.skill.goldMult : 5) * gearSkillMult(); }
+  return 1;
+}
+function skillHarvestMult(){ // 精华收割：击杀精华倍率
+  if((state.skillActive.harvest||0) > 0){ const def = GEARS.find(g=>g.skillId==="harvest"); return (def ? def.skill.essenceMult : 3) * gearSkillMult(); }
   return 1;
 }
 

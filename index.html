@@ -717,7 +717,7 @@ const CONFIG = {
   // 新版：觉醒【任一已雇佣英雄】消耗精华，给【全队英雄】永久 +awakenGlobalBonus 伤害
   //（所有英雄觉醒次数叠加计算）。每个英雄觉醒收益相同 → 无套利、无陷阱，鼓励分散投资整支军团。
   // 觉醒是“本局”投资（随转生重置），但灵魂精华转生后保留，鼓励玩家转生；转生的 prestigeMult 才是永久加成。
-  bossEssenceDivisor: 10,    // 每过这么多关，Boss 掉落精华 +1：floor(stage/10)
+  bossEssenceDivisor: 5,    // 每过这么多关，Boss 掉落精华 +1：floor(stage/5)
   awakenCostBase: 5,         // 单次觉醒基础精华消耗（所有英雄相同，不随梯度）
   awakenCostGrowth: 2.2,     // 同一英雄再次觉醒消耗 ×2.2（越叠越贵，鼓励分散给多英雄）
   awakenGlobalBonus: 0.05,   // 每觉醒任意英雄 1 次，全队英雄伤害 +5% [PLACEHOLDER]

@@ -886,12 +886,10 @@ const GEAR_SKILL_IDS = GEARS.map(g=>g.skillId);
 /* =========================================================================
    1.6) 音效系统（Web Audio API 合成，无外部文件）
    ========================================================================= */
-let sfxOn = true;
-let notifOn = true;
 let _audioCtx = null;
 function _getAudioCtx(){ if(!_audioCtx) try{_audioCtx=new(window.AudioContext||window.webkitAudioContext)();}catch(e){} return _audioCtx; }
 function playSfx(freq, dur, type){
-  if(!sfxOn || state.sfxOn === false) return;
+  if(state.sfxOn === false) return;
   const ctx = _getAudioCtx(); if(!ctx) return;
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
@@ -1560,7 +1558,7 @@ function adaptDifficulty(){
 
 // 难度变化时的轻提示（右上角短暂出现）
 function diffToast(msg){
-  if(!notifOn || state.notifOn === false) return;  // 用户关闭了通知
+  if(state.notifOn === false) return;  // 用户关闭了通知
   const t = document.getElementById("diffToast");
   if(!t) return;
   t.textContent = msg;
@@ -2101,7 +2099,7 @@ function showNextAchToast(){
   if(achToastQueue.length === 0){ achToastShowing = false; return; }
   achToastShowing = true;
   const id = achToastQueue.shift();
-  if(!notifOn){ setTimeout(showNextAchToast, 50); return; }  // 通知关闭时直接跳过显示
+  if(state.notifOn === false){ setTimeout(showNextAchToast, 50); return; }
   const ach = ACHIEVEMENTS[id];
   const t = document.getElementById("diffToast");
   if(!t){ setTimeout(showNextAchToast, 300); return; }
@@ -3172,10 +3170,9 @@ function importSave(){
 }
 function init(){
   load();
-  // 恢复开关状态
-  sfxOn = (state.sfxOn !== false); notifOn = (state.notifOn !== false);
-  const sfxBtn = document.getElementById("sfxToggle"); if(sfxBtn) sfxBtn.textContent = sfxOn ? "🔊" : "🔇";
-  const nfBtn = document.getElementById("notifToggle"); if(nfBtn) nfBtn.textContent = notifOn ? "📢" : "🔕";
+  // 恢复开关按钮显示
+  const sfxBtn = document.getElementById("sfxToggle"); if(sfxBtn) sfxBtn.textContent = state.sfxOn !== false ? "🔊" : "🔇";
+  const nfBtn = document.getElementById("notifToggle"); if(nfBtn) nfBtn.textContent = state.notifOn !== false ? "📢" : "🔕";
   // 确保英雄等级字段齐全
   HEROES.forEach(h=>{ if(state.heroes[h.id]===undefined) state.heroes[h.id]=0; if(state.awaken[h.id]===undefined) state.awaken[h.id]=0; });
   dynGrowth = state.dynGrowth !== undefined ? state.dynGrowth : CONFIG.enemyHpGrowth;
@@ -3234,8 +3231,8 @@ function init(){
   document.getElementById("gearClose").addEventListener("click", closeGearPage);
   document.getElementById("achBtn").addEventListener("click", openAchPage);
   document.getElementById("achClose").addEventListener("click", closeAchPage);
-  document.getElementById("sfxToggle").addEventListener("click", ()=>{ sfxOn=!sfxOn; state.sfxOn=sfxOn; document.getElementById("sfxToggle").textContent=sfxOn?"🔊":"🔇"; save(); });
-  document.getElementById("notifToggle").addEventListener("click", ()=>{ notifOn=!notifOn; state.notifOn=notifOn; document.getElementById("notifToggle").textContent=notifOn?"📢":"🔕"; save(); });
+  document.getElementById("sfxToggle").addEventListener("click", ()=>{ state.sfxOn = !(state.sfxOn !== false); document.getElementById("sfxToggle").textContent = state.sfxOn !== false ? "🔊" : "🔇"; save(); });
+  document.getElementById("notifToggle").addEventListener("click", ()=>{ state.notifOn = !(state.notifOn !== false); document.getElementById("notifToggle").textContent = state.notifOn !== false ? "📢" : "🔕"; save(); });
   document.getElementById("exportBtn").addEventListener("click", exportSave);
   document.getElementById("importBtn").addEventListener("click", importSave);
   document.getElementById("shareBtn").addEventListener("click", openHall);

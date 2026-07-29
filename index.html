@@ -195,6 +195,7 @@
   /* 通用战力提升行（英雄卡与点击强化卡共用）：绿色高亮，明确显示本次可提升的战力 */
   .card .power{ font-size:11px; color:var(--green); font-weight:800; margin-top:3px; }
 
+  .g-upcost{ font-size:11px; color:var(--muted); margin:4px 0 2px; }
   /* 主动技能面板（能量+冷却） */
   .skills{ display:flex; flex-direction:column; gap:6px; margin-bottom:10px; }
   .skill{ display:flex; align-items:center; gap:10px; background:var(--panel); border-radius:12px; padding:8px 10px; }
@@ -2895,11 +2896,21 @@ function gearUpgradeCost(gear){
   const discount = Math.min(0.9, artForgeDiscount());
   return Math.max(1, Math.ceil(GEAR_CONFIG.upgradeBaseCost * Math.pow(GEAR_CONFIG.upgradeGrowth, gear.level-1) * (1 - discount)));
 }
+function gearDustCost(gear){ // Lv.100+ 用碎片升级
+  return 5 + Math.floor((gear.level - 100) / 5);
+}
 function upgradeGearObj(gear){
   if(!gear) return false;
-  const cost = gearUpgradeCost(gear);
-  if(state.gold < cost){ diffToast("⚠ 金币不足（需 "+fmt(cost)+"）"); return false; }
-  state.gold -= cost; gear.level++; return true;
+  if(gear.level < 100){
+    const cost = gearUpgradeCost(gear);
+    if(state.gold < cost){ diffToast("⚠ 金币不足（需 "+fmt(cost)+"）"); return false; }
+    state.gold -= cost; gear.level++;
+  } else {
+    const cost = gearDustCost(gear);
+    if(state.gearDust < cost){ diffToast("⚠ 碎片不足（需 "+cost+"）"); return false; }
+    state.gearDust -= cost; gear.level++;
+  }
+  return true;
 }
 function breakthroughGearObj(gear){
   if(!gear) return false;
@@ -3099,7 +3110,10 @@ function renderGearPage(){
       else h += '<span class="gs-cost">消耗 '+si.energyCost+' 能 · CD '+si.cooldown+'s</span>';
       h += '<span class="gs-desc">'+si.desc+'</span></span></div>';
     }
+    // upgrade cost display
+    const upCost = g.level < 100 ? fmt(gearUpgradeCost(g))+" 金" : gearDustCost(g)+" 碎片";
     // buttons
+    h += '<div class="g-upcost">升级需 '+upCost+'</div>';
     h += '<div class="g-btns">';
     if(isSlot){
       h += '<button data-act="up-slot" data-slot="'+slotOrIdx+'">升级</button><button data-act="bt-slot" data-slot="'+slotOrIdx+'">突破</button><button data-act="unequip" data-slot="'+slotOrIdx+'">卸下</button>';

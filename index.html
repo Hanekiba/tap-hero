@@ -682,7 +682,7 @@ const CONFIG = {
   tapCostGrowth: 1.15, // 每次升级花费 ×1.15
 
   enemyHpBase: 10,     // 第1关敌人血量
-  enemyHpGrowth: 1.15, // 每过一关敌人血量 ×1.15（自适应浮动 ±0.04，原 1.18）
+  enemyHpGrowth: 1.16, // 每过一关敌人血量 ×1.16（自适应浮动 ±0.04）
   bossEvery: 5,        // 每5关一个 Boss（血量×10）
   bossHpMult: 10,
   bossTimeLimit: 30,   // Boss 关限时(秒)：时间内没击杀则 Boss 失败，退回上一小怪关练级（普通关不受影响）
@@ -690,7 +690,7 @@ const CONFIG = {
   monstersPerStage: 10, // 普通关卡的小怪数量（Boss 关固定 1 只）
 
   goldBase: 5,         // 第1关击杀给的金币
-  goldGrowth: 1.08,    // 每过一关金币 ×1.08（原 1.13 过快，200 关就能买完全部英雄）
+  goldGrowth: 1.10,    // 每过一关金币 ×1.10（平衡推关节奏）
 
   critChance: 0.05,    // 暴击概率 5%
   critMult: 5,         // 暴击伤害 ×5
@@ -746,8 +746,8 @@ const CONFIG = {
 // 思路：把“每关血量成长系数”当成一个会自我修正的移动目标，让游戏始终停在
 // “有挑战但不卡死”的区间，而不是被英雄DPS反超(秒杀无聊)或把人卡死(弃游)。
 const DIFF = {
-  minGrowth: 1.08,   // 难度下限
-  maxGrowth: 1.25,   // 难度上限
+  minGrowth: 1.09,   // 难度下限
+  maxGrowth: 1.26,   // 难度上限
   step: 0.01,        // 每次调整幅度
   oneShotStreakNeed: 3, // 连续几关“秒杀级”才上调一次难度（带迟滞，防抖动）
   hardSeconds: 40,   // 一关耗时超过这么久算“卡关”，下调难度帮玩家一把

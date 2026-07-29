@@ -1188,7 +1188,7 @@ function applyOfflineEarnings(){
   const hp = enemyMaxHp(state.stage);
   const killsPerSec = dps / hp;
   const goldPerSec = killsPerSec * goldReward(state.stage);
-  const rate = CONFIG.offlineRate + gearOfflineRate() + artOfflineRate();
+  const rate = CONFIG.offlineRate + gearOfflineRate() + artOfflineRate() + skillOfflineBoost();
   const earned = Math.floor(goldPerSec * capped * rate);
   if(earned <= 0) return;
   state.gold += earned;
@@ -3029,6 +3029,10 @@ function skillTapMult(){
 function skillGoldMult(){
   if((state.skillActive.gold_skill||0) > 0){ const def = GEARS.find(g=>g.skillId==="gold_skill"); return (def ? def.skill.goldMult : 5) * gearSkillMult(); }
   return 1;
+}
+function skillOfflineBoost(){ // 离线加速技能生效时，离线效率额外提升
+  if((state.skillActive.offline_boost||0) > 0){ const def = GEARS.find(g=>g.skillId==="offline_boost"); return (def ? def.skill.offlineBoost : 1) * gearSkillMult(); }
+  return 0;
 }
 
 /* =========================================================================

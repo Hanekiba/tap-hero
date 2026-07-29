@@ -811,7 +811,7 @@ const HEROES = [
    神器系统配置（v1.3，21 神器）+ 装备×技能系统配置（v1.1，12 装备/4槽/10连携）
    这些常量仅被下方定义的函数在运行期调用；本块位于 init() 之前，运行期均可用。
    ========================================================================= */
-const MAIN_AFFIX_BASE = { tapDmg:0.15, dps:0.15, global:0.15, critChance:0.10, gold:0.15 };
+const MAIN_AFFIX_BASE = { tapDmg:0.15, dps:0.15, global:0.15, critChance:0.10, gold:0.15, comboMax:0.04 };
 function rarCoeff(r){ return (GEAR_RARITY[r]||GEAR_RARITY.common).mainCoeff; }
 
 const ARTIFACTS = [
@@ -874,7 +874,7 @@ const GEARS = [
   { id:"resonance_badge",name:"共鸣勋章",emoji:"🎖️", type:"badge", skillId:"resonance",
     mainAffix:"global", skill:{name:"共鸣",icon:"🔗",energyCost:35,duration:8,cooldown:50,dpsMult:3,needCombo:0.5, desc:"连击≥50%时DPS×3，持续8秒"}, school:"hybrid" },
   { id:"berserker_badge",name:"战狂勋章",emoji:"🏅", type:"badge", skillId:"rage_combo",
-    mainAffix:"comboMax", skill:{name:"暴怒连打",icon:"👊",energyCost:25,cooldown:30,hits:5, desc:"立即进行5次点击伤害"}, school:"tap" },
+    mainAffix:"comboMax", skill:{name:"暴怒连打",icon:"👊",energyCost:25,cooldown:30,hits:5, desc:"立即造成5次×DPS伤害"}, school:"tap" },
   { id:"gale_badge",    name:"疾风勋章", emoji:"🎗️", type:"badge", skillId:"combo_storm",
     mainAffix:"global", skill:{name:"连击风暴",icon:"🌪️",energyCost:35,duration:6,cooldown:45, desc:"连击锁满且不衰减，持续6秒"}, school:"tap" },
 ];
@@ -1321,12 +1321,13 @@ function applySkillEffect(skillId, sk, durBonus){
     case "berserk":      state.skillActive.berserk = dur + durBonus; break;
     case "combo_storm":  state.skillActive.combo_storm = dur; break;
     case "deadly_crit":  state.skillActive.deadly_crit = dur; break;
-    case "rage_combo": { // 即时：N 次点击伤害；连携6暴击抢杀：致命暴击生效时必定暴击
+    case "rage_combo": { // 即时：N 次×DPS 伤害；连携暴击抢杀：致命暴击生效时翻倍
+      const dps = totalDps();
       const critActive = (state.skillActive.deadly_crit||0) > 0;
       const critExecute = activeSynergies().find(s => s.id === "crit_execute");
       for(let i=0;i<sk.hits;i++){
-        if(critActive && critExecute) dealDamage(tapDamage() * (CONFIG.critMult + gearCritMult() + artCritMult()));
-        else dealDamage(tapDamage());
+        if(critActive && critExecute) dealDamage(dps * 2);
+        else dealDamage(dps);
       }
       break;
     }

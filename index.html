@@ -1953,9 +1953,13 @@ function renderShop(){
       const m = maxAffordable(h.baseCost, h.growth, lv, state.gold);
       buyN = m.count; buyCost = m.cost; buyAfford = buyN >= 1;
     } else if(buyAmount === "round"){
-      buyN = Math.ceil((lv+1)/10)*10 - lv;
-      buyCost = costForN(h.baseCost, h.growth, lv, buyN);
-      buyAfford = state.gold >= buyCost;
+      // 取整：在金币允许范围内尽可能买到最大整数十级
+      const max = maxAffordable(h.baseCost, h.growth, lv, state.gold);
+      const maxLv = lv + max.count;
+      const targetLv = Math.floor(maxLv / 10) * 10; // 向下取整十
+      buyN = targetLv - lv;
+      buyCost = buyN > 0 ? costForN(h.baseCost, h.growth, lv, buyN) : 0;
+      buyAfford = buyN >= 1;
     } else {
       buyN = buyAmount;
       buyCost = costForN(h.baseCost, h.growth, lv, buyN);

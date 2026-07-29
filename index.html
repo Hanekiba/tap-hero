@@ -612,7 +612,7 @@
     <div class="overlay-head"><h2>✨ 神器</h2><button id="artClose" class="ov-close">✕</button></div>
     <div class="art-bar">
       <span>粉尘 <b id="artDust">0</b></span>
-      <span>图鉴 <b id="artOwned">0/22</b></span>
+      <span>图鉴 <b id="artOwned">0/23</b></span>
       <button id="artPull" class="buy">单抽(<span id="artCost1"></span>精)</button>
       <button id="artPull10" class="buy">十连(<span id="artCost10"></span>精)</button>
     </div>
@@ -839,6 +839,7 @@ const ARTIFACTS = [
   { id:"genesis",    name:"创世之心", emoji:"💎", rarity:"legendary", effect:"energyMax",     perLevel:5,    maxLevel:20, desc:"能量上限 +5/级" },
   { id:"dice",       name:"命运骰子", emoji:"🎲", rarity:"legendary", effect:"prestigeDouble", perLevel:0.01, maxLevel:30, desc:"转生点数 +1%/级概率翻倍" },
   { id:"pantheon",   name:"万神殿",   emoji:"🏛️", rarity:"legendary", effect:"synergyGlobal", perLevel:0.005, maxLevel:20, desc:"每拥有1个其他神器，全神器效果 +0.5%/级" },
+  { id:"guardGoblet",name:"守护圣杯", emoji:"🏆", rarity:"legendary", effect:"blessing",    perLevel:0.2,  maxLevel:30, desc:"Boss关限时 +0.2秒/级；满能量时自动释放技能" },
   { id:"resetStone", name:"转生基石", emoji:"🪨", rarity:"legendary", effect:"startStage", perLevel:5, maxLevel:80, desc:"转生后初始关卡 +5/级" },
 ];
 const ARTIFACT_RARITY = {
@@ -872,8 +873,8 @@ const GEARS = [
     mainAffix:"critChance", skill:{name:"致命暴击",icon:"🎯",energyCost:30,duration:10,cooldown:40,critChanceBonus:0.4,critMultBonus:2.0, desc:"暴击率+40%，暴击伤害+200%，持续10秒"}, school:"tap" },
   { id:"greed_ring",    name:"贪婪戒指", emoji:"💍", type:"ring", skillId:"gold_skill",
     mainAffix:"gold", skill:{name:"黄金",icon:"💰",energyCost:50,duration:20,cooldown:100,goldMult:5, desc:"金币获取×5，持续20秒"}, school:"universal" },
-  { id:"guard_ring",    name:"守护戒指", emoji:"💍", type:"ring", skillId:"guard",
-    mainAffix:"global", skill:{name:"守护",icon:"🛡️",passive:true,bossTimeBonus:5,autoShot:true, desc:"被动：Boss关限时+5秒；满能量时自动释放最低能耗技能"}, school:"universal" },
+  { id:"guard_ring",    name:"守护戒指", emoji:"💍", type:"ring", skillId:"drain",
+    mainAffix:"global", skill:{name:"汲取",icon:"🩸",energyCost:40,cooldown:40,pct:0.15, desc:"造成当前怪物15%最大HP伤害"}, school:"universal" },
   { id:"resonance_badge",name:"共鸣勋章",emoji:"🎖️", type:"badge", skillId:"resonance",
     mainAffix:"global", skill:{name:"共鸣",icon:"🔗",energyCost:35,duration:8,cooldown:50,dpsMult:3,needCombo:0.5, desc:"连击≥50%时DPS×3，持续8秒"}, school:"hybrid" },
   { id:"berserker_badge",name:"战狂勋章",emoji:"🏅", type:"badge", skillId:"rage_combo",
@@ -917,7 +918,7 @@ const SYNERGIES = [
   { id:"crit_execute", name:"暴击抢杀", skillIds:["deadly_crit","rage_combo"], desc:"致命暴击生效时，暴怒连打每秒8次自动点击全部暴击", bonus:{ target:"rage_combo", alwaysCrit:true } },
   { id:"triple_resonance", name:"共振双轨", skillIds:["resonance","dual_track","feedback"], desc:"三件齐配：共鸣×3→×5，反哺20%→35%，双轨+200%→+300%", bonus:{ target:"resonance", dpsMult:5, target2:"feedback", feedbackRate:0.35, target3:"dual_track", tapBonus:3.0, dpsBonus:3.0 } },
   { id:"gold_resonance", name:"黄金共鸣", skillIds:["gold_skill","resonance"], desc:"共鸣触发期间，击杀金币额外×2（叠加黄金×5即×10）", bonus:{ target:"gold_skill", resonanceGoldMult:2 } },
-  { id:"guard_burst", name:"守护爆发", skillIds:["guard","berserk"], desc:"守护+爆发技能：Boss+5s，爆发技能持续+3s", bonus:{ target:"berserk", durationBonus:3, targetAlt:["legion_charge","dual_track"], durationBonusAlt:3 } },
+  { id:"guard_burst", name:"守护爆发", skillIds:["drain","berserk"], desc:"汲取+爆发装备：爆发技能持续+3s", bonus:{ target:"berserk", durationBonus:3, targetAlt:["legion_charge","dual_track"], durationBonusAlt:3 } },
 ];
 const GEAR_SKILL_IDS = GEARS.map(g=>g.skillId);
 
@@ -1344,6 +1345,10 @@ function applySkillEffect(skillId, sk, durBonus){
       const spent = state.energy;
       state.energy = 0;
       dealDamage(totalDps() * spent * sk.dpsPerEnergy);
+      break;
+    }
+    case "drain": { // 即时：造成当前怪物最大HP的 pct 伤害
+      dealDamage(enemyMaxHp(state.stage) * sk.pct);
       break;
     }
     case "resonance":    state.skillActive.resonance = dur; break;
@@ -2020,7 +2025,7 @@ function allArtifactsMaxed(){
 }
 function gearBuildsAll3(){ const b = state.gearBuildsCompleted||{}; return !!(b.tap && b.dps && b.hybrid); }
 function allUltimateCombo(){
-  return state.totalPrestiges>=100 && allHeroesAwakened() && distinctArtifacts()>=22 && gearsSlotsFull() && ownedGearList().every(g=>g.rarity==="legendary");
+  return state.totalPrestiges>=100 && allHeroesAwakened() && distinctArtifacts()>=23 && gearsSlotsFull() && ownedGearList().every(g=>g.rarity==="legendary");
 }
 // 速通：转生后 5 分钟内再次到 100 关（离线时间不计入，用 lastPrestigeTime 比对）
 function speedrun100(){
@@ -2073,11 +2078,11 @@ const ACHIEVEMENTS = {
   // —— 神器（本轮未实装：cond 依赖 state.artifacts，自然降级）——
   A1:{ name:"神器初现", icon:"✨", cat:"artifact", diff:"easy", hidden:false, reward:"寻宝者", rewardType:"title", desc:"获得第1个神器", cond:s=>distinctArtifacts()>=1, prog:s=>p(distinctArtifacts(),1) },
   A2:{ name:"收藏家", icon:"📚", cat:"artifact", diff:"normal", hidden:false, reward:"收藏家", rewardType:"title", desc:"收集10个不同神器", cond:s=>distinctArtifacts()>=10, prog:s=>p(distinctArtifacts(),10) },
-  A3:{ name:"神器图鉴", icon:"📖", cat:"artifact", diff:"challenge", hidden:false, reward:"图鉴大师", rewardType:"title", desc:"收集全部22个神器", cond:s=>distinctArtifacts()>=22, prog:s=>p(distinctArtifacts(),22) },
+  A3:{ name:"神器图鉴", icon:"📖", cat:"artifact", diff:"challenge", hidden:false, reward:"图鉴大师", rewardType:"title", desc:"收集全部23个神器", cond:s=>distinctArtifacts()>=23, prog:s=>p(distinctArtifacts(),23) },
   A4:{ name:"召唤十连", icon:"🎰", cat:"artifact", diff:"easy", hidden:false, reward:"召唤", rewardType:"badge", desc:"累计召唤10次", cond:s=>(s.totalPulls||0)>=10, prog:s=>p(s.totalPulls,10) },
   A5:{ name:"重氪玩家", icon:"💎", cat:"artifact", diff:"challenge", hidden:false, reward:"召唤师", rewardType:"title", desc:"累计召唤50次", cond:s=>(s.totalPulls||0)>=50, prog:s=>p(s.totalPulls,50) },
   A6:{ name:"传说神器", icon:"🟡", cat:"artifact", diff:"challenge", hidden:false, reward:"神器传说", rewardType:"badge", desc:"获得1个传说神器", cond:s=>hasLegendaryArtifact() },
-  A7:{ name:"万神殿", icon:"🏛️", cat:"artifact", diff:"ultimate", hidden:false, ultimate:true, reward:"万神之光", rewardType:"frame", desc:"全部22神器均满级", cond:s=>allArtifactsMaxed() },
+  A7:{ name:"万神殿", icon:"🏛️", cat:"artifact", diff:"ultimate", hidden:false, ultimate:true, reward:"万神之光", rewardType:"frame", desc:"全部23神器均满级", cond:s=>allArtifactsMaxed() },
   // —— 技能 ——
   S1:{ name:"技能初试", icon:"⚡", cat:"skill", diff:"easy", hidden:false, reward:"施法者", rewardType:"title", desc:"释放第1次主动技能", cond:s=>(s.totalSkillUses||0)>=1, prog:s=>p(s.totalSkillUses,1) },
   S2:{ name:"技能老手", icon:"🎯", cat:"skill", diff:"normal", hidden:false, reward:"法师", rewardType:"title", desc:"累计释放100次技能", cond:s=>(s.totalSkillUses||0)>=100, prog:s=>p(s.totalSkillUses,100) },
@@ -2542,7 +2547,7 @@ function affixLabel(t){ return AFFIX_LABELS[t] || t; }
 function pct(x){ return (x*100).toFixed(1) + "%"; }
 function slotName(s){ return {weapon:"武器",armor:"护甲",ring:"戒指",badge:"勋章"}[s] || s; }
 function gearSkillInfo(g){
-  const def = GEARS.find(d=>d.id===g.id);
+  const def = GEARS.find(d=>d.id===g.typeId);
   if(!def||!def.skill) return null;
   const sk = def.skill;
   return { emoji:sk.icon||"", name:sk.name, desc:sk.desc||"", passive:!!sk.passive, energyCost:sk.energyCost||0, cooldown:sk.cooldown||0 };
@@ -2588,6 +2593,7 @@ function artCritEnergy(){     return artSumByEffect("critEnergy") * artSynergyGl
 function artPrestigeDouble(){ return artSumByEffect("prestigeDouble"); }                // 不×协同
 function artOfflinePush(){    return Math.max(5, artSumByEffect("offlinePush") * artSynergyGlobal()); }
 function artStartStage(){     return Math.floor(artSumByEffect("startStage") * artSynergyGlobal()); }
+function artBossTime(){       return artSumByEffect("blessing") * artSynergyGlobal(); } // 守护圣杯
 function artOverkillTransfer(){ return artSumByEffect("overkillTransfer") * artSynergyGlobal(); }
 function artifactTotalMult(){ return artGlobalMult(); }
 
@@ -2810,21 +2816,9 @@ function gearCritMult(){     return gearSumByAffix("critMult"); }
 function gearComboMax(){     return gearSumByAffix("comboMax"); }
 function gearOfflineRate(){  return gearSumByAffix("offline"); }
 function gearSkillMult(){    return 1 + gearSumByAffix("skillDmg"); }
-function gearBossTime(){
-  let bonus = 0;
-  for(const gear of equippedGears()){
-    const def = GEARS.find(g => g.id === gear.typeId);
-    if(def && def.skill && def.skill.bossTimeBonus) bonus += def.skill.bossTimeBonus;
-  }
-  return bonus;
-}
-function hasAutoShot(){
-  for(const gear of equippedGears()){
-    const def = GEARS.find(g => g.id === gear.typeId);
-    if(def && def.skill && def.skill.autoShot) return true;
-  }
-  return false;
-}
+function gearBossTime(){   return artBossTime(); } // 旧装备被动→神器
+function hasAutoShot(){ return artHasAutoShot(); } // 旧装备被动→神器
+function artHasAutoShot(){ return (state.artifacts.guardGoblet || 0) > 0; }
 function isSkillEquipped(skillId){
   for(const gear of equippedGears()){
     const def = GEARS.find(g => g.id === gear.typeId);
@@ -3038,7 +3032,7 @@ function renderArtifactPage(){
   const page = document.getElementById("artPage"); if(!page) return;
   const dust = document.getElementById("artDust"); if(dust) dust.textContent = fmt(state.artifactDust);
   let owned = 0; for(const a of ARTIFACTS) if((state.artifacts[a.id]||0) > 0) owned++;
-  const ow = document.getElementById("artOwned"); if(ow) ow.textContent = owned + "/22";
+  const ow = document.getElementById("artOwned"); if(ow) ow.textContent = owned + "/23";
   const c1 = document.getElementById("artCost1"); if(c1) c1.textContent = artifactPullCost(1);
   const c10 = document.getElementById("artCost10"); if(c10) c10.textContent = artifactPullCost(10);
   const p1 = document.getElementById("artPull"); if(p1) p1.disabled = state.essence < artifactPullCost(1);
@@ -3183,7 +3177,7 @@ function openHall(){
     ["最高关卡", state.bestStageEver || state.bestStage || 1],
     ["转生点数", state.prestige || 0],
     ["转生倍率", "×"+prestigeMult().toFixed(2)],
-    ["神器图鉴", owned.length+"/22"],
+    ["神器图鉴", owned.length+"/23"],
     ["成就解锁", achCount+"/50"],
     ["连续签到", state.dailyStreak||0],
     ["总点击", fmt(state.totalTaps||0)],

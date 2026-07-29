@@ -179,9 +179,14 @@
   .buy.awaken{background:linear-gradient(135deg,#7c5cff,#b06bff); color:#fff;}
   .buy.awaken:disabled{background:#4a3a6e; color:#8d7db5; cursor:not-allowed;}
   /* 英雄列表：已拥有的英雄全部显示 + 末尾露出一张“即将可购买”的下一个单位；整体更紧凑，给两个按钮留出空间 */
-  #heroList .card{ padding:8px 10px; }
-  #heroList .card .emoji{ font-size:26px; width:30px; }
-  #heroList .card .info .name{ font-size:13px; }
+  #heroList .card{ padding:6px 8px; }
+  #heroList .card .emoji{ font-size:22px; width:26px; }
+  #heroList .card .info .name{ font-size:12px; }
+  #heroList .card .info .sub{ font-size:10px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #heroList .card .info .power{ font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  #heroList .card .actions{ min-width:72px; gap:4px; }
+  #heroList .card .actions .buy{ padding:6px 8px; font-size:11px; min-width:66px; border-radius:8px; }
+  #heroList .card .actions .buy .c{ font-size:9px; }
   #heroList .card .info .sub{ font-size:10px; margin-top:1px; }
   #heroList .card .power{ font-size:11px; color:var(--green); font-weight:800; margin-top:3px; }
   #heroList .card .actions{ min-width:80px; gap:5px; }
@@ -2009,12 +2014,12 @@ function renderShop(){
     }
     // 英雄转生按钮
     const asc = state.ascend && state.ascend[h.id] || 0;
-    if(lv >= 100){
+    if(lv >= 1000){
       ref.asBtn.disabled = false;
       ref.asBtn.textContent = asc > 0 ? ("转生 ×"+asc) : "转生";
     } else {
       ref.asBtn.disabled = true;
-      ref.asBtn.textContent = "Lv.100 可转生";
+      ref.asBtn.textContent = "Lv.1000 可转生";
     }
   });
 }
@@ -2385,7 +2390,7 @@ function awakenHero(h){
 // 英雄转生：满100级可重置为1级，获得永久+50% DPS
 function ascendHero(h){
   const lv = state.heroes[h.id] || 0;
-  if(lv < 100) return;
+  if(lv < 1000) return;
   if(!state.ascend) state.ascend = {};
   state.ascend[h.id] = (state.ascend[h.id] || 0) + 1;
   state.heroes[h.id] = 1;

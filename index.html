@@ -1258,7 +1258,7 @@ function totalDps(){
   let dps = 0;
   for(const h of HEROES){
     const lv = state.heroes[h.id] || 0;
-    if(lv>0) dps += h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * awakenGlobalMult() * prestigeMult() * (state.awaken[h.id] >= 10 ? 10 : 1);
+    if(lv>0) dps += h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * awakenGlobalMult() * prestigeMult() * (state.awaken[h.id] >= 10 ? 100 : 1);
   }
   let mult = gearDpsMult() * gearGlobalMult() * artGlobalMult();
   // 军团冲锋（DPS流）：英雄DPS ×N
@@ -1952,7 +1952,7 @@ function renderShop(){
     const aw = state.awaken[h.id]||0;
     ref.lv.textContent = lv>0 ? ("Lv."+lv) : "";
     // 该英雄当前每秒贡献（受共鸣倍率影响）
-    const heroDpsNow = h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * mult * (aw >= 10 ? 10 : 1);
+    const heroDpsNow = h.baseDps * lv * Math.pow(1.35, Math.floor(lv/10)) * Math.pow(10, Math.floor(lv/1000)) * mult * (aw >= 10 ? 100 : 1);
     // 本次购买/升级的数量与花费（受批量购买数量影响）
     let buyN, buyCost, buyAfford;
     if(buyAmount === "max"){
@@ -1979,7 +1979,7 @@ function renderShop(){
     const milestoneMult = Math.pow(1.35, Math.floor(lv/10));
     const milleMult = Math.pow(10, Math.floor(lv/1000));
     const milestoneStr = lv >= 10 ? " · 每10级×1.35(已×"+milestoneMult.toFixed(1)+")" + (lv>=1000?" 每千级×10(已×"+milleMult.toFixed(0)+")":"") : (lv>0?"":"");
-    const awStr = aw >= 10 ? " · 觉醒×10" : (aw>0 ? " · 已觉醒×"+aw : "");
+    const awStr = aw >= 10 ? " · 觉醒×100" : (aw>0 ? " · 已觉醒×"+aw : "");
     ref.sub.textContent = lv>0
       ? ("当前每秒 +"+fmt(heroDpsNow)+" 伤害" + awStr + milestoneStr)
       : ("雇佣后每秒 +"+fmt(h.baseDps*mult)+" 伤害");

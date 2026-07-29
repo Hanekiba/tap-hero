@@ -1049,6 +1049,14 @@ function load(){
       const def = defaultState();
       for(const k in def){ if(state[k]===undefined) state[k] = def[k]; }
       state.version = SAVE_VERSION;
+      // 补丁：老装备对象缺少 mainAffix，从 GEARS 定义补上
+      for(const g of (state.gearInventory||[])){
+        if(!g.mainAffix){ const d = GEARS.find(x=>x.id===g.typeId); if(d) g.mainAffix = d.mainAffix; }
+      }
+      for(const s of ["weapon","armor","ring","badge"]){
+        const g = state.equipped && state.equipped[s];
+        if(g && !g.mainAffix){ const d = GEARS.find(x=>x.id===g.typeId); if(d) g.mainAffix = d.mainAffix; }
+      }
       for(const h of HEROES){
         if(state.heroes[h.id]===undefined) state.heroes[h.id]=0;
         if(state.awaken[h.id]===undefined) state.awaken[h.id]=0;
@@ -3049,8 +3057,9 @@ function renderGearPage(){
     const rar = GEAR_RARITY[g.rarity];
     const si = gearSkillInfo(g);
     let h = '<div class="g-head"><span class="g-emoji">'+g.emoji+'</span><span class="g-name">'+g.name+'</span><span class="g-rar" style="color:'+rar.color+'">'+rar.name+' Lv.'+g.level+'</span></div>';
-    // main affix
-    h += '<div class="g-main-affix"><span class="ga-label">主属性</span><span class="ga-val">'+affixLabel(g.mainAffix)+' <b>+'+pct(affixValue(g,g.mainAffix))+'</b></span></div>';
+    // main affix (render-time fallback if undefined)
+    const mAffix = g.mainAffix || (GEARS.find(x=>x.id===g.typeId)||{}).mainAffix;
+    h += '<div class="g-main-affix"><span class="ga-label">主属性</span><span class="ga-val">'+affixLabel(mAffix)+' <b>+'+pct(affixValue(g,mAffix))+'</b></span></div>';
     // sub affixes
     if(g.subAffixes && g.subAffixes.length>0){
       h += '<div class="g-sub-affix"><span class="ga-label">副属性</span><span class="ga-val">';

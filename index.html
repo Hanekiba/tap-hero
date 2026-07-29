@@ -2848,9 +2848,9 @@ function makeGear(def, rarity){
   }
   return gear;
 }
+function rollRarity(r){ return r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common"; }
 function rollGear(){
-  const r = Math.random();
-  const rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common";
+  const rarity = rollRarity(Math.random());
   const def = GEARS[Math.floor(Math.random()*GEARS.length)];
   return makeGear(def, rarity);
 }
@@ -2963,8 +2963,7 @@ function forgeGear(){
   const cost = GEAR_CONFIG.forgeRandomCost;
   if(state.essence < cost){ diffToast("⚠ 精华不足（需 "+cost+"）"); const fb=document.getElementById("forgeRandom"); if(fb){ fb.style.transition="none"; fb.style.background="#5a1a2a"; setTimeout(()=>{ fb.style.transition="background .5s"; fb.style.background=""; }, 50); } return; }
   state.essence -= cost; state.totalForgeCount++; state.totalEssenceSpentOnForge += cost;
-  const r = Math.random();
-  const rarity = r < 0.05 ? "legendary" : r < 0.20 ? "epic" : r < 0.50 ? "rare" : "common";
+  const rarity = rollRarity(Math.random());
   const pick = GEARS[Math.floor(Math.random()*GEARS.length)];
   const gear = makeGear(pick, rarity);
   if(autoSalvageGear(gear)){

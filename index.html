@@ -611,7 +611,7 @@
     <div class="overlay-head"><h2>✨ 神器</h2><button id="artClose" class="ov-close">✕</button></div>
     <div class="art-bar">
       <span>粉尘 <b id="artDust">0</b></span>
-      <span>图鉴 <b id="artOwned">0/21</b></span>
+      <span>图鉴 <b id="artOwned">0/22</b></span>
       <button id="artPull" class="buy">单抽(<span id="artCost1"></span>精)</button>
       <button id="artPull10" class="buy">十连(<span id="artCost10"></span>精)</button>
     </div>
@@ -836,6 +836,7 @@ const ARTIFACTS = [
   { id:"genesis",    name:"创世之心", emoji:"💎", rarity:"legendary", effect:"energyMax",     perLevel:5,    maxLevel:20, desc:"能量上限 +5/级" },
   { id:"dice",       name:"命运骰子", emoji:"🎲", rarity:"legendary", effect:"prestigeDouble", perLevel:0.01, maxLevel:30, desc:"转生点数 +1%/级概率翻倍" },
   { id:"pantheon",   name:"万神殿",   emoji:"🏛️", rarity:"legendary", effect:"synergyGlobal", perLevel:0.005, maxLevel:20, desc:"每拥有1个其他神器，全神器效果 +0.5%/级" },
+  { id:"resetStone", name:"转生基石", emoji:"🪨", rarity:"legendary", effect:"startStage", perLevel:5, maxLevel:80, desc:"转生后初始关卡 +5/级" },
 ];
 const ARTIFACT_RARITY = {
   common:    { name:"普通", color:"#9aa0b5", pullRate:0.50, upgradeMult:1 },
@@ -2015,7 +2016,7 @@ function allArtifactsMaxed(){
 }
 function gearBuildsAll3(){ const b = state.gearBuildsCompleted||{}; return !!(b.tap && b.dps && b.hybrid); }
 function allUltimateCombo(){
-  return state.totalPrestiges>=100 && allHeroesAwakened() && distinctArtifacts()>=21 && gearsSlotsFull() && ownedGearList().every(g=>g.rarity==="legendary");
+  return state.totalPrestiges>=100 && allHeroesAwakened() && distinctArtifacts()>=22 && gearsSlotsFull() && ownedGearList().every(g=>g.rarity==="legendary");
 }
 // 速通：转生后 5 分钟内再次到 100 关（离线时间不计入，用 lastPrestigeTime 比对）
 function speedrun100(){
@@ -2068,11 +2069,11 @@ const ACHIEVEMENTS = {
   // —— 神器（本轮未实装：cond 依赖 state.artifacts，自然降级）——
   A1:{ name:"神器初现", icon:"✨", cat:"artifact", diff:"easy", hidden:false, reward:"寻宝者", rewardType:"title", desc:"获得第1个神器", cond:s=>distinctArtifacts()>=1, prog:s=>p(distinctArtifacts(),1) },
   A2:{ name:"收藏家", icon:"📚", cat:"artifact", diff:"normal", hidden:false, reward:"收藏家", rewardType:"title", desc:"收集10个不同神器", cond:s=>distinctArtifacts()>=10, prog:s=>p(distinctArtifacts(),10) },
-  A3:{ name:"神器图鉴", icon:"📖", cat:"artifact", diff:"challenge", hidden:false, reward:"图鉴大师", rewardType:"title", desc:"收集全部21个神器", cond:s=>distinctArtifacts()>=21, prog:s=>p(distinctArtifacts(),21) },
+  A3:{ name:"神器图鉴", icon:"📖", cat:"artifact", diff:"challenge", hidden:false, reward:"图鉴大师", rewardType:"title", desc:"收集全部22个神器", cond:s=>distinctArtifacts()>=22, prog:s=>p(distinctArtifacts(),22) },
   A4:{ name:"召唤十连", icon:"🎰", cat:"artifact", diff:"easy", hidden:false, reward:"召唤", rewardType:"badge", desc:"累计召唤10次", cond:s=>(s.totalPulls||0)>=10, prog:s=>p(s.totalPulls,10) },
   A5:{ name:"重氪玩家", icon:"💎", cat:"artifact", diff:"challenge", hidden:false, reward:"召唤师", rewardType:"title", desc:"累计召唤50次", cond:s=>(s.totalPulls||0)>=50, prog:s=>p(s.totalPulls,50) },
   A6:{ name:"传说神器", icon:"🟡", cat:"artifact", diff:"challenge", hidden:false, reward:"神器传说", rewardType:"badge", desc:"获得1个传说神器", cond:s=>hasLegendaryArtifact() },
-  A7:{ name:"万神殿", icon:"🏛️", cat:"artifact", diff:"ultimate", hidden:false, ultimate:true, reward:"万神之光", rewardType:"frame", desc:"全部21神器均满级", cond:s=>allArtifactsMaxed() },
+  A7:{ name:"万神殿", icon:"🏛️", cat:"artifact", diff:"ultimate", hidden:false, ultimate:true, reward:"万神之光", rewardType:"frame", desc:"全部22神器均满级", cond:s=>allArtifactsMaxed() },
   // —— 技能 ——
   S1:{ name:"技能初试", icon:"⚡", cat:"skill", diff:"easy", hidden:false, reward:"施法者", rewardType:"title", desc:"释放第1次主动技能", cond:s=>(s.totalSkillUses||0)>=1, prog:s=>p(s.totalSkillUses,1) },
   S2:{ name:"技能老手", icon:"🎯", cat:"skill", diff:"normal", hidden:false, reward:"法师", rewardType:"title", desc:"累计释放100次技能", cond:s=>(s.totalSkillUses||0)>=100, prog:s=>p(s.totalSkillUses,100) },
@@ -2418,7 +2419,7 @@ function doPrestige(){
     comebackAfter10Fails: state.comebackAfter10Fails,
   };
   state = {
-    gold:0, stage:1, tapLevel:1, heroes:{}, essence:keepEssence, awaken: structuredClone(state.awaken||{}), enemyHp:0, monsterIndex:1,
+    gold:0, stage: 1 + artStartStage(), tapLevel:1, heroes:{}, essence:keepEssence, awaken: structuredClone(state.awaken||{}), enemyHp:0, monsterIndex:1,
     dynGrowth:CONFIG.enemyHpGrowth, bossLoop:false, lastSeen:keepLastSeen,
     prestige: keepPrestige, bestStage:1, energy:CONFIG.energyMax, skillActive:{}, skillCd:{}, combo:0, comboTimer:0, skillMastery: state.skillMastery,
     ...keepAch,
@@ -2555,6 +2556,7 @@ function artAwakenBonus(){    return artSumByEffect("awakenBonus") * artSynergyG
 function artCritEnergy(){     return artSumByEffect("critEnergy") * artSynergyGlobal(); }
 function artPrestigeDouble(){ return artSumByEffect("prestigeDouble"); }                // 不×协同
 function artOfflinePush(){    return Math.max(5, artSumByEffect("offlinePush") * artSynergyGlobal()); }
+function artStartStage(){     return Math.floor(artSumByEffect("startStage") * artSynergyGlobal()); }
 function artOverkillTransfer(){ return artSumByEffect("overkillTransfer") * artSynergyGlobal(); }
 function artifactTotalMult(){ return artGlobalMult(); }
 
@@ -3006,7 +3008,7 @@ function renderArtifactPage(){
   const page = document.getElementById("artPage"); if(!page) return;
   const dust = document.getElementById("artDust"); if(dust) dust.textContent = fmt(state.artifactDust);
   let owned = 0; for(const a of ARTIFACTS) if((state.artifacts[a.id]||0) > 0) owned++;
-  const ow = document.getElementById("artOwned"); if(ow) ow.textContent = owned + "/21";
+  const ow = document.getElementById("artOwned"); if(ow) ow.textContent = owned + "/22";
   const c1 = document.getElementById("artCost1"); if(c1) c1.textContent = artifactPullCost(1);
   const c10 = document.getElementById("artCost10"); if(c10) c10.textContent = artifactPullCost(10);
   const p1 = document.getElementById("artPull"); if(p1) p1.disabled = state.essence < artifactPullCost(1);
@@ -3150,7 +3152,7 @@ function openHall(){
     ["最高关卡", state.bestStageEver || state.bestStage || 1],
     ["转生点数", state.prestige || 0],
     ["转生倍率", "×"+prestigeMult().toFixed(2)],
-    ["神器图鉴", owned.length+"/21"],
+    ["神器图鉴", owned.length+"/22"],
     ["成就解锁", achCount+"/50"],
     ["连续签到", state.dailyStreak||0],
     ["总点击", fmt(state.totalTaps||0)],
